@@ -3,111 +3,124 @@ import pandas as pd
 import altair as alt
 
 # 1. Page Config
-st.set_page_config(page_title="Trump Action Tracker", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="Trump Action Tracker", 
+    layout="wide", 
+    initial_sidebar_state="expanded"
+)
 
 # 2. Load and Clean Data
 @st.cache_data
 def load_data():
-    # Skipping first 2 lines based on the CSV structure provided
+    # Load data skipping the first 2 lines of metadata
     df = pd.read_csv('trump-actions.csv', skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date')
     
-    # Identify category columns (everything after URL)
+    # Identify category columns (everything after 'URL')
     cat_cols = df.columns[4:].tolist()
     
-    # Create a helper for tooltips
+    # Helper for tooltips to show all tags an action has
     def get_active_cats(row):
         return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
     df['Active_Categories'] = df.apply(get_active_cats, axis=1)
-    
-    # Calculate Cumulative Count for the progression line
-    daily = df.groupby('Date')['Index'].nunique().reset_index()
-    daily = daily.sort_values('Date')
-    daily['Cumulative'] = daily['Index'].cumsum()
-    return df, daily, cat_cols
+    return df, cat_cols
 
-df, daily, cat_cols = load_data()
+df, cat_cols = load_data()
 
-# 3. Sidebar Filters
+# 3. Sidebar Navigation & Reset
 st.sidebar.title("Navigation & Filters")
-st.sidebar.markdown("Use these to drill down into specific policy areas.")
 
-selected_cat = st.sidebar.selectbox("Filter by Policy Category", ["All Actions"] + cat_cols)
+if st.sidebar.button("🔄 Reset All Filters"):
+    st.rerun()
 
-# Apply the bulletproof filtering logic
+selected_cat = st.sidebar.selectbox(
+    "Filter by Policy Category", 
+    ["All Actions"] + cat_cols,
+    help="Select a specific category to see its progression and related actions."
+)
+
+# 4. Bulletproof Filtering Logic
 if selected_cat != "All Actions":
-    display_df = df[df[selected_cat].fillna('No').astype(str).str.strip().str.lower() == 'yes']
+    # Using the bulletproof string cleaning to ensure 'Yes' is caught correctly
+    display_df = df[df[selected_cat].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
 else:
-    display_df = df
+    display_df = df.copy()
 
-# 4. Main Dashboard UI - Header & Intro
+# 5. Dynamic Cumulative Calculation (This fixes the 'graph not changing' issue)
+filtered_daily = display_df.groupby('Date')['Index'].nunique().reset_index()
+filtered_daily = filtered_daily.sort_values('Date')
+filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
+
+# Merge the dynamic cumulative count back to the display_df for accurate Y-axis plotting
+display_df = display_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
+
+# 6. Header & Intro
 st.title("🏛️ Trump Action Tracker")
 
-# Move Source/Credit to the top as requested
 st.markdown("""
 **Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0 License
 """)
 
-# Intro for Context
 st.info("""
 **Context:** Documenting the actions, statements, and plans of President Trump and his administration 
 that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.
 """)
 
-# Metric Row
-col1, col2 = st.columns(2)
-col1.metric("Total Actions Documented", len(df))
-col2.metric("Latest Update", df['Date'].max().strftime('%B %d, %Y'))
+# Metrics
+col1, col2, col3 = st.columns(3)
+col1.metric("Actions in View", len(display_df))
+col2.metric("Total in Database", len(df))
+col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
 
-# 5. The Progression Chart
-st.subheader("Action Progression Over Time")
+# 7. High-Contrast Red Interactive Chart
+st.subheader(f"Timeline Progression: {selected_cat}")
 
-# Main trend line using #DE0100
-line = alt.Chart(daily).mark_line(
+# The Red Trendline
+line = alt.Chart(filtered_daily).mark_line(
     color='#DE0100', 
-    strokeWidth=3, 
+    strokeWidth=4, 
     interpolate='step-after'
 ).encode(
     x=alt.X('Date:T', title='Timeline'),
     y=alt.Y('Cumulative:Q', title='Cumulative Actions')
 )
 
-# Interactive hover points
-points = alt.Chart(df).mark_circle(size=60, color='#1d3557', opacity=0.4).encode(
+# High-Contrast Points: Using white/light-grey points with red borders 
+# so they stay visible against the dark line and dark backgrounds.
+points = alt.Chart(display_df).mark_circle(
+    size=80, 
+    color='white',      # Light fill for contrast
+    opacity=0.6, 
+    stroke='#DE0100',   # Red border to match theme
+    strokeWidth=1.5
+).encode(
     x='Date:T',
+    y='Cumulative:Q',
     tooltip=[
-        alt.Tooltip('Date:T', title='Date'),
+        alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
         alt.Tooltip('Title:N', title='Action'),
         alt.Tooltip('Active_Categories:N', title='Categories'),
-        alt.Tooltip('URL:N', title='Source')
+        alt.Tooltip('URL:N', title='Source URL')
     ]
-).transform_lookup(
-    lookup='Date',
-    from_=alt.LookupData(daily, 'Date', ['Cumulative'])
-).encode(y='Cumulative:Q')
-
-st.altair_chart((line + points).interactive(), use_container_width=True)
-
-# 6. Searchable Data Vault
-st.subheader("Data Vault")
-search_query = st.text_input("Search titles or descriptions...", "")
-
-if search_query:
-    filtered_df = display_df[display_df['Title'].str.contains(search_query, case=False, na=False)]
-else:
-    filtered_df = display_df
-
-st.dataframe(
-    filtered_df[['Date', 'Title', 'Active_Categories', 'URL']], 
-    column_config={
-        "URL": st.column_config.LinkColumn("Source Link"),
-        "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")
-    },
-    use_container_width=True,
-    hide_index=True
 )
 
-st.markdown("---")
-st.caption("Updated via GitHub Integration. For educational and research purposes.")
+# Layer them and make interactive
+final_chart = (line + points).interactive().properties(height=500)
+st.altair_chart(final_chart, use_container_width=True)
+
+# 8. Searchable Data Vault
+st.subheader("Data Vault")
+search_query = st.text_input("Search titles or descriptions...", placeholder="Type to filter table...")
+
+if search_query:
+    filtered_table = display_df[display_df['Title'].str.contains(search_query, case=False, na=False)]
+else:
+    filtered_table = display_df
+
+st.dataframe(
+    filtered_table[['Date', 'Title', 'Active_Categories', 'URL']], 
+    column_config={
+        "URL": st.column_config.LinkColumn("Source Link"),
+        "Date": st.column_config.DateColumn("
