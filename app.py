@@ -12,7 +12,7 @@ st.set_page_config(
 # 2. Load and Clean Data
 @st.cache_data
 def load_data():
-    # Load data skipping the first 2 lines of metadata
+    # Load data skipping metadata lines
     df = pd.read_csv('trump-actions.csv', skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date')
@@ -20,7 +20,7 @@ def load_data():
     # Identify category columns (everything after 'URL')
     cat_cols = df.columns[4:].tolist()
     
-    # Helper for tooltips to show all tags an action has
+    # Helper for tooltips
     def get_active_cats(row):
         return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
@@ -29,72 +29,46 @@ def load_data():
 
 df, cat_cols = load_data()
 
-# 3. Sidebar Navigation & Reset
+# 3. Sidebar Navigation
 st.sidebar.title("Navigation & Filters")
-
-if st.sidebar.button("🔄 Reset All Filters"):
-    st.rerun()
+st.sidebar.info("To reset the view, simply select 'All Actions' from the dropdown below.")
 
 selected_cat = st.sidebar.selectbox(
     "Filter by Policy Category", 
     ["All Actions"] + cat_cols,
-    help="Select a specific category to see its progression and related actions."
+    help="Selecting a category will filter both graphs and the data table."
 )
 
-# 4. Bulletproof Filtering Logic
+# 4. Filtering Logic
 if selected_cat != "All Actions":
-    # Ensure empty cells don't break the string comparison
     display_df = df[df[selected_cat].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
 else:
     display_df = df.copy()
 
-# 5. Dynamic Cumulative Calculation (Ensures graph updates on filter)
+# Dynamic Cumulative Calculation
 filtered_daily = display_df.groupby('Date')['Index'].nunique().reset_index()
 filtered_daily = filtered_daily.sort_values('Date')
 filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
 
-# Merge back to display_df so points align with the new line height
+# Merge back for point alignment
 display_df = display_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 6. Header & Intro
+# 5. Header & Intro
 st.title("🏛️ Trump Action Tracker")
+st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0 License")
 
-st.markdown("""
-**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0 License
-""")
+st.info("**Context:** Documenting the actions, statements, and plans of President Trump and his administration that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.")
 
-st.info("""
-**Context:** Documenting the actions, statements, and plans of President Trump and his administration 
-that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.
-""")
-
-# Metrics Row
-col1, col2, col3 = st.columns(3)
-col1.metric("Actions in View", len(display_df))
-col2.metric("Total in Database", len(df))
-col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
-
-# 7. High-Contrast Chart Overhaul
+# 6. Progression Graph
 st.subheader(f"Timeline Progression: {selected_cat}")
+st.caption("💡 Hover over any point to see the specific action and the 'Category' flags it triggered (many actions fall into multiple categories).")
 
-# The Bold Red Trendline
-line = alt.Chart(filtered_daily).mark_line(
-    color='#DE0100', 
-    strokeWidth=4, 
-    interpolate='step-after'
-).encode(
+line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
     x=alt.X('Date:T', title='Timeline'),
     y=alt.Y('Cumulative:Q', title='Cumulative Actions')
 )
 
-# High-Contrast Points (White fill with Red border for visibility)
-points = alt.Chart(display_df).mark_circle(
-    size=90, 
-    color='white',      # Pop against dark backgrounds
-    opacity=0.8, 
-    stroke='#DE0100',   # Match the line color
-    strokeWidth=2
-).encode(
+points = alt.Chart(display_df).mark_circle(size=90, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
     x='Date:T',
     y='Cumulative:Q',
     tooltip=[
@@ -105,10 +79,32 @@ points = alt.Chart(display_df).mark_circle(
     ]
 )
 
-final_chart = (line + points).interactive().properties(height=500)
-st.altair_chart(final_chart, use_container_width=True)
+st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# 8. Searchable Data Vault (Corrected Syntax for st.column_config)
+# 7. Category Summary Bar Graph
+st.divider()
+st.subheader("Action Volume by Category")
+st.markdown("This graph shows the total count of actions tagged under each category in the current view.")
+
+# Calculate counts for bar chart
+cat_counts = []
+for col in cat_cols:
+    count = (display_df[col].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
+    cat_counts.append({'Category': col, 'Count': count})
+
+bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
+
+# Bar chart with a short description label (using the Category name as the proxy for description)
+bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
+    x=alt.X('Count:Q', title='Number of Actions'),
+    y=alt.Y('Category:N', sort='-x', title=None),
+    tooltip=['Category:N', 'Count:Q']
+).properties(height=400)
+
+st.altair_chart(bar_chart, use_container_width=True)
+
+# 8. Data Vault
+st.divider()
 st.subheader("Data Vault")
 search_query = st.text_input("Search titles or descriptions...", placeholder="Type to filter table...")
 
@@ -129,5 +125,4 @@ st.dataframe(
     hide_index=True
 )
 
-st.markdown("---")
-st.caption("Site deployed via Streamlit Cloud. Data updated to Feb 2026.")
+st.caption("Updated to Feb 2026. Interactive dashboard maintained for research and documentation.")
