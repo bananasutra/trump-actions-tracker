@@ -123,20 +123,14 @@ points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, s
     ]
 )
 
-# 7b. GLOBAL CONFIG (The Fix for 'LayerChart' error)
-# We apply configuration to the combined chart object
+# 7b. GLOBAL CONFIG (RESTORED BACKGROUND)
+# Removed the white background fill and the tooltip config that caused the crash.
 final_progression_chart = (line + points).interactive().configure_view(
     stroke=None
 ).configure_axis(
     grid=False
-).configure_legend(
-    orient='bottom'
-).configure_view(
-    fill='#f9f9f9'
 )
 
-# Streamlit-specific: We can't always use configure_tooltip on layered charts, 
-# so we ensure the chart renders and use standard styling.
 st.altair_chart(final_progression_chart, use_container_width=True)
 
 st.caption("💡 **Desktop:** Hover to see details. **Click** any point to open source URL in a new window.")
