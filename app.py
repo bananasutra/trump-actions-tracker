@@ -65,12 +65,12 @@ col1.metric("Actions in View", len(display_df))
 col2.metric("Total in Database", len(df))
 col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
 
-# 6. Progression Graph (With Click Function & Warning)
+# 6. Progression Graph (With Click Function & Smaller Notes)
 st.subheader(f"Timeline Progression: {selected_cat}")
-st.caption("💡 **Hover** to see details. **Click** any point to open source URL in a new window.")
 
-# Specific warning about external sites
-st.warning("⚠️ **Note on Links:** Source URLs will open in a new window. Some sites (like *The Guardian* or the *NYTimes*) block direct opening from external apps.")
+# Link usage and browser notes in smaller font
+st.caption("💡 **Hover** to see details. **Click** any point to open source URL in a new window.")
+st.caption("⚠️ **Note on Links:** Source URLs will open in a new window. Some sites (like *The Guardian* or the *NYTimes*) block direct opening from external apps.")
 
 line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
     x=alt.X('Date:T', title='Timeline'),
@@ -133,7 +133,7 @@ with insight_col1:
 
 with insight_col2:
     st.write("### Diversity of Action")
-    st.write(f"Many individual actions are multi-classified. On average, each action triggers **{avg_cats:.1f} category flags**, indicating that policy shifts (like EPA rollbacks) often impact multiple institutional norms simultaneously.")
+    st.write(f"Many individual actions are multi-classified. On average, each action triggers **{avg_cats:.1f} category flags**, indicating that policy shifts often impact multiple institutional norms simultaneously.")
     
     st.write("### Policy Focus")
     st.write("The distribution shows a high concentration of actions targeting federal institutional strength and democratic norms, reflecting the primary focus of the tracking project.")
