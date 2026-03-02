@@ -45,7 +45,7 @@ def load_data():
     df = df.sort_values('Date', ascending=False)
     cat_cols = list(CATEGORY_MAP.keys())
     
-    # Tooltip helpers
+    # Tooltip & Data Vault helpers
     def get_active_long(row):
         return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
@@ -53,7 +53,7 @@ def load_data():
         return ", ".join([CATEGORY_MAP.get(col, col) for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
     df['Active_Categories_Full'] = df.apply(get_active_long, axis=1)
-    df['Active_Categories_Short'] = df.apply(get_active_short, axis=1)
+    df['Themes'] = df.apply(get_active_short, axis=1)
     df['Source_Domain'] = df['URL'].apply(lambda x: urlparse(x).netloc.replace('www.', '') if pd.notnull(x) else "Other")
     df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
     
@@ -79,7 +79,7 @@ else:
 # 5. Filtering & Comparison Logic
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Active_Categories_Short', 'Active_Categories_Full', 'URL'], 
+    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'Active_Categories_Full', 'URL'], 
                       value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
@@ -135,14 +135,13 @@ else:
         tooltip=[
             alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
             alt.Tooltip('Title:N', title='Action'),
-            alt.Tooltip('Active_Categories_Short:N', title='Themes'),
+            alt.Tooltip('Themes:N', title='Themes'),
             alt.Tooltip('Active_Categories_Full:N', title='Official Classifications'),
             alt.Tooltip('URL:N', title='Source URL (Click point or see below)')
         ]
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# RESTORED CAPTIONS
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
 st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. You can search the action in the Data Vault to use the direct source link.")
 
@@ -178,7 +177,7 @@ if not display_df.empty:
     for i, row in top_5.iterrows():
         with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
             st.write(f"**Description:** {row['Title']}")
-            st.write(f"**Themes:** {row['Active_Categories_Short']}")
+            st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
 # 11. Data Vault & Export
@@ -190,7 +189,21 @@ if not display_df.empty:
 
 search = st.text_input("Search descriptions...", placeholder="Type here to filter table...")
 filtered_table = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
+
 if not filtered_table.empty:
-    st.dataframe(filtered_table[['Date', 'Title', 'URL']], use_container_width=True, hide_index=True)
+    # RESTORED: Clickable LinkColumn + Reordered Columns (Themes last)
+    st.dataframe(
+        filtered_table[['Date', 'Title', 'URL', 'Themes']], 
+        column_config={
+            "URL": st.column_config.LinkColumn("Source Link"),
+            "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD"),
+            "Title": st.column_config.TextColumn("Action Description", width="large"),
+            "Themes": st.column_config.TextColumn("Themes", width="medium")
+        },
+        use_container_width=True, 
+        hide_index=True
+    )
+else:
+    st.write("No data matching your search.")
 
 st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
