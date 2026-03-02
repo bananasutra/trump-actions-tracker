@@ -55,23 +55,25 @@ col1.metric("Actions in View", len(display_df))
 col2.metric("Total in Database", len(df))
 col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
 
-# 6. Progression Graph
+# 6. Progression Graph (With Hover & Click-to-Open)
 st.subheader(f"Timeline Progression: {selected_cat}")
-st.caption("💡 Hover over any point to see the specific action and the 'Category' flags it triggered.")
+st.caption("💡 **Hover** to see details. **Click** any point to open the official source link.")
 
 line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
     x=alt.X('Date:T', title='Timeline'),
     y=alt.Y('Cumulative:Q', title='Cumulative Actions')
 )
 
-points = alt.Chart(display_df).mark_circle(size=90, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
+# Added 'href' to encode so points become clickable links
+points = alt.Chart(display_df).mark_circle(size=100, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
     x='Date:T',
     y='Cumulative:Q',
+    href='URL:N',  # This makes the point a clickable link
     tooltip=[
         alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
         alt.Tooltip('Title:N', title='Action'),
         alt.Tooltip('Active_Categories:N', title='Categories'),
-        alt.Tooltip('URL:N', title='Source URL')
+        alt.Tooltip('URL:N', title='Source (Click to open)')
     ]
 )
 
@@ -81,16 +83,13 @@ st.altair_chart((line + points).interactive(), use_container_width=True)
 st.divider()
 st.subheader("Action Volume by Category")
 
-# Dynamic Note for Filtering
 if selected_cat != "All Actions":
-    st.warning(f"**Note:** You are currently filtering for **'{selected_cat}'**. Other categories appear below because many actions are tagged with multiple labels (e.g., an action may be classified as both '{selected_cat}' and another category simultaneously).")
-else:
-    st.markdown("This graph shows the distribution of all documented actions across the primary tracking categories.")
+    st.warning(f"**Note:** Filtering for **'{selected_cat}'**. Other bars show categories that overlap with this selection.")
 
 cat_counts = []
 for col in cat_cols:
     count = (display_df[col].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
-    if count > 0: # Only show categories that have data in the current view
+    if count > 0:
         cat_counts.append({'Category': col, 'Count': count})
 
 bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
@@ -124,4 +123,4 @@ st.dataframe(
     hide_index=True
 )
 
-st.caption("Updated to Feb 2026. Dashboard generated for research purposes.")
+st.caption("Updated to Feb 2026. Dashboard maintained for research and documentation.")
