@@ -57,7 +57,7 @@ display_df = display_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 # 5. Header & Intro
 st.title("🏛️ U.S. Democracy Gone Bananas: Trump Actions Tracker")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0 License")
-st.info("**Context:** Documenting actions, statements, and plans of the Trump administration that echo authoritarian regimes and may pose a threat to American democracy, since Jan 2025.")
+st.info("**Context:** Documenting actions, statements, and plans of the Trump administration that echo authoritarian regimes and threaten American democracy, since Jan 2025.")
 
 # Metrics
 col1, col2, col3 = st.columns(3)
