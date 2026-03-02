@@ -12,15 +12,11 @@ st.set_page_config(
 # 2. Load and Clean Data
 @st.cache_data
 def load_data():
-    # Load data skipping metadata lines
     df = pd.read_csv('trump-actions.csv', skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date')
-    
-    # Identify category columns (everything after 'URL')
     cat_cols = df.columns[4:].tolist()
     
-    # Helper for tooltips
     def get_active_cats(row):
         return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
@@ -35,8 +31,7 @@ st.sidebar.info("To reset the view, simply select 'All Actions' from the dropdow
 
 selected_cat = st.sidebar.selectbox(
     "Filter by Policy Category", 
-    ["All Actions"] + cat_cols,
-    help="Selecting a category will filter both graphs and the data table."
+    ["All Actions"] + cat_cols
 )
 
 # 4. Filtering Logic
@@ -45,23 +40,24 @@ if selected_cat != "All Actions":
 else:
     display_df = df.copy()
 
-# Dynamic Cumulative Calculation
-filtered_daily = display_df.groupby('Date')['Index'].nunique().reset_index()
-filtered_daily = filtered_daily.sort_values('Date')
+filtered_daily = display_df.groupby('Date')['Index'].nunique().reset_index().sort_values('Date')
 filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
-
-# Merge back for point alignment
 display_df = display_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
 # 5. Header & Intro
 st.title("🏛️ Trump Action Tracker")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0 License")
-
 st.info("**Context:** Documenting the actions, statements, and plans of President Trump and his administration that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.")
+
+# Metrics Row
+col1, col2, col3 = st.columns(3)
+col1.metric("Actions in View", len(display_df))
+col2.metric("Total in Database", len(df))
+col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
 
 # 6. Progression Graph
 st.subheader(f"Timeline Progression: {selected_cat}")
-st.caption("💡 Hover over any point to see the specific action and the 'Category' flags it triggered (many actions fall into multiple categories).")
+st.caption("💡 Hover over any point to see the specific action and the 'Category' flags it triggered.")
 
 line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
     x=alt.X('Date:T', title='Timeline'),
@@ -81,12 +77,10 @@ points = alt.Chart(display_df).mark_circle(size=90, color='white', opacity=0.8, 
 
 st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# 7. Category Summary Bar Graph
+# 7. Readable Category Bar Graph
 st.divider()
 st.subheader("Action Volume by Category")
-st.markdown("This graph shows the total count of actions tagged under each category in the current view.")
 
-# Calculate counts for bar chart
 cat_counts = []
 for col in cat_cols:
     count = (display_df[col].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
@@ -94,12 +88,12 @@ for col in cat_cols:
 
 bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
 
-# Bar chart with a short description label (using the Category name as the proxy for description)
+# Fixed: Using y-axis for Categories with labelLimit to ensure readability
 bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
     x=alt.X('Count:Q', title='Number of Actions'),
-    y=alt.Y('Category:N', sort='-x', title=None),
+    y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300, labelFontSize=12)),
     tooltip=['Category:N', 'Count:Q']
-).properties(height=400)
+).properties(height=450)
 
 st.altair_chart(bar_chart, use_container_width=True)
 
@@ -118,8 +112,7 @@ st.dataframe(
     column_config={
         "URL": st.column_config.LinkColumn("Source Link"),
         "Date": st.column_config.DateColumn("Action Date", format="YYYY-MM-DD"),
-        "Title": st.column_config.TextColumn("Action Description", width="large"),
-        "Active_Categories": st.column_config.TextColumn("Full Categories")
+        "Title": st.column_config.TextColumn("Action Description", width="large")
     },
     use_container_width=True,
     hide_index=True
