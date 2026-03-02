@@ -130,7 +130,7 @@ st.altair_chart((line + points).interactive(), use_container_width=True)
 
 # Link instructions placed underneath the progression chart
 st.caption("💡 **Desktop:** Hover to see details. **Click** any point to open source URL in a new window.")
-st.caption("⚠️ **Note on Links:** Some sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps.")
+st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. You can search action in Data Vault to use direct link.")
 
 # 8. Category Summary (Shorter Names)
 st.divider()
