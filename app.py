@@ -43,18 +43,19 @@ def load_data():
     df = df.sort_values('Date', ascending=False)
     cat_cols = list(CATEGORY_MAP.keys())
     
+    # Safe string conversion and cleaning for categories
     df['Themes'] = df.apply(lambda r: ", ".join([CATEGORY_MAP.get(c, c) for c in cat_cols if str(r[c]).strip().lower() == 'yes']), axis=1)
     df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
     return df, cat_cols
 
 df, cat_cols = load_data()
 
-# 4. TITLE & CONTEXT
+# 4. Header
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
-st.info("**Context:** A strategic analysis of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
+st.info("**Context:** A strategic diagnostic of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
 
-# 5. GHOST NAVIGATION
+# 5. Anchored Navigation (Ghost Style)
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
     <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Timeline</button></a>
@@ -65,7 +66,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 6. Sidebar Logic
+# 6. Filters
 st.sidebar.title("Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", value=False)
 if comparison_mode:
@@ -74,7 +75,7 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Data Branching
+# 7. Logic
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
@@ -94,13 +95,13 @@ st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
     if not df_comp.empty:
-        comp_chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
+        chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x=alt.X('Date:T', title='Timeline'),
             y=alt.Y('Cumulative:Q', title='Actions'),
             color=alt.Color('Category_Short:N', legend=alt.Legend(orient='bottom', columns=2)),
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), 'Title:N', 'Category_Short:N']
         ).interactive().properties(height=450)
-        st.altair_chart(comp_chart, use_container_width=True)
+        st.altair_chart(chart, use_container_width=True)
 else:
     st.subheader(f"Timeline Progression: {selected_short}")
     line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(x='Date:T', y='Cumulative:Q')
@@ -110,7 +111,10 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# 9. VOLUME & GLOSSARY
+st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault for links.")
+st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for source links.")
+
+# 9. VOLUME
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
@@ -138,42 +142,33 @@ st.subheader(f"📍 Latest 5 Actions: {selected_short}")
 if not display_df.empty:
     for i, row in display_df.head(5).iterrows():
         with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
-            st.write(f"**Full Description:** {row['Title']}")
+            st.write(f"**Description:** {row['Title']}")
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. DEEP INSIGHTS (THE DIAGNOSTIC ANALYSIS)
+# 11. DEEP INSIGHTS (THE DIAGNOSTIC ANALYSIS - FIXED)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: The Authoritarian Blueprint")
 
 if not display_df.empty:
-    # Statistical Calculations
     total = len(df)
     days_active = (df['Date'].max() - df['Date'].min()).days
     pace = (total / max(days_active, 1)) * 30.44
     multi_ratio = (len(df[df['Cat_Count'] > 1]) / total) * 100
-    
-    # Stratification of Data (Strategy Pillars)
-    structural = df[df['Hollowing State / Weakening Federal Institutions'].fillna('No').str.strip().lower() == 'yes']
-    norm_violation = df[df['Violating Democratic Norms, Undermining Rule of Law'].fillna('No').str.strip().lower() == 'yes']
-    dissent = df[df['Suppressing Dissent / Weaponising State Against \'Enemies\''].fillna('No').str.strip().lower() == 'yes']
 
     col_ins1, col_ins2 = st.columns(2)
-
     with col_ins1:
         st.markdown("### ⚡ Strategic Velocity & Attrition")
-        st.write(f"The administration is executing **{pace:.1f} actions per month**. In historical backsliding contexts (Hungary, Poland), this 'Blitzkrieg' pace is used to ensure the judicial system's **processing latency** is higher than the implementation rate.")
-        st.warning(f"**Dire Projection:** By Jan 2029, the tracker projects **8,220 actions**. This represents an exponential scale-up compared to 2017-2021, moving from 'disruption' to a 'full institutional rewrite.'")
-        
+        st.write(f"Executing **{pace:.1f} actions per month**. This 'Blitzkrieg' pace is designed to ensure judicial **processing latency** remains higher than the implementation rate.")
+        st.warning(f"**Dire Projection:** Linear extrapolation projects **8,220 actions** by Jan 2029—moving from 'disruption' to a total institutional rewrite.")
         st.markdown("### 🕸️ Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of actions are 'multi-tagged.' This indicates a **synergistic strategy**: for example, a single personnel purge (Schedule F) simultaneously triggers 'Federal Institutions,' 'Civil Rights,' and 'Scientific Control' violations.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of actions are multi-tagged. This indicates personnel purges (like Schedule F) are engineered to bypass multiple institutional checks simultaneously.")
 
     with col_ins2:
         st.markdown("### 🛡️ The Geography of Resistance")
-        st.write("**The Heatmap of Resistance** is currently anchored by 'Blue State Shields' (CA, WA, NY). Data shows litigation is the *only* friction point slowing the velocity. However, the 'Hollowing' of the DOJ and Courts is specifically designed to neutralize this geographical resistance over the next 24 months.")
+        st.write("Opposition is concentrated in 'Blue State Shields' (CA, WA, NY). Data shows litigation is the *only* friction point slowing velocity, which is why DOJ and Judicial hollowing are prioritized targets for the next 24 months.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-        st.caption("📽️ *Context:* Prof. Pagel analyzes why tracking this 'Shock Strategy' in real-time is the only way to maintain a coherent historical record.")
 
 # 12. VAULT
 st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
