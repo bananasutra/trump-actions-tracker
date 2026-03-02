@@ -29,7 +29,6 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load and Clean Data
 @st.cache_data
 def load_data():
-    # Attempting newest file first
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
@@ -38,7 +37,6 @@ def load_data():
             break
         except:
             continue
-    
     if df is None:
         st.error("Data file not found. Ensure the latest CSV is in your repository.")
         return None, None
@@ -55,23 +53,22 @@ def load_data():
 
 df, cat_cols = load_data()
 
-# 4. TITLE & HEADER
+# 4. TITLE & CONTEXT
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
+st.info("**Context:** Documenting actions and plans of the Trump administration that threaten American democracy, since Jan 2025.")
 
-# 5. ONE-WORD ANCHOR NAVIGATION
-# We use HTML anchor tags and st.markdown for true functional jumping
+# 5. ONE-WORD GHOST NAVIGATION (BELOW CONTEXT)
+st.markdown("<br>", unsafe_allow_html=True) # Adds vertical spacing
 st.markdown("""
-<div style="display: flex; justify-content: space-between; gap: 10px;">
-    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Timeline</button></a>
-    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Volume</button></a>
-    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Latest</button></a>
-    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Insights</button></a>
-    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Vault</button></a>
+<div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px;">
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Timeline</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Volume</button></a>
+    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Latest</button></a>
+    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Insights</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Vault</button></a>
 </div>
 """, unsafe_allow_html=True)
-
-st.info("**Context:** Documenting actions and plans of the Trump administration that threaten American democracy, since Jan 2025.")
 
 # 6. Sidebar Logic
 st.sidebar.title("Filters")
@@ -82,7 +79,7 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Filter by Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Filtering Logic
+# 7. Filtering & Processing
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Source_Domain', 'Cat_Count'], 
@@ -144,7 +141,7 @@ if cat_counts:
 with st.expander("📖 Glossary & Multi-Tagging Context"):
     st.table(pd.DataFrame({"Category": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
 
-# 10. LATEST SECTION (MOVED ABOVE INSIGHTS)
+# 10. LATEST SECTION
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
@@ -155,7 +152,7 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. INSIGHTS SECTION (DEEP DIVE)
+# 11. INSIGHTS SECTION
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Velocity, Strategy, & Projections")
@@ -170,13 +167,13 @@ if not display_df.empty:
     with col_ins1:
         st.markdown("### ⚡ Pace of Power")
         st.write(f"Moving at **{pace_per_month:.1f} actions per month**. Projected: **8,200 systemic actions** by Jan 2029.")
-        st.warning("**The Shock Strategy:** Historical backsliding shows that sheer volume is used to overwhelm judicial processing.")
+        st.warning("**The Shock Strategy:** Historical patterns suggest high volume is used to saturate judicial processing capacity.")
         st.markdown("### 🧬 Pattern Recognition")
-        st.write(f"**Interconnectivity:** {multi_cat_pct:.1f}% of actions trigger multiple flags. This isn't random; it's engineered to create cascading failures in institutional checks.")
+        st.write(f"**Interconnectivity:** {multi_cat_pct:.1f}% of actions trigger multiple flags, engineered for cascading institutional impact.")
 
     with col_ins2:
         st.markdown("### 🛡️ Resistance Analysis")
-        st.write("Opposition is concentrated in state-level litigation (CA, WA, NY, IL). These 'Blue Shields' correlate directly with escalations in federal institution hollowing.")
+        st.write("The 'Resistance Heatmap' highlights the concentration of legal opposition in state-level hubs (CA, WA, NY, IL).")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
 # 12. VAULT SECTION
@@ -192,7 +189,7 @@ v_df = display_df if not search else display_df[display_df['Title'].str.contains
 if not v_df.empty:
     st.dataframe(
         v_df[['Date', 'Title', 'URL', 'Themes']], 
-        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
+        column_config={"URL": st.column_config.LinkColumn("Source Link"), "Date": st.column_config.DateColumn("Date")},
         use_container_width=True, hide_index=True
     )
 
