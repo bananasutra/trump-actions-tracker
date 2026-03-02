@@ -77,21 +77,27 @@ points = alt.Chart(display_df).mark_circle(size=90, color='white', opacity=0.8, 
 
 st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# 7. Readable Category Bar Graph
+# 7. Category Bar Graph with Explanatory Note
 st.divider()
 st.subheader("Action Volume by Category")
+
+# Dynamic Note for Filtering
+if selected_cat != "All Actions":
+    st.warning(f"**Note:** You are currently filtering for **'{selected_cat}'**. Other categories appear below because many actions are tagged with multiple labels (e.g., an action may be classified as both '{selected_cat}' and another category simultaneously).")
+else:
+    st.markdown("This graph shows the distribution of all documented actions across the primary tracking categories.")
 
 cat_counts = []
 for col in cat_cols:
     count = (display_df[col].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
-    cat_counts.append({'Category': col, 'Count': count})
+    if count > 0: # Only show categories that have data in the current view
+        cat_counts.append({'Category': col, 'Count': count})
 
 bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
 
-# Fixed: Using y-axis for Categories with labelLimit to ensure readability
 bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
     x=alt.X('Count:Q', title='Number of Actions'),
-    y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300, labelFontSize=12)),
+    y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=350, labelFontSize=12)),
     tooltip=['Category:N', 'Count:Q']
 ).properties(height=450)
 
@@ -118,4 +124,4 @@ st.dataframe(
     hide_index=True
 )
 
-st.caption("Updated to Feb 2026. Interactive dashboard maintained for research and documentation.")
+st.caption("Updated to Feb 2026. Dashboard generated for research purposes.")
