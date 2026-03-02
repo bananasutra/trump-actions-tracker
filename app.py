@@ -4,7 +4,7 @@ import altair as alt
 
 # 1. Page Config
 st.set_page_config(
-    page_title="Trump Action Tracker", 
+    page_title="Trump Actions Tracker", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
@@ -55,7 +55,7 @@ filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
 display_df = display_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
 # 5. Header & Intro
-st.title("🏛️ Trump Action Tracker")
+st.title("🏛️ Trump Actions Tracker")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0 License")
 st.info("**Context:** Documenting actions, statements, and plans of the Trump administration that echo authoritarian regimes and may pose a threat to American democracy, since Jan 2025.")
 
