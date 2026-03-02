@@ -45,7 +45,6 @@ def load_data():
     df = df.sort_values('Date', ascending=False)
     cat_cols = list(CATEGORY_MAP.keys())
     
-    # Tooltip & Data Vault helpers
     def get_active_long(row):
         return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
@@ -79,7 +78,7 @@ else:
 # 5. Filtering & Comparison Logic
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'Active_Categories_Full', 'URL'], 
+    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'Active_Categories_Full', 'URL', 'Source_Domain', 'Cat_Count'], 
                       value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
@@ -143,7 +142,7 @@ else:
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
-st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. You can search the action in the Data Vault to use the direct source link.")
+st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. Search in the Data Vault to use the direct source link.")
 
 # 8. Category Volume Bar Chart
 st.divider()
@@ -180,7 +179,30 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. Data Vault & Export
+# 11. Analytical Insights (RESTORED SECTION)
+st.divider()
+st.subheader("📊 Data Insights (Jan 2025 – Mar 2026)")
+
+if not display_df.empty:
+    top_cats_list = bar_df.head(2)['Category'].tolist() if not bar_df.empty else ["N/A", "N/A"]
+    avg_cats = df['Cat_Count'].mean()
+    multi_cat_pct = (len(df[df['Cat_Count'] > 1]) / len(df)) * 100
+    top_source = df['Source_Domain'].value_counts().idxmax()
+
+    col_i1, col_i2 = st.columns(2)
+    with col_i1:
+        st.write("### 📈 Volume & Progression")
+        st.write(f"Since Jan 2025, the tracker has logged **{len(df)} significant actions**. The data reveals a steady, near-linear increase in policy shifts, with notable bursts observed around the start of the term and the first quarter of 2026.")
+        st.write("### 🏛️ Dominant Themes")
+        st.write(f"The tracking data is currently dominated by **'{top_cats_list[0]}'**, followed closely by **'{top_cats_list[1]}'**.")
+
+    with col_i2:
+        st.write("### 🔗 Diversity & Impact")
+        st.write(f"Complexity is high: **{multi_cat_pct:.1f}%** of all documented events trigger multiple category flags. On average, each action impacts **{avg_cats:.1f}** distinct institutional norms simultaneously.")
+        st.write("### 📰 Source Documentation")
+        st.write(f"The most frequent primary documentation source in the dataset is **{top_source}**, highlighting the role of investigative journalism in tracking these shifts.")
+
+# 12. Data Vault & Export
 st.divider()
 st.subheader("Data Vault")
 if not display_df.empty:
@@ -191,7 +213,6 @@ search = st.text_input("Search descriptions...", placeholder="Type here to filte
 filtered_table = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 
 if not filtered_table.empty:
-    # RESTORED: Clickable LinkColumn + Reordered Columns (Themes last)
     st.dataframe(
         filtered_table[['Date', 'Title', 'URL', 'Themes']], 
         column_config={
@@ -203,7 +224,5 @@ if not filtered_table.empty:
         use_container_width=True, 
         hide_index=True
     )
-else:
-    st.write("No data matching your search.")
 
 st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
