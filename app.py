@@ -188,4 +188,4 @@ if not filtered_table.empty:
 else:
     st.write("No data found.")
 
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Updated Mar 2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated Mar, 1st 2026. CC BY 4.0.")
