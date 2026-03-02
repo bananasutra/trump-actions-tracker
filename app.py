@@ -52,13 +52,12 @@ df, cat_cols = load_data()
 # 4. Header
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
-st.info("**Context:** A strategic diagnostic of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
+st.info("**Context:** Diagnostic analysis of systemic democratic erosion. *Updated March 2026.*")
 
-# 5. WHITE-ON-WHITE GHOST NAVIGATION
-# Border and Text are now both #FFFFFF (White) for maximum clean contrast
+# 5. CRISP GHOST NAVIGATION
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
-    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
     <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
     <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
     <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
@@ -75,7 +74,7 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Data Branching
+# 7. Data Filtering
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
@@ -111,8 +110,6 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault for links.")
-
 # 9. VOLUME & GLOSSARY
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
@@ -145,10 +142,10 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. DEEP INSIGHTS (STRATEGIC DIAGNOSTIC)
+# 11. DEEP INSIGHTS (THE DIAGNOSTIC REWRITE)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🚨 Deep Insights: Strategic Diagnostic")
+st.subheader("🚨 Deep Insights: The Authoritarian Blueprint")
 
 if not display_df.empty:
     total = len(df)
@@ -158,14 +155,17 @@ if not display_df.empty:
 
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
-        st.markdown("### ⚡ Strategic Velocity")
-        st.write(f"Executing **{pace:.1f} actions per month**. This trajectory projects over **8,200 actions** by Jan 2029. Historically, this volume is used to maintain 'first-mover advantage' over judicial stays.")
-        st.warning("**The Blueprint:** Linear escalation suggests a move from institutional 'disruption' to a total administrative rewrite.")
+        st.markdown("### ⚡ Strategic Velocity: The 'Shock' Phase")
+        st.write(f"The administration is maintaining a pace of **{pace:.1f} significant actions per month**. This is not just 'fast'; it is a **Saturation Strategy**.")
+        st.warning(f"**Diagnostic:** At this rate, the system produces more institutional changes in 90 days than the federal court system can process in 2 years. This creates a **Permanent Implementation Advantage**—actions become reality before they can be adjudicated.")
+        st.markdown("### 🕸️ Norm-Collapse Loops")
+        st.write(f"**Complexity:** {multi_ratio:.1f}% of actions are multi-tagged. This highlights the **Interconnected Strike** pattern: for example, replacing civil service experts (Federal Institutions) with political loyalists who then restrict reproductive rights (Civil Rights) and censor climate data (Science Control).")
 
     with col_ins2:
-        st.markdown("### 🧬 Cascading Impacts")
-        st.write(f"**Complexity:** {multi_ratio:.1f}% of actions are multi-tagged, creating interlocking policy strikes that disrupt multiple norms simultaneously.")
+        st.markdown("### 🛡️ The Geography of Resistance")
+        st.write("**Analysis:** Litigation from 'Blue State Shields' (CA, WA, NY) remains the *only* functional friction point. However, the data reveals a prioritization of **Judicial Hollowing**—appointing judges and purging DOJ staff specifically to neutralize these geographical resistance hubs.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+        st.caption("📽️ *Context:* Prof. Christina Pagel discusses why tracking these 'Shock' patterns is critical to preventing 'Normalization'.")
 
 # 12. DATA VAULT
 st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
