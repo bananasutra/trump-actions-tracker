@@ -159,4 +159,4 @@ st.dataframe(
     hide_index=True
 )
 
-st.caption("Updated via GitHub Integration. CC BY 4.0 License.")
+st.caption("Dashboard created by bananasutra. Updated via GitHub Integration. CC BY 4.0 License.")
