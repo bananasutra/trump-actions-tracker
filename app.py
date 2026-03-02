@@ -54,15 +54,15 @@ st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 st.info("**Context:** A strategic diagnostic of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
 
-# 5. WHITE-TEXT NAVIGATION (BELOW CONTEXT)
-# Swapped color to #FFFFFF (white) and border to #DE0100 (red)
+# 5. WHITE-ON-WHITE GHOST NAVIGATION
+# Border and Text are now both #FFFFFF (White) for maximum clean contrast
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
-    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
-    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
-    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
-    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
-    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Vault</button></a>
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
+    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
+    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Vault</button></a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -75,7 +75,7 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Data Filtering
+# 7. Data Branching
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
@@ -112,7 +112,6 @@ else:
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault for links.")
-st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for source links.")
 
 # 9. VOLUME & GLOSSARY
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
@@ -146,7 +145,7 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. DEEP INSIGHTS (DIAGNOSTIC)
+# 11. DEEP INSIGHTS (STRATEGIC DIAGNOSTIC)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -160,14 +159,12 @@ if not display_df.empty:
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("### ⚡ Strategic Velocity")
-        st.write(f"Executing **{pace:.1f} actions per month**. This pace is designed to maintain a 'first-mover advantage' over judicial oversight, ensuring that systemic changes are implemented before legal stay orders can be processed.")
-        st.warning(f"**Dire Projection:** Current trajectory projects over **8,200 actions** by Jan 2029—an overhaul of the federal administrative state with no 20th-century precedent.")
-        st.markdown("### 🕸️ Norm-Collapse Loops")
-        st.write(f"**Complexity:** {multi_ratio:.1f}% of actions trigger 2+ flags. This reveals 'interlocking policy strikes' where one move (e.g., gutting the EPA) simultaneously hits scientific control, federal hollowing, and norm violations.")
+        st.write(f"Executing **{pace:.1f} actions per month**. This trajectory projects over **8,200 actions** by Jan 2029. Historically, this volume is used to maintain 'first-mover advantage' over judicial stays.")
+        st.warning("**The Blueprint:** Linear escalation suggests a move from institutional 'disruption' to a total administrative rewrite.")
 
     with col_ins2:
-        st.markdown("### 🛡️ Geography of Friction")
-        st.write("Opposition is currently anchored by 'Blue Shield' state litigation (CA, WA, NY). Data shows that legal friction is the primary bottleneck for this velocity, leading to the current prioritization of judicial and DOJ hollowing.")
+        st.markdown("### 🧬 Cascading Impacts")
+        st.write(f"**Complexity:** {multi_ratio:.1f}% of actions are multi-tagged, creating interlocking policy strikes that disrupt multiple norms simultaneously.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
 # 12. DATA VAULT
