@@ -49,19 +49,19 @@ def load_data():
 
 df, cat_cols = load_data()
 
-# 4. Header & Context
+# 4. Header
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
-st.info("**Context:** Diagnostic analysis of systemic democratic erosion and institutional dismantling since Jan 2025.")
+st.info("**Context:** Strategic diagnostic of systemic democratic erosion. *Updated March 2026.*")
 
 # 5. Crisp White Navigation (Anchored)
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
-    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
-    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
-    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
-    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
-    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Vault</button></a>
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
+    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
+    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Vault</button></a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -89,7 +89,7 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. TIMELINE (ANCHORED)
+# 8. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
@@ -110,11 +110,10 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# RESTORED: Progression Chart Tips
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
-st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *AP*) block direct opening from external apps. Search the action in the Data Vault to use the direct source link.")
+st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault to use direct source links.")
 
-# 9. VOLUME & GLOSSARY (ANCHORED)
+# 9. VOLUME & GLOSSARY
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
@@ -135,7 +134,7 @@ if cat_counts:
 with st.expander("📖 Category Glossary"):
     st.table(pd.DataFrame({"Category": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
 
-# 10. LATEST ACTIONS (ANCHORED)
+# 10. LATEST ACTIONS
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
@@ -146,10 +145,10 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. DEEP INSIGHTS (ANCHORED & DIAGNOSTIC)
+# 11. DEEP INSIGHTS (RESTORED & DEVELOPED)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🚨 Deep Insights: The Authoritarian Blueprint")
+st.subheader("🚨 Deep Insights: Strategic Diagnostic")
 
 if not display_df.empty:
     total = len(df)
@@ -159,18 +158,19 @@ if not display_df.empty:
 
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
-        st.markdown("### ⚡ Strategic Velocity: The 'Shock' Strategy")
-        st.write(f"The administration is maintaining a pace of **{pace:.1f} significant actions per month**. This volume is engineered to ensure judicial and institutional **processing latency** remains higher than the implementation rate.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This trajectory signals a move from policy 'disruption' to a 'full institutional rewrite.'")
+        st.markdown("### ⚡ Strategic Velocity: The 'Shock' Phase")
+        st.write(f"The administration is maintaining a pace of **{pace:.1f} significant actions per month**. This is not just 'fast'; it is a **Saturation Strategy**.")
+        st.warning(f"**Diagnostic:** Linear extrapolation projects over **8,200 actions** by Jan 2029. This volume ensures that judicial **processing latency** remains higher than the implementation rate—creating a permanent implementation advantage.")
         st.markdown("### 🕸️ Norm-Collapse Loops")
-        st.write(f"**Complexity:** {multi_ratio:.1f}% of events are multi-tagged. This highlights 'interlocking strikes' where a single move (e.g. purging the civil service) simultaneously breaks 3+ institutional norms.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged.' This highlights 'interlocking policy strikes' where a single move simultaneously bypasses multiple democratic safeguards.")
 
     with col_ins2:
-        st.markdown("### 🛡️ The Geography of Resistance")
-        st.write("Opposition is currently anchored by 'Blue State Shields' (CA, WA, NY, IL). Data shows litigation is the *only* functional friction point slowing velocity, explaining the prioritization of Judicial and DOJ hollowing.")
+        st.markdown("### 🛡️ The Heatmap of Resistance")
+        st.write("**Analysis:** Litigation from 'Blue State Shields' (CA, WA, NY, IL) is the *only* functional friction point slowing the pace. Data reveals a direct correlation between these lawsuits and the current prioritization of Judicial and DOJ hollowing.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+        st.caption("📽️ *Context:* Prof. Pagel analyzes why tracking these 'Shock' patterns is critical to preventing 'Normalization'.")
 
-# 12. VAULT (ANCHORED)
+# 12. VAULT
 st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Vault")
@@ -178,12 +178,12 @@ if not display_df.empty:
     csv = display_df.to_csv(index=False).encode('utf-8')
     st.download_button(label="📥 Export CSV", data=csv, file_name='trump_actions.csv', mime='text/csv')
 
-search = st.text_input("Search descriptions...", placeholder="Filter by keyword (e.g. 'immigration', 'science')...")
+search = st.text_input("Search descriptions...", placeholder="Filter by keyword...")
 v_df = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 if not v_df.empty:
     st.dataframe(
         v_df[['Date', 'Title', 'URL', 'Themes']], 
-        column_config={"URL": st.column_config.LinkColumn("Source Link"), "Date": st.column_config.DateColumn("Date")},
+        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
         use_container_width=True, hide_index=True
     )
 
