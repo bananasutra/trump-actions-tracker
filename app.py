@@ -29,7 +29,6 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load Data
 @st.cache_data
 def load_data():
-    # Use the specific filename you've uploaded or a generic placeholder
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
@@ -41,7 +40,8 @@ def load_data():
     if df is None: return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
-    df = df.sort_values('Date', ascending=True) # Sort ascending for correct cumulative math
+    # CRITICAL: We load everything sorted by date ASCENDING for the math
+    df = df.sort_values('Date', ascending=True) 
     cat_cols = list(CATEGORY_MAP.keys())
     
     df['Themes'] = df.apply(lambda r: ", ".join([CATEGORY_MAP.get(c, c) for c in cat_cols if str(r[c]).strip().lower() == 'yes']), axis=1)
@@ -58,10 +58,10 @@ st.info("**Context:** Strategic diagnostic of systemic democratic erosion. *Upda
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
     <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
-    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Categories</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
     <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
     <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
-    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Search</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Vault</button></a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -74,18 +74,16 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 6. Data Processing Fix
+# 6. Data Processing
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    # Melting ensures we can plot multiple lines correctly
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], 
                       value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
-    # Crucial: Sort by date within category for the cumulative sum
     df_comp = df_comp.sort_values(['Category_Short', 'Date'])
     df_comp['Cumulative'] = df_comp.groupby('Category_Short').cumcount() + 1
-    display_df = df_comp.sort_values('Date', ascending=False)
+    display_df = df_comp 
 else:
     display_df = df if selected_short == "All Actions" else df[df[SHORT_TO_LONG[selected_short]].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
     chart_df = display_df.sort_values('Date')
@@ -93,7 +91,7 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 7. TIMELINE (FIXED LOGIC)
+# 7. TIMELINE 
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
@@ -121,7 +119,6 @@ st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
 cat_counts = []
-# Fixed: Always calculate based on the full DF for the bar chart to show relative volume
 for long, short in CATEGORY_MAP.items():
     if comparison_mode and short not in selected_compare: continue
     count = (df[long].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
@@ -138,39 +135,34 @@ if cat_counts:
 with st.expander("📖 Category Glossary"):
     st.table(pd.DataFrame({"Category": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
 
-# 9. LATEST ACTIONS
+# 9. LATEST ACTIONS (THE FIX: Force Re-Sort to Descending)
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
-# Always pull from the most recent entries
-latest_display = display_df.head(5)
-for i, row in latest_display.iterrows():
+# We sort descending specifically for this view so Newest is on top
+latest_view = display_df.sort_values('Date', ascending=False).head(5)
+for i, row in latest_view.iterrows():
     with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
         st.write(f"**Description:** {row['Title']}")
         st.write(f"**Themes:** {row['Themes']}")
         st.link_button("🚀 Open Source", row['URL'])
 
-# 10. DEEP INSIGHTS (RESTORED TO FULL DEPTH)
+# 10. DEEP INSIGHTS (RESTORED)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
-
 if not df.empty:
     total = len(df)
     pace = (total / max((df['Date'].max() - df['Date'].min()).days, 1)) * 30.44
     multi_ratio = (len(df[df['Cat_Count'] > 1]) / total) * 100
-
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("#### Strategic Velocity: The 'Shock' Phase")
-        st.write(f"Executing **{pace:.1f} actions per month**. This volume ensures that judicial **processing latency** remains higher than the implementation rate—creating a permanent implementation advantage.")
-        st.warning(f"**Diagnostic:** Linear extrapolation projects over **8,200 actions** by Jan 2029. This trajectory signals a move from policy 'disruption' to a 'full institutional rewrite.'")
-        st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of actions are multi-tagged. This highlights 'interlocking strikes' where a single move (e.g. purging the civil service) simultaneously breaks 3+ institutional norms.")
-
+        st.markdown("### ⚡ Strategic Velocity")
+        st.write(f"Executing **{pace:.1f} actions per month**. This pace ensures judicial latency remains higher than implementation rate.")
+        st.warning(f"**Projection:** Extrapolates to **8,200 actions** by Jan 2029—a total institutional rewrite.")
     with col2:
-        st.markdown("#### The Heatmap of Resistance")
-        st.write("Opposition is currently anchored by 'Blue State Shields' (CA, WA, NY, IL). Data shows litigation is the *only* functional friction point slowing velocity, explaining the prioritization of Judicial and DOJ hollowing.")
+        st.markdown("### 🛡️ Resistance Heatmap")
+        st.write("Concentrated in state-level hubs (CA, WA, NY). Litigation is the primary friction point.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
 # 11. DATA VAULT
@@ -178,11 +170,14 @@ st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Vault")
 search = st.text_input("Search descriptions...", placeholder="Filter by keyword...")
-v_df = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
+# Vault should also be Descending (Newest first)
+vault_df = display_df.sort_values('Date', ascending=False)
+if search:
+    vault_df = vault_df[vault_df['Title'].str.contains(search, case=False, na=False)]
 st.dataframe(
-    v_df[['Date', 'Title', 'URL', 'Themes']], 
+    vault_df[['Date', 'Title', 'URL', 'Themes']], 
     column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
     use_container_width=True, hide_index=True
 )
 
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Updated Mar 2026. CC BY 4.0.")
+st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
