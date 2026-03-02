@@ -70,7 +70,7 @@ st.subheader(f"Timeline Progression: {selected_cat}")
 st.caption("💡 **Hover** to see details. **Click** any point to open source URL in a new window.")
 
 # Specific warning about external sites
-st.warning("⚠️ **Note on Links:** Source URLs will open in a new window. Some sites (like *The Guardian*) may occasionally block direct opening from external apps.")
+st.warning("⚠️ **Note on Links:** Source URLs will open in a new window. Some sites (like *The Guardian* or the *NYTimes*) block direct opening from external apps.")
 
 line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
     x=alt.X('Date:T', title='Timeline'),
