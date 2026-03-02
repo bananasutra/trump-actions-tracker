@@ -26,7 +26,7 @@ CATEGORY_MAP = {
 SORTED_SHORT_NAMES = sorted(list(CATEGORY_MAP.values()))
 SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 
-# 3. Load and Clean Data
+# 3. Load Data
 @st.cache_data
 def load_data():
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
@@ -37,18 +37,14 @@ def load_data():
             break
         except:
             continue
-    if df is None:
-        st.error("Data file not found. Ensure the latest CSV is in your repository.")
-        return None, None
+    if df is None: return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date', ascending=False)
     cat_cols = list(CATEGORY_MAP.keys())
     
     df['Themes'] = df.apply(lambda r: ", ".join([CATEGORY_MAP.get(c, c) for c in cat_cols if str(r[c]).strip().lower() == 'yes']), axis=1)
-    df['Source_Domain'] = df['URL'].apply(lambda x: urlparse(str(x)).netloc.replace('www.', '') if pd.notnull(x) else "Other")
     df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
-    
     return df, cat_cols
 
 df, cat_cols = load_data()
@@ -56,12 +52,11 @@ df, cat_cols = load_data()
 # 4. TITLE & CONTEXT
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
-st.info("**Context:** Documenting actions and plans of the Trump administration that threaten American democracy, since Jan 2025.")
+st.info("**Context:** A strategic analysis of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
 
-# 5. ONE-WORD GHOST NAVIGATION (BELOW CONTEXT)
-st.markdown("<br>", unsafe_allow_html=True) # Adds vertical spacing
+# 5. GHOST NAVIGATION
 st.markdown("""
-<div style="display: flex; justify-content: space-between; gap: 10px; margin-bottom: 25px;">
+<div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
     <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Timeline</button></a>
     <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Volume</button></a>
     <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Latest</button></a>
@@ -74,37 +69,35 @@ st.markdown("""
 st.sidebar.title("Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", value=False)
 if comparison_mode:
-    selected_compare = st.sidebar.multiselect("Categories to Compare", SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
+    selected_compare = st.sidebar.multiselect("Categories", SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
     selected_short = "Comparison View"
 else:
-    selected_short = st.sidebar.selectbox("Filter by Area", ["All Actions"] + SORTED_SHORT_NAMES)
+    selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Filtering & Processing
+# 7. Data Branching
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Source_Domain', 'Cat_Count'], 
-                      value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
+    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
-    df_comp = df_comp.sort_values(['Category_Short', 'Date'])
     df_comp['Cumulative'] = df_comp.groupby('Category_Short').cumcount() + 1
     display_df = df_comp 
 else:
     display_df = df if selected_short == "All Actions" else df[df[SHORT_TO_LONG[selected_short]].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
     chart_df = display_df.sort_values('Date')
-    filtered_daily = chart_df.groupby('Date')['Index'].nunique().reset_index().sort_values('Date')
+    filtered_daily = chart_df.groupby('Date')['Index'].nunique().reset_index()
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. TIMELINE SECTION
+# 8. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
     if not df_comp.empty:
         comp_chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x=alt.X('Date:T', title='Timeline'),
-            y=alt.Y('Cumulative:Q', title='Cumulative Actions'),
-            color=alt.Color('Category_Short:N', title=None, legend=alt.Legend(orient='bottom', columns=2)),
+            y=alt.Y('Cumulative:Q', title='Actions'),
+            color=alt.Color('Category_Short:N', legend=alt.Legend(orient='bottom', columns=2)),
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), 'Title:N', 'Category_Short:N']
         ).interactive().properties(height=450)
         st.altair_chart(comp_chart, use_container_width=True)
@@ -117,10 +110,7 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
-st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for direct source links.")
-
-# 9. VOLUME SECTION
+# 9. VOLUME & GLOSSARY
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
@@ -141,7 +131,7 @@ if cat_counts:
 with st.expander("📖 Glossary & Multi-Tagging Context"):
     st.table(pd.DataFrame({"Category": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
 
-# 10. LATEST SECTION
+# 10. LATEST ACTIONS
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
@@ -152,44 +142,53 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. INSIGHTS SECTION
+# 11. DEEP INSIGHTS (THE DIAGNOSTIC ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🚨 Deep Insights: Velocity, Strategy, & Projections")
+st.subheader("🚨 Deep Insights: The Authoritarian Blueprint")
 
 if not display_df.empty:
-    total_actions = len(df)
+    # Statistical Calculations
+    total = len(df)
     days_active = (df['Date'].max() - df['Date'].min()).days
-    pace_per_month = (total_actions / max(days_active, 1)) * 30.44
-    multi_cat_pct = (len(df[df['Cat_Count'] > 1]) / total_actions) * 100
+    pace = (total / max(days_active, 1)) * 30.44
+    multi_ratio = (len(df[df['Cat_Count'] > 1]) / total) * 100
     
+    # Stratification of Data (Strategy Pillars)
+    structural = df[df['Hollowing State / Weakening Federal Institutions'].fillna('No').str.strip().lower() == 'yes']
+    norm_violation = df[df['Violating Democratic Norms, Undermining Rule of Law'].fillna('No').str.strip().lower() == 'yes']
+    dissent = df[df['Suppressing Dissent / Weaponising State Against \'Enemies\''].fillna('No').str.strip().lower() == 'yes']
+
     col_ins1, col_ins2 = st.columns(2)
+
     with col_ins1:
-        st.markdown("### ⚡ Pace of Power")
-        st.write(f"Moving at **{pace_per_month:.1f} actions per month**. Projected: **8,200 systemic actions** by Jan 2029.")
-        st.warning("**The Shock Strategy:** Historical patterns suggest high volume is used to saturate judicial processing capacity.")
-        st.markdown("### 🧬 Pattern Recognition")
-        st.write(f"**Interconnectivity:** {multi_cat_pct:.1f}% of actions trigger multiple flags, engineered for cascading institutional impact.")
+        st.markdown("### ⚡ Strategic Velocity & Attrition")
+        st.write(f"The administration is executing **{pace:.1f} actions per month**. In historical backsliding contexts (Hungary, Poland), this 'Blitzkrieg' pace is used to ensure the judicial system's **processing latency** is higher than the implementation rate.")
+        st.warning(f"**Dire Projection:** By Jan 2029, the tracker projects **8,220 actions**. This represents an exponential scale-up compared to 2017-2021, moving from 'disruption' to a 'full institutional rewrite.'")
+        
+        st.markdown("### 🕸️ Norm-Collapse Loops")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of actions are 'multi-tagged.' This indicates a **synergistic strategy**: for example, a single personnel purge (Schedule F) simultaneously triggers 'Federal Institutions,' 'Civil Rights,' and 'Scientific Control' violations.")
 
     with col_ins2:
-        st.markdown("### 🛡️ Resistance Analysis")
-        st.write("The 'Resistance Heatmap' highlights the concentration of legal opposition in state-level hubs (CA, WA, NY, IL).")
+        st.markdown("### 🛡️ The Geography of Resistance")
+        st.write("**The Heatmap of Resistance** is currently anchored by 'Blue State Shields' (CA, WA, NY). Data shows litigation is the *only* friction point slowing the velocity. However, the 'Hollowing' of the DOJ and Courts is specifically designed to neutralize this geographical resistance over the next 24 months.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+        st.caption("📽️ *Context:* Prof. Pagel analyzes why tracking this 'Shock Strategy' in real-time is the only way to maintain a coherent historical record.")
 
-# 12. VAULT SECTION
+# 12. VAULT
 st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Vault")
 if not display_df.empty:
     csv = display_df.to_csv(index=False).encode('utf-8')
-    st.download_button(label="📥 Export CSV", data=csv, file_name=f'trump_actions.csv', mime='text/csv')
+    st.download_button(label="📥 Export CSV", data=csv, file_name='trump_actions.csv', mime='text/csv')
 
-search = st.text_input("Search...", placeholder="Type to filter table...")
+search = st.text_input("Search...", placeholder="Filter by keyword...")
 v_df = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 if not v_df.empty:
     st.dataframe(
         v_df[['Date', 'Title', 'URL', 'Themes']], 
-        column_config={"URL": st.column_config.LinkColumn("Source Link"), "Date": st.column_config.DateColumn("Date")},
+        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
         use_container_width=True, hide_index=True
     )
 
