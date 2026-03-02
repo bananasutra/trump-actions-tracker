@@ -36,7 +36,7 @@ st.sidebar.markdown("Use these to drill down into specific policy areas.")
 selected_cat = st.sidebar.selectbox("Filter by Policy Category", ["All Actions"] + cat_cols)
 
 if selected_cat != "All Actions":
-    display_df = df[df[selected_cat].str.strip().lower() == 'yes']
+    display_df = df[df[selected_cat].fillna('No').astype(str).str.strip().str.lower() == 'yes']
 else:
     display_df = df
 
