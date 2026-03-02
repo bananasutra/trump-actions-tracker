@@ -162,14 +162,14 @@ if not df.empty:
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### ⚡ Strategic Velocity: The 'Shock' Phase")
+        st.markdown("#### Strategic Velocity: The 'Shock' Phase")
         st.write(f"Executing **{pace:.1f} actions per month**. This volume ensures that judicial **processing latency** remains higher than the implementation rate—creating a permanent implementation advantage.")
         st.warning(f"**Diagnostic:** Linear extrapolation projects over **8,200 actions** by Jan 2029. This trajectory signals a move from policy 'disruption' to a 'full institutional rewrite.'")
-        st.markdown("### 🕸️ Norm-Collapse Loops")
+        st.markdown("#### Norm-Collapse Loops")
         st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of actions are multi-tagged. This highlights 'interlocking strikes' where a single move (e.g. purging the civil service) simultaneously breaks 3+ institutional norms.")
 
     with col2:
-        st.markdown("### 🛡️ The Heatmap of Resistance")
+        st.markdown("#### The Heatmap of Resistance")
         st.write("Opposition is currently anchored by 'Blue State Shields' (CA, WA, NY, IL). Data shows litigation is the *only* functional friction point slowing velocity, explaining the prioritization of Judicial and DOJ hollowing.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
