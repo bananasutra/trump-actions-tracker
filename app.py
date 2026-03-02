@@ -68,7 +68,7 @@ col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
 # 6. Progression Graph (With Click Function & Smaller Notes)
 st.subheader(f"Timeline Progression: {selected_cat}")
 
-# Link usage and browser notes in smaller font
+# Notes moved to st.caption for smaller font size
 st.caption("💡 **Hover** to see details. **Click** any point to open source URL in a new window.")
 st.caption("⚠️ **Note on Links:** Source URLs will open in a new window. Some sites (like *The Guardian*, the *NY Times*, *NBC News*, and *AP News*) block links from external apps.")
 
@@ -119,7 +119,7 @@ st.divider()
 st.subheader("📊 Data Insights (Feb 2025 – Feb 2026)")
 
 # Calculate dominant categories
-top_cats = bar_df.head(2)['Category'].tolist()
+top_cats = bar_df.head(2)['Category'].tolist() if not bar_df.empty else ["N/A", "N/A"]
 avg_cats = df['Cat_Count'].mean()
 
 insight_col1, insight_col2 = st.columns(2)
