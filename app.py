@@ -43,7 +43,6 @@ def load_data():
     df = df.sort_values('Date', ascending=False)
     cat_cols = list(CATEGORY_MAP.keys())
     
-    # Safe string conversion and cleaning for categories
     df['Themes'] = df.apply(lambda r: ", ".join([CATEGORY_MAP.get(c, c) for c in cat_cols if str(r[c]).strip().lower() == 'yes']), axis=1)
     df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
     return df, cat_cols
@@ -55,18 +54,19 @@ st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 st.info("**Context:** A strategic diagnostic of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
 
-# 5. Anchored Navigation (Ghost Style)
+# 5. WHITE-TEXT NAVIGATION (BELOW CONTEXT)
+# Swapped color to #FFFFFF (white) and border to #DE0100 (red)
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
-    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Timeline</button></a>
-    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Volume</button></a>
-    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Latest</button></a>
-    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Insights</button></a>
-    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #DE0100; font-weight: bold; cursor: pointer;">Vault</button></a>
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
+    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
+    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #DE0100; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Vault</button></a>
 </div>
 """, unsafe_allow_html=True)
 
-# 6. Filters
+# 6. Sidebar Logic
 st.sidebar.title("Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", value=False)
 if comparison_mode:
@@ -75,7 +75,7 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Logic
+# 7. Data Filtering
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
@@ -95,13 +95,13 @@ st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
     if not df_comp.empty:
-        chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
+        comp_chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x=alt.X('Date:T', title='Timeline'),
             y=alt.Y('Cumulative:Q', title='Actions'),
-            color=alt.Color('Category_Short:N', legend=alt.Legend(orient='bottom', columns=2)),
+            color=alt.Color('Category_Short:N', legend=alt.Legend(orient='bottom', columns=2), scale=alt.Scale(scheme='category10')),
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), 'Title:N', 'Category_Short:N']
         ).interactive().properties(height=450)
-        st.altair_chart(chart, use_container_width=True)
+        st.altair_chart(comp_chart, use_container_width=True)
 else:
     st.subheader(f"Timeline Progression: {selected_short}")
     line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(x='Date:T', y='Cumulative:Q')
@@ -114,7 +114,7 @@ else:
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault for links.")
 st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for source links.")
 
-# 9. VOLUME
+# 9. VOLUME & GLOSSARY
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
@@ -146,10 +146,10 @@ if not display_df.empty:
             st.write(f"**Themes:** {row['Themes']}")
             st.link_button("🚀 Open Source", row['URL'])
 
-# 11. DEEP INSIGHTS (THE DIAGNOSTIC ANALYSIS - FIXED)
+# 11. DEEP INSIGHTS (DIAGNOSTIC)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🚨 Deep Insights: The Authoritarian Blueprint")
+st.subheader("🚨 Deep Insights: Strategic Diagnostic")
 
 if not display_df.empty:
     total = len(df)
@@ -159,18 +159,18 @@ if not display_df.empty:
 
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
-        st.markdown("### ⚡ Strategic Velocity & Attrition")
-        st.write(f"Executing **{pace:.1f} actions per month**. This 'Blitzkrieg' pace is designed to ensure judicial **processing latency** remains higher than the implementation rate.")
-        st.warning(f"**Dire Projection:** Linear extrapolation projects **8,220 actions** by Jan 2029—moving from 'disruption' to a total institutional rewrite.")
+        st.markdown("### ⚡ Strategic Velocity")
+        st.write(f"Executing **{pace:.1f} actions per month**. This pace is designed to maintain a 'first-mover advantage' over judicial oversight, ensuring that systemic changes are implemented before legal stay orders can be processed.")
+        st.warning(f"**Dire Projection:** Current trajectory projects over **8,200 actions** by Jan 2029—an overhaul of the federal administrative state with no 20th-century precedent.")
         st.markdown("### 🕸️ Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of actions are multi-tagged. This indicates personnel purges (like Schedule F) are engineered to bypass multiple institutional checks simultaneously.")
+        st.write(f"**Complexity:** {multi_ratio:.1f}% of actions trigger 2+ flags. This reveals 'interlocking policy strikes' where one move (e.g., gutting the EPA) simultaneously hits scientific control, federal hollowing, and norm violations.")
 
     with col_ins2:
-        st.markdown("### 🛡️ The Geography of Resistance")
-        st.write("Opposition is concentrated in 'Blue State Shields' (CA, WA, NY). Data shows litigation is the *only* friction point slowing velocity, which is why DOJ and Judicial hollowing are prioritized targets for the next 24 months.")
+        st.markdown("### 🛡️ Geography of Friction")
+        st.write("Opposition is currently anchored by 'Blue Shield' state litigation (CA, WA, NY). Data shows that legal friction is the primary bottleneck for this velocity, leading to the current prioritization of judicial and DOJ hollowing.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 12. VAULT
+# 12. DATA VAULT
 st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Vault")
@@ -178,7 +178,7 @@ if not display_df.empty:
     csv = display_df.to_csv(index=False).encode('utf-8')
     st.download_button(label="📥 Export CSV", data=csv, file_name='trump_actions.csv', mime='text/csv')
 
-search = st.text_input("Search...", placeholder="Filter by keyword...")
+search = st.text_input("Search descriptions...", placeholder="Filter by keyword...")
 v_df = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 if not v_df.empty:
     st.dataframe(
