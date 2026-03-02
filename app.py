@@ -10,14 +10,14 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Category Mapping
+# 2. Category Mapping (RESTORED TO FULL CSV COLUMN NAMES)
 CATEGORY_MAP = {
     "Violating Democratic Norms, Undermining Rule of Law": "Democratic Norms",
     "Hollowing State / Weakening Federal Institutions": "Federal Institutions",
     "Suppressing Dissent / Weaponising State Against 'Enemies'": "Suppressing Dissent",
     "Controlling Information Including Spreading Misinformation and Propaganda": "Info Control",
     "Control of Science & Health to Align with State Ideology": "Science & Health",
-    "Attacking Universities, Museums, Culture": "Education & Culture",
+    "Attacking Universities, Schools, Museums, Culture": "Education & Culture",
     "Weakening Civil Rights": "Civil Rights",
     "Corruption & Enrichment": "Corruption",
     "Aggressive Foreign Policy & Global Destabilisation": "Foreign Policy",
@@ -29,44 +29,61 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load Data
 @st.cache_data
 def load_data():
-    files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
+    # Attempting to load the file
+    files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv', 'trump_actions.csv']
     df = None
     for file in files_to_try:
         try:
+            # Note: We use skiprows=2 because the CSV typically has a title and a source line
             df = pd.read_csv(file, skiprows=2)
             break
         except:
             continue
-    if df is None: return None, None
+    
+    if df is None:
+        st.error("Data file not found. Ensure the CSV is uploaded to your GitHub repository.")
+        return None, None
 
+    # Cleaning column names to remove any accidental leading/trailing spaces
+    df.columns = [c.strip() for c in df.columns]
+    
     df['Date'] = pd.to_datetime(df['Date'])
-    # ASCENDING for cumulative chart math
-    df = df.sort_values('Date', ascending=True) 
+    df = df.sort_values('Date', ascending=True) # Ascending for correct chart growth
+    
     cat_cols = list(CATEGORY_MAP.keys())
     
-    df['Themes'] = df.apply(lambda r: ", ".join([CATEGORY_MAP.get(c, c) for c in cat_cols if str(r[c]).strip().lower() == 'yes']), axis=1)
-    df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
+    # THE FIX: Check if column exists before trying to access it in the lambda
+    def get_active_short(row):
+        active = []
+        for col in cat_cols:
+            if col in df.columns:
+                if str(row[col]).strip().lower() == 'yes':
+                    active.append(CATEGORY_MAP[col])
+        return ", ".join(active)
+    
+    df['Themes'] = df.apply(get_active_short, axis=1)
+    df['Cat_Count'] = df[[c for c in cat_cols if c in df.columns]].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
+    
     return df, cat_cols
 
 df, cat_cols = load_data()
 
-# 4. Header
+# 4. Header & Navigation (Crisp White Anchors)
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 st.info("**Context:** A strategic diagnostic of the systematic dismantling of U.S. democratic institutions since Jan 2025.")
 
-# 5. Crisp White Ghost Navigation
 st.markdown("""
 <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 10px; margin-bottom: 25px;">
-    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
-    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
-    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
-    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
-    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Search</button></a>
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Volume</button></a>
+    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
+    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Search</button></a>
 </div>
 """, unsafe_allow_html=True)
 
-# 6. Sidebar
+# 5. Sidebar Logic
 st.sidebar.title("Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", value=False)
 if comparison_mode:
@@ -75,23 +92,29 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 7. Data Branching
+# 6. Data Branching
 if comparison_mode:
-    long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
+    long_cats = [SHORT_TO_LONG[s] for s in selected_compare if SHORT_TO_LONG[s] in df.columns]
+    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Cat_Count'], 
+                      value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
     df_comp = df_comp.sort_values(['Category_Short', 'Date'])
     df_comp['Cumulative'] = df_comp.groupby('Category_Short').cumcount() + 1
     display_df = df_comp 
 else:
-    display_df = df if selected_short == "All Actions" else df[df[SHORT_TO_LONG[selected_short]].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
+    target_col = SHORT_TO_LONG[selected_short] if selected_short != "All Actions" else None
+    if target_col and target_col in df.columns:
+        display_df = df[df[target_col].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
+    else:
+        display_df = df.copy()
+    
     chart_df = display_df.sort_values('Date')
     filtered_daily = chart_df.groupby('Date')['Index'].nunique().reset_index()
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. TIMELINE
+# 7. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
@@ -112,17 +135,18 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
+st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault for links.")
 
-# 9. VOLUME & GLOSSARY
+# 8. VOLUME & GLOSSARY
 st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
 cat_counts = []
 for long, short in CATEGORY_MAP.items():
-    if comparison_mode and short not in selected_compare: continue
-    count = (df[long].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
-    if count > 0: cat_counts.append({'Category': short, 'Count': count})
+    if long in df.columns:
+        if comparison_mode and short not in selected_compare: continue
+        count = (df[long].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
+        if count > 0: cat_counts.append({'Category': short, 'Count': count})
 
 if cat_counts:
     bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
@@ -135,7 +159,7 @@ if cat_counts:
 with st.expander("📖 Category Glossary"):
     st.table(pd.DataFrame({"Category": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
 
-# 10. LATEST ACTIONS (STRICTLY DESCENDING)
+# 9. LATEST ACTIONS (STRICTLY DESCENDING)
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
@@ -146,7 +170,7 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes']}")
         st.link_button("🚀 Open Source", row['URL'])
 
-# 11. DEEP INSIGHTS (RESTORED FULL DIAGNOSTIC)
+# 10. DEEP INSIGHTS (RESTORED FULL DIAGNOSTIC)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: The Authoritarian Blueprint")
@@ -159,19 +183,19 @@ if not df.empty:
 
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
-        st.markdown("### Strategic Velocity: The 'Shock' Strategy")
+        st.markdown("###  Strategic Velocity: The 'Shock' Strategy")
         st.write(f"The administration is maintaining a pace of **{pace:.1f} significant actions per month**. This volume is engineered to ensure judicial and institutional **processing latency** remains higher than the implementation rate.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This trajectory signals a move from policy 'disruption' to a 'full institutional rewrite.'")
-        st.markdown("### Norm-Collapse Loops")
+        st.markdown("###  Norm-Collapse Loops")
         st.write(f"**Complexity:** {multi_ratio:.1f}% of events are multi-tagged. This highlights 'interlocking strikes' where a single move (e.g. purging the civil service) simultaneously breaks 3+ institutional norms.")
 
     with col_ins2:
-        st.markdown("### The Geography of Resistance")
+        st.markdown("###  The Geography of Resistance")
         st.write("Opposition is currently anchored by 'Blue State Shields' (CA, WA, NY, IL). Data shows litigation is the *only* functional friction point slowing velocity, explaining the prioritization of Judicial and DOJ hollowing.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
         st.caption("📽️ *Context:* Prof. Christina Pagel discusses why tracking these 'Shock' patterns is critical to preventing 'Normalization'.")
 
-# 12. VAULT (STRICTLY DESCENDING)
+# 11. VAULT (STRICTLY DESCENDING)
 st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Vault")
