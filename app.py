@@ -61,11 +61,10 @@ st.sidebar.title("Navigation & Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode (Multi-Line)", value=False)
 
 if comparison_mode:
-    # UPDATED: Defaulting to ALL categories instead of just 2
     selected_compare = st.sidebar.multiselect(
         "Categories to Compare", 
         list(SHORT_TO_LONG.keys()), 
-        default=list(SHORT_TO_LONG.keys()), # Selects everything by default
+        default=list(SHORT_TO_LONG.keys()), 
         help="Remove categories to simplify the comparison chart."
     )
     selected_short = "Comparison View"
@@ -104,15 +103,18 @@ st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](http
 if comparison_mode:
     st.subheader("Category Comparison: Growth Over Time")
     if not df_comp.empty:
+        # MOBILE FIX: Legend moved to bottom with multi-column layout
         comp_chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x=alt.X('Date:T', title='Timeline'),
             y=alt.Y('Cumulative:Q', title='Cumulative Actions'),
-            color=alt.Color('Category_Short:N', title='Category', scale=alt.Scale(scheme='category10')),
+            color=alt.Color('Category_Short:N', title=None, 
+                            legend=alt.Legend(orient='bottom', columns=2, labelLimit=200, labelFontSize=11),
+                            scale=alt.Scale(scheme='category10')),
             tooltip=['Date:T', 'Category_Short:N', 'Cumulative:Q', 'Title:N']
-        ).interactive().properties(height=500)
+        ).interactive().properties(height=450)
         st.altair_chart(comp_chart, use_container_width=True)
     else:
-        st.info("Please select at least one category in the sidebar to view the comparison chart.")
+        st.info("Please select at least one category to view comparison.")
 else:
     st.subheader(f"Timeline Progression: {selected_short}")
     line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
@@ -125,9 +127,9 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Export Tip:** Hover over the chart and click the **'...'** (three dots) in the top right to download as PNG/SVG for sharing.")
+st.caption("💡 **Export Tip:** Hover and click '...' (top right) to download chart as PNG/SVG.")
 
-# 8. Category Volume Bar Chart (Safety Check Added)
+# 8. Category Volume Bar Chart
 st.divider()
 st.subheader("Action Volume by Category")
 cat_counts = []
@@ -136,7 +138,6 @@ for long, short in CATEGORY_MAP.items():
     count = (display_df[long].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum() if not comparison_mode else len(df_comp[df_comp['Category_Short'] == short])
     if count > 0: cat_counts.append({'Category': short, 'Count': count})
 
-# FIX: Check if cat_counts is empty before creating/sorting dataframe
 if cat_counts:
     bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
     bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
@@ -146,14 +147,15 @@ if cat_counts:
     ).properties(height=len(bar_df) * 40 + 50)
     st.altair_chart(bar_chart, use_container_width=True)
 else:
-    st.info("No data available for the current selection.")
+    st.info("No data available for selection.")
 
+# 9. Educational Note & Glossary
 with st.expander("📖 Category Glossary & Multi-Tagging Logic"):
     st.markdown("### Category Glossary")
     st.table(pd.DataFrame({"Short Name": list(SHORT_TO_LONG.keys()), "Full Official Definition": list(SHORT_TO_LONG.values())}))
-    st.write("**Pervasive Complexity:** One action often triggers multiple flags. Filtering for one category shows its co-occurrence with others.")
+    st.write("**Pervasive Complexity:** One action often triggers multiple flags. Filtering shows co-occurrence.")
 
-# 9. Latest Actions
+# 10. Latest Actions Highlight
 st.divider()
 st.subheader(f"📍 Latest Actions: {selected_short}")
 if not display_df.empty:
@@ -165,7 +167,7 @@ if not display_df.empty:
 else:
     st.write("No actions to display.")
 
-# 10. Data Vault & Export
+# 11. Data Vault & Export
 st.divider()
 st.subheader("Data Vault")
 
@@ -179,13 +181,8 @@ if not display_df.empty:
     )
 
 search = st.text_input("Search descriptions...", placeholder="Type here...")
-filtered_table = display_df
-if search and not display_df.empty:
-    filtered_table = display_df[display_df['Title'].str.contains(search, case=False, na=False)]
-
+filtered_table = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 if not filtered_table.empty:
     st.dataframe(filtered_table[['Date', 'Title', 'URL']], use_container_width=True, hide_index=True)
-else:
-    st.write("No data found.")
 
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated Mar, 1st 2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03/01/2026. CC BY 4.0.")
