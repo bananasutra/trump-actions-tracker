@@ -29,17 +29,18 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load and Clean Data
 @st.cache_data
 def load_data():
+    # Attempting newest file first
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
         try:
             df = pd.read_csv(file, skiprows=2)
             break
-        except FileNotFoundError:
+        except:
             continue
     
     if df is None:
-        st.error("Data file not found. Ensure 'trump-actions-3-1-26.csv' is in your repository.")
+        st.error("Data file not found. Ensure the latest CSV is in your repository.")
         return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
@@ -54,19 +55,23 @@ def load_data():
 
 df, cat_cols = load_data()
 
-# 4. Header (TITLE FIRST)
+# 4. TITLE & HEADER
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
-st.info("**Context:** Documenting actions, statements, and plans of the Trump administration that echo authoritarian regimes and threaten American democracy, since Jan 2025.")
 
-# 5. Anchored Navigation Menu (BELOW TITLE)
-st.markdown("### 🧭 Quick Navigation")
-nav_col1, nav_col2, nav_col3, nav_col4, nav_col5 = st.columns(5)
-nav_col1.button("📈 Timeline", use_container_width=True)
-nav_col2.button("📊 Volume", use_container_width=True)
-nav_col3.button("🚨 Deep Insights", use_container_width=True)
-nav_col4.button("📍 Latest", use_container_width=True)
-nav_col5.button("🗄️ Data Vault", use_container_width=True)
+# 5. ONE-WORD ANCHOR NAVIGATION
+# We use HTML anchor tags and st.markdown for true functional jumping
+st.markdown("""
+<div style="display: flex; justify-content: space-between; gap: 10px;">
+    <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Timeline</button></a>
+    <a href="#volume" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Volume</button></a>
+    <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Latest</button></a>
+    <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Insights</button></a>
+    <a href="#vault" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: white; color: #DE0100; cursor: pointer;">Vault</button></a>
+</div>
+""", unsafe_allow_html=True)
+
+st.info("**Context:** Documenting actions and plans of the Trump administration that threaten American democracy, since Jan 2025.")
 
 # 6. Sidebar Logic
 st.sidebar.title("Filters")
@@ -75,7 +80,7 @@ if comparison_mode:
     selected_compare = st.sidebar.multiselect("Categories to Compare", SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
     selected_short = "Comparison View"
 else:
-    selected_short = st.sidebar.selectbox("Filter by Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
+    selected_short = st.sidebar.selectbox("Filter by Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
 # 7. Filtering Logic
 if comparison_mode:
@@ -94,7 +99,8 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. Progression Charts
+# 8. TIMELINE SECTION
+st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Category Growth")
     if not df_comp.empty:
@@ -115,9 +121,10 @@ else:
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
-st.caption("⚠️ **Note on Links:** Many sites block direct opening from external apps. Search the Data Vault to use direct links.")
+st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for direct source links.")
 
-# 9. Category Volume & GLOSSARY (RESTORED TO ORIGINAL INTENT)
+# 9. VOLUME SECTION
+st.markdown("<div id='volume'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Category")
 cat_counts = []
@@ -134,11 +141,22 @@ if cat_counts:
         tooltip=['Category:N', 'Count:Q']
     ).properties(height=len(bar_df) * 40 + 50), use_container_width=True)
 
-with st.expander("📖 Glossary: Category Definitions & Multi-Tagging Context"):
+with st.expander("📖 Glossary & Multi-Tagging Context"):
     st.table(pd.DataFrame({"Category": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
-    st.write("**Pervasive Complexity:** These categories overlap because policy actions are multifaceted. One Executive Order often simultaneously triggers flags for 'Federal Institutions,' 'Civil Rights,' and 'Scientific Control.'")
 
-# 10. DEEP ANALYTICAL INSIGHTS (DEVELOPED & RESTRUCTURED)
+# 10. LATEST SECTION (MOVED ABOVE INSIGHTS)
+st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
+st.divider()
+st.subheader(f"📍 Latest 5 Actions: {selected_short}")
+if not display_df.empty:
+    for i, row in display_df.head(5).iterrows():
+        with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
+            st.write(f"**Full Description:** {row['Title']}")
+            st.write(f"**Themes:** {row['Themes']}")
+            st.link_button("🚀 Open Source", row['URL'])
+
+# 11. INSIGHTS SECTION (DEEP DIVE)
+st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Velocity, Strategy, & Projections")
 
@@ -147,41 +165,35 @@ if not display_df.empty:
     days_active = (df['Date'].max() - df['Date'].min()).days
     pace_per_month = (total_actions / max(days_active, 1)) * 30.44
     multi_cat_pct = (len(df[df['Cat_Count'] > 1]) / total_actions) * 100
-    top_source = df['Source_Domain'].value_counts().idxmax()
-
+    
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
-        st.markdown(f"### ⚡ The Pace of Power")
-        st.write(f"The administration is moving at a velocity of **{pace_per_month:.1f} actions per month**. In historical backsliding contexts, this speed is designed to 'flood the zone,' ensuring the judicial and legislative systems cannot process challenges at the rate of implementation.")
-        st.warning(f"**Dire Projection:** Linear extrapolation of the current Mar 2026 dataset projects over **8,200 systemic actions** by Jan 2029—a volume that would represent a total structural replacement of the federal workforce.")
-
-        st.markdown("### 🧬 Structural Pattern Recognition")
-        st.write(f"**Interconnectivity:** {multi_cat_pct:.1f}% of events are 'multi-tagged.' This reveals a deliberate strategy where actions are rarely isolated; they are engineered to impact multiple democratic norms simultaneously, creating a cascading failure in institutional checks.")
+        st.markdown("### ⚡ Pace of Power")
+        st.write(f"Moving at **{pace_per_month:.1f} actions per month**. Projected: **8,200 systemic actions** by Jan 2029.")
+        st.warning("**The Shock Strategy:** Historical backsliding shows that sheer volume is used to overwhelm judicial processing.")
+        st.markdown("### 🧬 Pattern Recognition")
+        st.write(f"**Interconnectivity:** {multi_cat_pct:.1f}% of actions trigger multiple flags. This isn't random; it's engineered to create cascading failures in institutional checks.")
 
     with col_ins2:
-        st.markdown("### 🛡️ The Heatmap of Resistance")
-        st.write("The 'Heatmap' refers to the geographical and jurisdictional concentration of opposition. Analysis shows that **'State-Level Shielding'** (litigation from CA, WA, NY, and IL) is the primary friction point. Legal filings from these hubs correlate 1:1 with escalations in 'Hollowing Federal Institutions' actions.")
+        st.markdown("### 🛡️ Resistance Analysis")
+        st.write("Opposition is concentrated in state-level litigation (CA, WA, NY, IL). These 'Blue Shields' correlate directly with escalations in federal institution hollowing.")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-        st.caption("📽️ *Context:* Prof. Christina Pagel discuss the 'Shock Strategy' behind these documented patterns.")
 
-# 11. Latest Actions
-st.divider()
-st.subheader(f"📍 Latest 5 Actions: {selected_short}")
-for i, row in display_df.head(5).iterrows():
-    with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
-        st.write(f"**Full Action:** {row['Title']}")
-        st.write(f"**Themes Involved:** {row['Themes']}")
-        st.link_button("🚀 View Original Source", row['URL'])
-
-# 12. Data Vault
+# 12. VAULT SECTION
+st.markdown("<div id='vault'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Vault")
-search = st.text_input("Search descriptions...", placeholder="Filter by keyword (e.g. 'immigration', 'science', 'court')...")
-v_df = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
-st.dataframe(
-    v_df[['Date', 'Title', 'URL', 'Themes']], 
-    column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
-    use_container_width=True, hide_index=True
-)
+if not display_df.empty:
+    csv = display_df.to_csv(index=False).encode('utf-8')
+    st.download_button(label="📥 Export CSV", data=csv, file_name=f'trump_actions.csv', mime='text/csv')
 
-st.caption("Dashboard by bananasutra. Projections based on linear regression of tracker data. Updated Mar 2026. CC BY 4.0.")
+search = st.text_input("Search...", placeholder="Type to filter table...")
+v_df = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
+if not v_df.empty:
+    st.dataframe(
+        v_df[['Date', 'Title', 'URL', 'Themes']], 
+        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
+        use_container_width=True, hide_index=True
+    )
+
+st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
