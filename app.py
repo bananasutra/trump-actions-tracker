@@ -67,7 +67,7 @@ if comparison_mode:
 else:
     selected_short = st.sidebar.selectbox("Filter by Policy Area", ["All Actions"] + SORTED_SHORT_NAMES)
 
-# 5. Filtering & Comparison Logic
+# 5. Filtering Logic
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Themes', 'URL', 'Source_Domain', 'Cat_Count'], 
@@ -85,11 +85,20 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 6. Header
+# 6. Top Anchored Navigation Menu
+st.markdown("### 🧭 Quick Navigation")
+nav_col1, nav_col2, nav_col3, nav_col4, nav_col5 = st.columns(5)
+if nav_col1.button("📈 Timeline", use_container_width=True): st.write('<style>div.row-widget.stButton > button { border: 2px solid red; }</style>', unsafe_allow_html=True)
+if nav_col2.button("📊 Volume", use_container_width=True): pass
+if nav_col3.button("🚨 Insights", use_container_width=True): pass
+if nav_col4.button("📍 Latest", use_container_width=True): pass
+if nav_col5.button("🗄️ Vault", use_container_width=True): pass
+
+# 7. Header
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
-# 7. Chart Rendering
+# 8. Charts Section
 if comparison_mode:
     st.subheader("Category Comparison: Growth Over Time")
     if not df_comp.empty:
@@ -100,6 +109,8 @@ if comparison_mode:
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), 'Title:N', 'Category_Short:N']
         ).interactive().properties(height=450)
         st.altair_chart(comp_chart, use_container_width=True)
+    else:
+        st.info("Select a category to view comparison.")
 else:
     st.subheader(f"Timeline Progression: {selected_short}")
     line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(x='Date:T', y='Cumulative:Q')
@@ -109,31 +120,11 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# 8. ANALYTICAL INSIGHTS (The "Deep Dive")
-st.divider()
-st.subheader("📊 Analytical Insights & Velocity Projections")
+# RESTORED: Hover & Links Tip
+st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
+st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *AP*) block direct opening from external apps. Search the action in the Data Vault to use the direct source link.")
 
-if not display_df.empty:
-    total_actions = len(df)
-    days_active = (df['Date'].max() - df['Date'].min()).days
-    pace_per_month = (total_actions / max(days_active, 1)) * 30.44
-    multi_cat_pct = (len(df[df['Cat_Count'] > 1]) / total_actions) * 100
-    top_source = df['Source_Domain'].value_counts().idxmax()
-
-    col_ins1, col_ins2 = st.columns(2)
-    with col_ins1:
-        st.write("### 📈 Pace of Power")
-        st.write(f"The administration is moving at **{pace_per_month:.1f} significant actions per month**. At this trajectory, the data projects over **8,200 actions** by Jan 2029—a speed that bypasses traditional judicial oversight.")
-        st.write(f"### 🛡️ Heatmap of Resistance")
-        st.write("Legal pushback is scaling alongside policy actions. Blue states (led by California, New York, and Washington) have filed over **250 collective lawsuits** against these actions, primarily targeting 'Federal Institution' hollowing.")
-
-    with col_ins2:
-        st.write("### 🧬 Cascading Impacts")
-        st.write(f"**{multi_cat_pct:.1f}%** of documented events trigger multiple category flags. This suggests a strategy of 'Structural Interconnectivity,' where a single personnel change disrupts 2-3 institutional norms at once.")
-        st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-        st.caption("📽️ *Context:* Prof. Christina Pagel explains the methodology and purpose of this tracker.")
-
-# 9. Category Volume Bar Chart
+# 9. Category Volume
 st.divider()
 st.subheader("Action Volume by Category")
 cat_counts = []
@@ -150,8 +141,30 @@ if cat_counts:
         tooltip=['Category:N', 'Count:Q']
     ).properties(height=len(bar_df) * 40 + 50), use_container_width=True)
 
-# 10. Glossary & Latest Actions
-with st.expander("📖 Category Glossary & Multi-Tagging Logic"):
+# 10. ANALYTICAL INSIGHTS (Moved below charts)
+st.divider()
+st.subheader("🚨 Deep Insights & Projections")
+
+if not display_df.empty:
+    total_actions = len(df)
+    days_active = (df['Date'].max() - df['Date'].min()).days
+    pace_per_month = (total_actions / max(days_active, 1)) * 30.44
+    multi_cat_pct = (len(df[df['Cat_Count'] > 1]) / total_actions) * 100
+    top_source = df['Source_Domain'].value_counts().idxmax()
+
+    col_ins1, col_ins2 = st.columns(2)
+    with col_ins1:
+        st.write("### ⚡ Pace of Power")
+        st.write(f"The administration is moving at **{pace_per_month:.1f} actions per month**. Projection: **8,200 actions** by Jan 2029.")
+        st.write("### 🛡️ Heatmap of Resistance")
+        st.write("State-led litigation (led by WA, CA, NY) acts as the primary friction point against this velocity.")
+    with col_ins2:
+        st.write("### 📽️ Tracker Context")
+        st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+        st.caption(f"**Multi-Tagging:** {multi_cat_pct:.1f}% of events impact multiple democratic norms.")
+
+# 11. Glossary & Latest Actions
+with st.expander("📖 Glossary & Multi-Tagging Logic"):
     st.table(pd.DataFrame({"Short Name": list(SHORT_TO_LONG.keys()), "Official Definition": list(SHORT_TO_LONG.values())}))
 
 st.divider()
@@ -161,17 +174,16 @@ for i, row in display_df.head(5).iterrows():
         st.write(f"**Description:** {row['Title']}")
         st.link_button("🚀 Open Source", row['URL'])
 
-# 11. Data Vault
+# 12. Data Vault
 st.divider()
 st.subheader("Data Vault")
+if not display_df.empty:
+    csv = display_df.to_csv(index=False).encode('utf-8')
+    st.download_button(label="📥 Download View as CSV", data=csv, file_name=f'trump_actions.csv', mime='text/csv')
+
 search = st.text_input("Search descriptions...", placeholder="Type here...")
 filtered_table = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
-
 if not filtered_table.empty:
-    st.dataframe(
-        filtered_table[['Date', 'Title', 'URL', 'Themes']], 
-        column_config={"URL": st.column_config.LinkColumn("Source Link"), "Date": st.column_config.DateColumn("Date")},
-        use_container_width=True, hide_index=True
-    )
+    st.dataframe(filtered_table[['Date', 'Title', 'URL', 'Themes']], column_config={"URL": st.column_config.LinkColumn("Source Link"), "Date": st.column_config.DateColumn("Date")}, use_container_width=True, hide_index=True)
 
-st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Updated 03/01/2026. CC BY 4.0.")
