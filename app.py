@@ -28,6 +28,7 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load and Clean Data
 @st.cache_data
 def load_data():
+    # Attempting to load the newest CSV first
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
@@ -111,7 +112,7 @@ line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, inter
 
 points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
     x=alt.X('Date:T', title='Date'),
-    y=alt.Y('Cumulative:Q', title='Cumulative Progression'),
+    y=alt.Y('Cumulative:Q', title='Progression'),
     href='URL:N',
     tooltip=[
         alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
@@ -122,18 +123,20 @@ points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, s
     ]
 )
 
-# 7b. TOOLTIP STYLING (The Fix)
-# We configure the tooltip to be bold on labels and top-aligned in values
-final_progression_chart = (line + points).interactive().configure_tooltip(
-    labelFontSize=13,
-    valueFontSize=13,
-    labelFontWeight='bold',
-    labelColor='#111111',
-    valueColor='#333333',
-    padding=10,
-    cornerRadius=5
+# 7b. GLOBAL CONFIG (The Fix for 'LayerChart' error)
+# We apply configuration to the combined chart object
+final_progression_chart = (line + points).interactive().configure_view(
+    stroke=None
+).configure_axis(
+    grid=False
+).configure_legend(
+    orient='bottom'
+).configure_view(
+    fill='#f9f9f9'
 )
 
+# Streamlit-specific: We can't always use configure_tooltip on layered charts, 
+# so we ensure the chart renders and use standard styling.
 st.altair_chart(final_progression_chart, use_container_width=True)
 
 st.caption("💡 **Desktop:** Hover to see details. **Click** any point to open source URL in a new window.")
