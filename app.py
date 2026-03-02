@@ -38,7 +38,7 @@ def load_data():
             continue
     
     if df is None:
-        st.error("Data file not found.")
+        st.error("Data file not found. Ensure the CSV is in your repository.")
         return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
@@ -58,13 +58,11 @@ df, cat_cols = load_data()
 
 # 4. Sidebar Navigation
 st.sidebar.title("Navigation & Filters")
-
-# Comparison Mode Toggle
-comparison_mode = st.sidebar.toggle("📊 Enable Comparison Mode", value=False)
+comparison_mode = st.sidebar.toggle("📊 Comparison Mode (Multi-Line)", value=False)
 
 if comparison_mode:
     selected_compare = st.sidebar.multiselect(
-        "Select Categories to Compare", 
+        "Categories to Compare", 
         list(SHORT_TO_LONG.keys()), 
         default=list(SHORT_TO_LONG.keys())[:2]
     )
@@ -74,18 +72,16 @@ else:
 
 # 5. Filtering & Comparison Logic
 if comparison_mode:
-    # Melt the data for comparison chart
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Active_Categories_Short'], 
+    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Active_Categories_Short', 'URL'], 
                       value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
     
-    # Calculate cumulative per category
     df_comp = df_comp.sort_values(['Category_Short', 'Date'])
     df_comp['Count'] = 1
     df_comp['Cumulative'] = df_comp.groupby('Category_Short')['Count'].cumsum()
-    display_df = df_comp # For the vault
+    display_df = df_comp 
 else:
     if selected_short != "All Actions":
         long_name = SHORT_TO_LONG[selected_short]
@@ -124,46 +120,52 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for links.")
+st.caption("💡 **Export Tip:** Hover over the chart and click the **'...'** (three dots) in the top right to download as PNG/SVG for sharing.")
 
-# 8. Category Volume Bar Chart (Syncs with filters)
+# 8. Category Volume Bar Chart
 st.divider()
 st.subheader("Action Volume by Category")
 cat_counts = []
 for long, short in CATEGORY_MAP.items():
-    if comparison_mode:
-        # Only show the categories being compared
-        if short not in selected_compare: continue
+    if comparison_mode and short not in selected_compare: continue
     count = (display_df[long].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum() if not comparison_mode else len(df_comp[df_comp['Category_Short'] == short])
     if count > 0: cat_counts.append({'Category': short, 'Count': count})
 
 bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
 bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
     x=alt.X('Count:Q', title='Number of Actions'),
-    y=alt.Y('Category:N', sort='-x', title=None),
+    y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=350)),
     tooltip=['Category:N', 'Count:Q']
 ).properties(height=len(bar_df) * 40 + 50)
 st.altair_chart(bar_chart, use_container_width=True)
 
-# 9. Educational Note & Glossary
-with st.expander("📖 Understanding These Categories & Filtered Views"):
-    st.markdown("### Why do other categories appear when I filter?")
-    st.write("Policy actions are rarely isolated. When you filter for one category, you see overlapping tags. This **pervasive complexity** highlights how shifts in governance have cascading effects.")
+with st.expander("📖 Category Glossary & Multi-Tagging Logic"):
     st.markdown("### Category Glossary")
     st.table(pd.DataFrame({"Short Name": list(SHORT_TO_LONG.keys()), "Full Official Definition": list(SHORT_TO_LONG.values())}))
+    st.write("**Pervasive Complexity:** One action often triggers multiple flags. Filtering for one category shows its co-occurrence with others.")
 
-# 10. Latest Actions
+# 9. Latest Actions
 st.divider()
-st.subheader(f"📍 Latest Actions")
+st.subheader(f"📍 Latest Actions: {selected_short}")
 top_5 = display_df.head(5)
 for i, row in top_5.iterrows():
     with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
-        st.write(f"**Full Description:** {row['Title']}")
-        st.link_button("🚀 Open Original Source", row['URL'])
+        st.write(f"**Description:** {row['Title']}")
+        st.link_button("🚀 Open Source", row['URL'])
 
-# 11. Data Vault
+# 10. Data Vault & Export
 st.divider()
 st.subheader("Data Vault")
+
+# NEW: CSV Export Button
+csv = display_df.to_csv(index=False).encode('utf-8')
+st.download_button(
+    label="📥 Download Current View as CSV",
+    data=csv,
+    file_name=f'trump_actions_{selected_short.replace(" ", "_")}.csv',
+    mime='text/csv',
+)
+
 search = st.text_input("Search descriptions...", placeholder="Type here...")
 filtered_table = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 st.dataframe(filtered_table[['Date', 'Title', 'URL']], use_container_width=True, hide_index=True)
