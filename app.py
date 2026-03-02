@@ -45,9 +45,14 @@ def load_data():
     df = df.sort_values('Date', ascending=False)
     cat_cols = list(CATEGORY_MAP.keys())
     
+    # Tooltip helpers
+    def get_active_long(row):
+        return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
+    
     def get_active_short(row):
         return ", ".join([CATEGORY_MAP.get(col, col) for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
+    df['Active_Categories_Full'] = df.apply(get_active_long, axis=1)
     df['Active_Categories_Short'] = df.apply(get_active_short, axis=1)
     df['Source_Domain'] = df['URL'].apply(lambda x: urlparse(x).netloc.replace('www.', '') if pd.notnull(x) else "Other")
     df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
@@ -74,11 +79,10 @@ else:
 # 5. Filtering & Comparison Logic
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Active_Categories_Short', 'URL'], 
+    df_comp = df.melt(id_vars=['Date', 'Index', 'Title', 'Active_Categories_Short', 'Active_Categories_Full', 'URL'], 
                       value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
     df_comp = df_comp[df_comp['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
     df_comp['Category_Short'] = df_comp['Category_Long'].map(CATEGORY_MAP)
-    
     df_comp = df_comp.sort_values(['Category_Short', 'Date'])
     df_comp['Count'] = 1
     df_comp['Cumulative'] = df_comp.groupby('Category_Short')['Count'].cumsum()
@@ -98,23 +102,28 @@ else:
 # 6. Header
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
+st.info("**Context:** Documenting actions, statements, and plans of the Trump administration that echo authoritarian regimes and threaten American democracy, since Jan 2025.")
 
 # 7. Chart Rendering
 if comparison_mode:
     st.subheader("Category Comparison: Growth Over Time")
     if not df_comp.empty:
-        # MOBILE FIX: Legend moved to bottom with multi-column layout
         comp_chart = alt.Chart(df_comp).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x=alt.X('Date:T', title='Timeline'),
             y=alt.Y('Cumulative:Q', title='Cumulative Actions'),
             color=alt.Color('Category_Short:N', title=None, 
-                            legend=alt.Legend(orient='bottom', columns=2, labelLimit=200, labelFontSize=11),
+                            legend=alt.Legend(orient='bottom', columns=2, labelLimit=200),
                             scale=alt.Scale(scheme='category10')),
-            tooltip=['Date:T', 'Category_Short:N', 'Cumulative:Q', 'Title:N']
+            tooltip=[
+                alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
+                alt.Tooltip('Title:N', title='Action'),
+                alt.Tooltip('Category_Short:N', title='Category'),
+                alt.Tooltip('Active_Categories_Full:N', title='Official Classifications')
+            ]
         ).interactive().properties(height=450)
         st.altair_chart(comp_chart, use_container_width=True)
     else:
-        st.info("Please select at least one category to view comparison.")
+        st.info("Select a category to view comparison.")
 else:
     st.subheader(f"Timeline Progression: {selected_short}")
     line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
@@ -123,11 +132,19 @@ else:
     )
     points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
         x='Date:T', y='Cumulative:Q', href='URL:N',
-        tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), 'Title:N', 'Active_Categories_Short:N']
+        tooltip=[
+            alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
+            alt.Tooltip('Title:N', title='Action'),
+            alt.Tooltip('Active_Categories_Short:N', title='Themes'),
+            alt.Tooltip('Active_Categories_Full:N', title='Official Classifications'),
+            alt.Tooltip('URL:N', title='Source URL (Click point or see below)')
+        ]
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Export Tip:** Hover and click '...' (top right) to download chart as PNG/SVG.")
+# RESTORED CAPTIONS
+st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for stable links.")
+st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. You can search the action in the Data Vault to use the direct source link.")
 
 # 8. Category Volume Bar Chart
 st.divider()
@@ -146,8 +163,6 @@ if cat_counts:
         tooltip=['Category:N', 'Count:Q']
     ).properties(height=len(bar_df) * 40 + 50)
     st.altair_chart(bar_chart, use_container_width=True)
-else:
-    st.info("No data available for selection.")
 
 # 9. Educational Note & Glossary
 with st.expander("📖 Category Glossary & Multi-Tagging Logic"):
@@ -163,26 +178,19 @@ if not display_df.empty:
     for i, row in top_5.iterrows():
         with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
             st.write(f"**Description:** {row['Title']}")
+            st.write(f"**Themes:** {row['Active_Categories_Short']}")
             st.link_button("🚀 Open Source", row['URL'])
-else:
-    st.write("No actions to display.")
 
 # 11. Data Vault & Export
 st.divider()
 st.subheader("Data Vault")
-
 if not display_df.empty:
     csv = display_df.to_csv(index=False).encode('utf-8')
-    st.download_button(
-        label="📥 Download Current View as CSV",
-        data=csv,
-        file_name=f'trump_actions_{selected_short.replace(" ", "_")}.csv',
-        mime='text/csv',
-    )
+    st.download_button(label="📥 Download View as CSV", data=csv, file_name=f'trump_actions.csv', mime='text/csv')
 
-search = st.text_input("Search descriptions...", placeholder="Type here...")
+search = st.text_input("Search descriptions...", placeholder="Type here to filter table...")
 filtered_table = display_df if not search else display_df[display_df['Title'].str.contains(search, case=False, na=False)]
 if not filtered_table.empty:
     st.dataframe(filtered_table[['Date', 'Title', 'URL']], use_container_width=True, hide_index=True)
 
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03/01/2026. CC BY 4.0.")
+st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
