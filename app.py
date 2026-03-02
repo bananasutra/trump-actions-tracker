@@ -11,7 +11,6 @@ st.set_page_config(
 )
 
 # 2. Advanced Mapping Strategy
-# Maps the long technical headers in the CSV to punchy, mobile-friendly names
 CATEGORY_MAP = {
     "Violating Democratic Norms, Undermining Rule of Law": "Democratic Norms",
     "Hollowing State / Weakening Federal Institutions": "Federal Institutions",
@@ -29,7 +28,6 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load and Clean Data
 @st.cache_data
 def load_data():
-    # Attempt to load the newest data file provided by the user
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
@@ -44,7 +42,6 @@ def load_data():
         return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
-    # We keep the main dataframe sorted by Date descending for 'Latest' highlights
     df = df.sort_values('Date', ascending=False)
     
     cat_cols = df.columns[4:].tolist()
@@ -88,7 +85,6 @@ if selected_short != "All Actions":
 else:
     display_df = df.copy()
 
-# Dynamic Progression Calculation (Requires chronological sort for line chart)
 chart_df = display_df.sort_values('Date')
 filtered_daily = chart_df.groupby('Date')['Index'].nunique().reset_index().sort_values('Date')
 filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
@@ -114,8 +110,8 @@ line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, inter
 )
 
 points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
-    x='Date:T',
-    y='Cumulative:Q',
+    x=alt.X('Date:T', title='Date'),
+    y=alt.Y('Cumulative:Q', title='Cumulative Progression'),
     href='URL:N',
     tooltip=[
         alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
@@ -126,13 +122,24 @@ points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, s
     ]
 )
 
-st.altair_chart((line + points).interactive(), use_container_width=True)
+# 7b. TOOLTIP STYLING (The Fix)
+# We configure the tooltip to be bold on labels and top-aligned in values
+final_progression_chart = (line + points).interactive().configure_tooltip(
+    labelFontSize=13,
+    valueFontSize=13,
+    labelFontWeight='bold',
+    labelColor='#111111',
+    valueColor='#333333',
+    padding=10,
+    cornerRadius=5
+)
 
-# Link instructions placed underneath the progression chart
+st.altair_chart(final_progression_chart, use_container_width=True)
+
 st.caption("💡 **Desktop:** Hover to see details. **Click** any point to open source URL in a new window.")
 st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. You can search action in Data Vault to use direct link.")
 
-# 8. Category Summary (Shorter Names)
+# 8. Category Summary
 st.divider()
 st.subheader("Action Volume by Category")
 
@@ -153,12 +160,11 @@ bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
 
 st.altair_chart(bar_chart, use_container_width=True)
 
-# 9. LATEST ACTIONS HIGHLIGHT (Now placed underneath charts)
+# 9. LATEST ACTIONS HIGHLIGHT
 st.divider()
 st.subheader(f"📍 Latest Actions: {selected_short}")
 st.markdown(f"*The 5 most recent entries documented under the **{selected_short}** category.*")
 
-# display_df is sorted descending by date already
 top_5 = display_df.head(5)
 for i, row in top_5.iterrows():
     with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
