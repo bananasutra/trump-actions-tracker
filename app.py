@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Advanced Mapping Strategy
+# 2. Category Mapping & Descriptions (The Glossary)
 CATEGORY_MAP = {
     "Violating Democratic Norms, Undermining Rule of Law": "Democratic Norms",
     "Hollowing State / Weakening Federal Institutions": "Federal Institutions",
@@ -28,7 +28,6 @@ SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 # 3. Load and Clean Data
 @st.cache_data
 def load_data():
-    # Attempting to load the newest CSV first
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
@@ -39,30 +38,18 @@ def load_data():
             continue
     
     if df is None:
-        st.error("Data file not found. Please ensure 'trump-actions-3-1-26.csv' is in your repository.")
+        st.error("Data file not found. Please ensure the latest CSV is in your repository.")
         return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date', ascending=False)
-    
-    cat_cols = df.columns[4:].tolist()
-    
-    def get_active_long(row):
-        return ", ".join([col for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
+    cat_cols = list(CATEGORY_MAP.keys())
     
     def get_active_short(row):
         return ", ".join([CATEGORY_MAP.get(col, col) for col in cat_cols if str(row[col]).strip().lower() == 'yes'])
     
-    df['Active_Categories_Full'] = df.apply(get_active_long, axis=1)
     df['Active_Categories_Short'] = df.apply(get_active_short, axis=1)
-    
-    def extract_domain(url):
-        try:
-            domain = urlparse(url).netloc
-            return domain.replace('www.', '')
-        except:
-            return "Other"
-    df['Source_Domain'] = df['URL'].apply(extract_domain)
+    df['Source_Domain'] = df['URL'].apply(lambda x: urlparse(x).netloc.replace('www.', '') if pd.notnull(x) else "Other")
     df['Cat_Count'] = df[cat_cols].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
     
     return df, cat_cols
@@ -71,13 +58,7 @@ df, cat_cols = load_data()
 
 # 4. Sidebar Navigation
 st.sidebar.title("Navigation & Filters")
-st.sidebar.info("To reset the view, select 'All Actions' from the dropdown.")
-
-selected_short = st.sidebar.selectbox(
-    "Filter by Policy Area", 
-    ["All Actions"] + list(SHORT_TO_LONG.keys()),
-    help="Select a category to filter the entire dashboard."
-)
+selected_short = st.sidebar.selectbox("Filter by Policy Area", ["All Actions"] + list(SHORT_TO_LONG.keys()))
 
 # 5. Filtering Logic
 if selected_short != "All Actions":
@@ -104,12 +85,10 @@ col3.metric("Latest Entry", df['Date'].max().strftime('%Y-%m-%d'))
 
 # 7. Progression Graph
 st.subheader(f"Timeline Progression: {selected_short}")
-
 line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(
     x=alt.X('Date:T', title='Timeline'),
     y=alt.Y('Cumulative:Q', title='Cumulative Actions')
 )
-
 points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(
     x=alt.X('Date:T', title='Date'),
     y=alt.Y('Cumulative:Q', title='Progression'),
@@ -117,26 +96,13 @@ points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, s
     tooltip=[
         alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'),
         alt.Tooltip('Title:N', title='Action'),
-        alt.Tooltip('Active_Categories_Short:N', title='Themes'),
-        alt.Tooltip('Active_Categories_Full:N', title='Official Classifications'),
-        alt.Tooltip('URL:N', title='Source URL (Click to open)')
+        alt.Tooltip('Active_Categories_Short:N', title='Themes')
     ]
 )
+st.altair_chart((line + points).interactive(), use_container_width=True)
+st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Data Vault below for links.")
 
-# 7b. GLOBAL CONFIG (RESTORED BACKGROUND)
-# Removed the white background fill and the tooltip config that caused the crash.
-final_progression_chart = (line + points).interactive().configure_view(
-    stroke=None
-).configure_axis(
-    grid=False
-)
-
-st.altair_chart(final_progression_chart, use_container_width=True)
-
-st.caption("💡 **Desktop:** Hover to see details. **Click** any point to open source URL in a new window.")
-st.caption("⚠️ **Note on Links:** Many sites (like *The Guardian*, *NYT*, *NBC News*, and *AP News*) block direct opening from external apps. You can search action in Data Vault to use direct link.")
-
-# 8. Category Summary
+# 8. Category Summary & Educational Notes
 st.divider()
 st.subheader("Action Volume by Category")
 
@@ -147,21 +113,33 @@ for long, short in CATEGORY_MAP.items():
         cat_counts.append({'Category': short, 'Count': count})
 
 bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
-dynamic_height = len(bar_df) * 40 + 50
-
 bar_chart = alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
     x=alt.X('Count:Q', title='Number of Actions'),
     y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=350, labelFontSize=12)),
     tooltip=['Category:N', 'Count:Q']
-).properties(height=dynamic_height)
+).properties(height=len(bar_df) * 40 + 50)
 
 st.altair_chart(bar_chart, use_container_width=True)
+
+# THE EDUCATIONAL NOTES SECTION
+with st.expander("📖 Understanding These Categories & Filtered Views"):
+    st.markdown("### Why do other categories appear when I filter?")
+    st.write("""
+    Policy actions are rarely isolated. A single Executive Order often impacts multiple institutional norms simultaneously. 
+    When you filter for **Democratic Norms**, you are seeing every action tagged with that label—but many of those 
+    same actions are *also* tagged as **Federal Institutions** or **Civil Rights**. 
+    
+    This **pervasive complexity** highlights how individual shifts in governance can have cascading effects across 
+    multiple democratic safeguards.
+    """)
+    
+    st.markdown("### Category Glossary")
+    glossary_data = {"Short Name": list(SHORT_TO_LONG.keys()), "Full Official Definition": list(SHORT_TO_LONG.values())}
+    st.table(pd.DataFrame(glossary_data))
 
 # 9. LATEST ACTIONS HIGHLIGHT
 st.divider()
 st.subheader(f"📍 Latest Actions: {selected_short}")
-st.markdown(f"*The 5 most recent entries documented under the **{selected_short}** category.*")
-
 top_5 = display_df.head(5)
 for i, row in top_5.iterrows():
     with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
@@ -171,8 +149,8 @@ for i, row in top_5.iterrows():
 
 # 10. Analytical Insights
 st.divider()
-st.subheader("📊 Data Insights (Jan 2025 – Feb 2026)")
-
+st.subheader("📊 Data Insights")
+# (Rest of insights logic remains same as previous version...)
 top_cats_list = bar_df.head(2)['Category'].tolist() if not bar_df.empty else ["N/A", "N/A"]
 avg_cats = df['Cat_Count'].mean()
 multi_cat_pct = (len(df[df['Cat_Count'] > 1]) / len(df)) * 100
@@ -181,35 +159,25 @@ top_source = df['Source_Domain'].value_counts().idxmax()
 col_i1, col_i2 = st.columns(2)
 with col_i1:
     st.write("### 📈 Volume & Progression")
-    st.write(f"Since Jan 2025, the tracker has logged **{len(df)} significant actions**. The data reveals a steady, near-linear increase in policy shifts, with notable bursts observed around the start of the term and the first quarter of 2026.")
-    st.write("### 🏛️ Dominant Themes")
-    st.write(f"The tracking data is currently dominated by **'{top_cats_list[0]}'**, followed closely by **'{top_cats_list[1]}'**.")
-
+    st.write(f"Logged **{len(df)} actions** since Jan 2025. Spikes observed at the term start and early 2026.")
+    st.write(f"### 🏛️ Dominant Themes")
+    st.write(f"Classifications are currently led by **'{top_cats_list[0]}'** and **'{top_cats_list[1]}'**.")
 with col_i2:
     st.write("### 🔗 Diversity & Impact")
-    st.write(f"Complexity is high: **{multi_cat_pct:.1f}%** of all documented events trigger multiple category flags. On average, each action impacts **{avg_cats:.1f}** distinct institutional norms simultaneously.")
-    st.write("### 📰 Source Documentation")
-    st.write(f"The most frequent primary documentation source in the dataset is **{top_source}**, highlighting the role of investigative journalism in tracking these shifts.")
+    st.write(f"**{multi_cat_pct:.1f}%** of events trigger multiple flags, averaging **{avg_cats:.1f}** norms per action.")
+    st.write(f"### 📰 Source Documentation")
+    st.write(f"Primary documentation source domain: **{top_source}**.")
 
 # 11. Data Vault
 st.divider()
 st.subheader("Data Vault")
-search_query = st.text_input("Search descriptions...", placeholder="Type here to filter table...")
-
-filtered_table = display_df
-if search_query:
-    filtered_table = display_df[display_df['Title'].str.contains(search_query, case=False, na=False)]
+search_query = st.text_input("Search descriptions...", placeholder="Type here...")
+filtered_table = display_df if not search_query else display_df[display_df['Title'].str.contains(search_query, case=False, na=False)]
 
 st.dataframe(
     filtered_table[['Date', 'Title', 'Active_Categories_Short', 'URL']], 
-    column_config={
-        "URL": st.column_config.LinkColumn("Source Link"),
-        "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD"),
-        "Title": st.column_config.TextColumn("Description", width="large"),
-        "Active_Categories_Short": st.column_config.TextColumn("Themes")
-    },
-    use_container_width=True,
-    hide_index=True
+    column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date")},
+    use_container_width=True, hide_index=True
 )
 
-st.caption("Dashboard created by bananasutra. Updated via GitHub. CC BY 4.0 License.")
+st.caption("Dashboard by bananasutra. Updated Mar 2026. CC BY 4.0.")
