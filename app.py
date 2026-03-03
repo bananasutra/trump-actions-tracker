@@ -14,13 +14,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown("""
-    <head>
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker" />
-    <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion." />
-    </head>
-    """, unsafe_allow_html=True)
-
 # 2. THEMES & GLOSSARY MAPPING
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants."},
@@ -164,14 +157,13 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. VELOCITY: PROGRESSIVE TIMELINE (ALT ENHANCED)
+# 10. VELOCITY & MONTHLY STRATEGIC WAVES
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.subheader("📈 Progressive Velocity & Monthly Waves")
 if not filtered_df.empty:
     chart_df = filtered_df.copy().sort_values('Date')
     chart_df['Cumulative'] = range(1, len(chart_df) + 1)
     
-    # 1. Progressive Line (Velocity)
     line_chart = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
         x=alt.X('Date:T', title='Timeline'),
         y=alt.Y('Cumulative:Q', title='Total Actions'),
@@ -179,30 +171,24 @@ if not filtered_df.empty:
     ).properties(height=350).interactive()
     st.altair_chart(line_chart, use_container_width=True)
 
-    # 2. Monthly Strategic Waves (Stacked Bar)
-    
-
-[Image of stacked bar chart over time]
-
+    # Monthly Wave Data Processing
     df_monthly = filtered_df.copy()
     df_monthly['Month'] = df_monthly['Date'].dt.strftime('%Y-%m')
     long_cats = list(CATEGORY_MAP.keys())
     df_melted = df_monthly.melt(id_vars=['Month'], value_vars=long_cats, var_name='Mapping', value_name='Active')
     df_melted = df_melted[df_melted['Active'].str.strip().str.lower() == 'yes']
     df_melted['Theme'] = df_melted['Mapping'].map(CATEGORY_MAP)
-    
     monthly_counts = df_melted.groupby(['Month', 'Theme']).size().reset_index(name='Count')
     
     wave_chart = alt.Chart(monthly_counts).mark_bar().encode(
-        x=alt.X('Month:N', title="Month-by-Month"),
-        y=alt.Y('Count:Q', title="Actions"),
-        color=alt.Color('Theme:N', scale=alt.Scale(scheme='category10'), legend=alt.Legend(orient="bottom", columns=3)),
+        x=alt.X('Month:N', title="Month-by-Month Patterns"),
+        y=alt.Y('Count:Q', title="Theme Concentration"),
+        color=alt.Color('Theme:N', scale=alt.Scale(scheme='category10'), legend=alt.Legend(orient="bottom", columns=2)),
         tooltip=['Month', 'Theme', 'Count']
     ).properties(height=400).interactive()
     st.altair_chart(wave_chart, use_container_width=True)
 
 # 11. THEMES: THE NIGHTINGALE ROSE
-
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🌹 Thematic Distribution (Nightingale Rose)")
