@@ -60,20 +60,21 @@ def load_data():
 
 df = load_data()
 
-# 4. STRATEGIC DIALOG (SOCRATIC ENTRY)
-@st.dialog("Strategic Diagnostic: A Note on Wit & Wisdom")
+# 4. STRATEGIC DIALOG (UPDATED CONTENT)
+@st.dialog("Strategic Note on Facts")
 def show_welcome():
-    st.markdown(f"""
-    ### Welcome to the Diagnostic
-    In an era defined by what Bertrand Russell called the "certainty of fanatics," this tracker is 
-    built for those who prioritize **verifiable doubt**.
+    st.markdown("""
+    **Opinions shall not trump the data.**
     
-    **How to Read This Engine:**
-    * **Velocity:** We track 'procedural shock'—the rate at which institutional norms are rewritten.
-    * **Strategic Overlap:** We map 'multi-tagged' actions that strike several democratic pillars at once.
-    * **The Goal:** To sharpen our wits against the magical (and often chaotic) things happening in 2025-2026.
+    In an era where the "certainty of fanatics” is all the rage (like Bertrand Russell almost said), this tracker is built for those who prioritize **verifiable doubt**, and dare to care enough to share. Or god help us sharpen our wits against the FU things IRL in Murica 2025-2026!
     
-    *Click anywhere outside this box to begin your investigation.*
+    **The real world problems gone bananas:**
+    
+    * **Velocity:** the rate at which institutional norms are rewritten; ’procedural shock’ is a euphemism.
+    * **Complexity:** the ‘strategic’ overlap; the 'multi-tagged' actions that strike several democratic pillars at once.
+    
+    ---
+    Now, if you’re curious 👀 click anywhere outside this box to begin your investigation.
     """)
 
 if "first_visit" not in st.session_state:
@@ -184,7 +185,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 8. DATA PROCESSING
+# 8. DATA PROCESSING ... (Logic remains identical)
 if not filtered_df.empty:
     if comparison_mode:
         long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
@@ -253,7 +254,7 @@ if not filtered_df.empty:
             st.link_button("🚀 View Source", row['URL'])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 12. DEEP INSIGHTS (WITH THE BERTRAND MOMENT)
+# 12. DEEP INSIGHTS (WITH BERTRAND MOMENT)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -265,13 +266,12 @@ if not filtered_df.empty:
         st.markdown("#### Strategic Velocity & Attrition")
         st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This volume induces 'procedural shock' designed to exhaust bandwidth.")
         st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass institutional checks.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition centers in CA, WA, NY, IL. Litigation remains the primary friction point.")
+        st.write("Opposition centers in CA, WA, NY, IL. Litigation remains the primary friction point against this velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**.")
 
-    # THE BERTRAND MOMENT
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
         <div style="background: rgba(255, 255, 255, 0.03); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px;">
@@ -292,7 +292,7 @@ if not filtered_df.empty:
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 13. SEARCH (VAULT)
+# 13. SEARCH (DATA VAULT)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
