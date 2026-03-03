@@ -16,25 +16,23 @@ st.set_page_config(
 
 st.markdown("""
     <head>
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
-    <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025." />
-    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png" />
-    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker" />
+    <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion." />
     </head>
     """, unsafe_allow_html=True)
 
 # 2. THEMES & GLOSSARY MAPPING
 THEME_GLOSSARY = [
-    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights."},
-    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption and Enrichment: Actions that directly enrich the president, his family, or his cabinet, or that trade political favors for wealth."},
-    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating democratic norms, undermining rule of law: Actions that weaken checks and balances, restrict press freedom, undermine states' rights, violate court orders or the Constitution, or reduce the independence of oversight bodies."},
-    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking universities, schools, museums, culture: Undermining the independence of universities, restricting K-12 education topics, and targeting information within museums and national parks."},
-    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing state / weakening federal institutions: Dismantling federal institutions, mass firings of staff, or politicizing government roles."},
-    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Aggressive Foreign Policy & Global Destabilisation: Threatening allies, using tariffs to extract concessions, withdrawing from international treaties (like the WHO or Paris Climate Treaty), and aligning with anti-democratic rivals."},
-    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Anti-immigrant or Militarised Nationalism: Using language that demonizes immigrants, deploying military-type enforcement (like the National Guard) within the U.S., and expanding domestic surveillance."},
-    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Controlling information including spreading misinformation and propaganda: Manufacturing evidence to support state policy, restricting access to contradicting evidence, and spreading propaganda."},
-    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Control of science to align with state ideology: Restricting scientific research (e.g., on climate change), expanding drilling against environmental evidence, and attacking public health through vaccine restrictions or funding cuts."},
-    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Suppressing dissent / Weaponising state power against 'enemies': Punishing opponents, instituting loyalty tests, and weaponizing executive power or legal action against rivals, critics, and perceived enemy states or cities."}
+    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants."},
+    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption and Enrichment: Actions that directly enrich the president, his family, or his cabinet."},
+    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating democratic norms, undermining rule of law: Actions that weaken checks and balances or restrict press freedom."},
+    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking universities, schools, museums, culture: Restricting K-12 education topics and targeting cultural institutions."},
+    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing state: Dismantling federal institutions, mass firings, or politicizing government roles."},
+    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Aggressive Foreign Policy: Threatening allies and aligning with anti-democratic rivals."},
+    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Anti-immigrant/Nationalism: Using language that demonizes immigrants and expanding domestic surveillance."},
+    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Controlling information: Manufacturing evidence to support state policy."},
+    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Control of science: Restricting research on climate change and attacking public health."},
+    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Suppressing dissent: Weaponizing executive power against rivals and critics."}
 ]
 
 GLOSSARY_DF = pd.DataFrame(THEME_GLOSSARY).sort_values("Theme")
@@ -62,21 +60,14 @@ def load_data():
 
 df = load_data()
 
-# 4. STRATEGIC DIALOG (FACTS OVER OPINIONS)
+# 4. STRATEGIC DIALOG
 @st.dialog("Strategic Note on Facts")
 def show_welcome():
     st.markdown("""
     **Opinions shall not trump the data.**
-    
-    In an era where the "certainty of fanatics” is all the rage (like Bertrand Russell almost said), this tracker is built for those who prioritize **verifiable doubt**, and dare to care enough to share. Or god help us sharpen our wits against the FU things IRL in Murica 2025-2026!
-    
-    **The real world problems gone bananas:**
-    
-    * **Velocity:** the rate at which institutional norms are rewritten; ’procedural shock’ is a euphemism.
-    * **Complexity:** the ‘strategic’ overlap; the 'multi-tagged' actions that strike several democratic pillars at once.
-    
-    ---
-    Now, if you’re curious 👀 click anywhere outside this box to begin your investigation.
+    In an era of certainty, this tracker is built for **verifiable doubt**.
+    * **Velocity:** the rate of institutional rewrite.
+    * **Complexity:** interlocking strikes against democratic pillars.
     """)
 
 if "first_visit" not in st.session_state:
@@ -109,256 +100,172 @@ st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync
 
 st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
-query_params = st.query_params
-default_area = query_params.get("area", "All Actions")
-
-options = ["All Actions"] + SORTED_SHORT_NAMES
-if comparison_mode:
-    selected_compare = st.sidebar.multiselect("Categories", SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
-    selected_short = "Comparison View"
-else:
-    start_index = options.index(default_area) if default_area in options else 0
-    selected_short = st.sidebar.selectbox("Filter Area", options, index=start_index, key="filter_area")
-    st.query_params["area"] = selected_short
+selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
 
 if df is not None:
-    st.sidebar.divider()
-    st.sidebar.subheader("📅 Timeline Scrub")
-    min_date = df['Date'].min().to_pydatetime()
-    max_date = df['Date'].max().to_pydatetime()
-    selected_range = st.sidebar.slider("Select Window", min_value=min_date, max_value=max_date, value=(min_date, max_date), key="date_range", format="MMM DD")
+    min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
+    selected_range = st.sidebar.slider("Timeline Scrub", min_value=min_date, max_value=max_date, value=(min_date, max_date), key="date_range", format="MMM DD")
     
     mask = (df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])
     if st.session_state.search_term:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
     filtered_df = df.loc[mask]
-    
-    st.sidebar.divider()
-    st.sidebar.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
-else:
-    filtered_df = pd.DataFrame()
+    st.sidebar.button("🧹 Clear Filters", on_click=reset_filters, use_container_width=True)
 
-# 7. ELEGANT DREAMY BRANDED HEADER
+# 7. ELEGANT BRANDED HEADER
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
-
 st.markdown("""
     <style>
         .brand-container { max-width: 1200px; margin-bottom: 30px; }
         .brand-link { text-decoration: none !important; color: inherit !important; display: flex; align-items: center; gap: 20px; }
         .brand-link h1 { color: inherit !important; text-decoration: none !important; margin: 0 !important; font-weight: 700; line-height: 1.1; font-size: calc(1.5rem + 1.5vw); }
-        .brand-logo { font-size: 2.5rem; background: transparent; padding: 5px 0px; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; }
+        .brand-logo { font-size: 2.5rem; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; }
         .brand-link:hover .brand-logo { transform: scale(1.1); }
         .brand-link:hover h1 { opacity: 0.7; transition: opacity 0.8s ease; }
     </style>
     <div class="brand-container">
-        <a href="https://trump-actions-tracker.streamlit.app/" target="_self" class="brand-link">
+        <a href="#top" class="brand-link">
             <div class="brand-logo">🍌</div>
             <div><h1>U.S. Democracy Gone Bananas</h1></div>
         </a>
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
-st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
-
-# 8. HERO STATS (RESPONSIVE)
+# 8. HERO STATS
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
     pace_per_month = (total_actions / days_active) * 30.44
-    overlap = (len(filtered_df[filtered_df['Cat_Count'] > 1]) / total_actions * 100)
-
     st.markdown(f"""
-    <div style="display: flex; justify-content: center; gap: 20px; width: 100%; padding: 40px 0; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 250px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 25px; text-align: center;">
+    <div style="display: flex; justify-content: center; gap: 20px; width: 100%; padding: 20px 0; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 200px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 20px; text-align: center;">
             <p style="margin: 0; font-size: 0.9rem; opacity: 0.7;">Actions in Window</p>
             <h2 style="margin: 0; font-size: 2.5rem; color: #FFFFFF;">{total_actions}</h2>
         </div>
-        <div style="flex: 1; min-width: 250px; background: rgba(255, 255, 255, 0.05); border: 1px solid #DE0100; border-radius: 10px; padding: 25px; text-align: center;">
-            <p style="margin: 0; font-size: 0.9rem; opacity: 0.7;">Velocity (Window)</p>
+        <div style="flex: 1; min-width: 200px; background: rgba(255, 255, 255, 0.05); border: 1px solid #DE0100; border-radius: 10px; padding: 20px; text-align: center;">
+            <p style="margin: 0; font-size: 0.9rem; opacity: 0.7;">Velocity</p>
             <h2 style="margin: 0; font-size: 2.5rem; color: #DE0100;">{pace_per_month:.1f} <span style="font-size: 1rem;">/ mo</span></h2>
-        </div>
-        <div style="flex: 1; min-width: 250px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 25px; text-align: center;">
-            <p style="margin: 0; font-size: 0.9rem; opacity: 0.7;">Strategic Overlap</p>
-            <h2 style="margin: 0; font-size: 2.5rem; color: #FFFFFF;">{overlap:.1f}%</h2>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV (THEME-PROOF & GAP FIX)
+# 9. STICKY NAV
 st.markdown("""
     <style>
-        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
-            position: sticky; top: 2.875rem; z-index: 999; 
-            background-color: transparent !important; 
-            padding: 15px 0;
-            backdrop-filter: blur(5px);
-        }
+        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { position: sticky; top: 2.875rem; z-index: 999; background-color: transparent !important; padding: 15px 0; backdrop-filter: blur(5px); }
         [id] { scroll-margin-top: 130px !important; }
-        .back-to-top { font-size: 0.75rem; color: #666; text-decoration: none; display: block; text-align: right; margin-top: 5px; }
-        .back-to-top:hover { color: #DE0100; transition: 0.3s; }
-        
-        /* Padding fix for Quote to Video */
-        .quote-container {
-            background: rgba(255, 255, 255, 0.05); 
-            border-left: 5px solid #DE0100; 
-            padding: 25px; 
-            border-radius: 5px;
-            margin-bottom: 50px !important;
-        }
+        .quote-container { background: rgba(255, 255, 255, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 50px !important; }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
-        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Timeline</button></a>
+        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Velocity</button></a>
         <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Themes</button></a>
-        <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Latest</button></a>
-        <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Insights</button></a>
-        <a href="#wordcloud" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Words</button></a>
+        <a href="#words" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Words</button></a>
         <a href="#search" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 10. DATA PROCESSING
-if not filtered_df.empty:
-    if comparison_mode:
-        long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
-        display_df = filtered_df.melt(id_vars=['Date', 'Index', 'Title', 'Themes_List', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
-        display_df = display_df[display_df['Is_Active'].fillna('No').astype(str).str.strip().str.lower() == 'yes']
-        display_df['Category_Short'] = display_df['Category_Long'].map(CATEGORY_MAP)
-        display_df['Cumulative'] = display_df.groupby('Category_Short').cumcount() + 1
-    else:
-        display_df = filtered_df if selected_short == "All Actions" else filtered_df[filtered_df[SHORT_TO_LONG[selected_short]].fillna('No').astype(str).str.strip().str.lower() == 'yes'].copy()
-        chart_df = display_df.sort_values('Date')
-        filtered_daily = chart_df.groupby('Date')['Index'].nunique().reset_index()
-        filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
-        chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
-
-# 11. TIMELINE
+# 10. VELOCITY: PROGRESSIVE TIMELINE (ALT ENHANCED)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
+st.subheader("📈 Progressive Velocity & Monthly Waves")
 if not filtered_df.empty:
-    if comparison_mode:
-        st.subheader("Velocity Analysis: Comparative Theme Growth")
-        comp_chart = alt.Chart(display_df).mark_line(interpolate='step-after', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', color='Category_Short:N').interactive()
-        st.altair_chart(comp_chart, use_container_width=True)
-    else:
-        st.subheader(f"Timeline Progression: {selected_short}")
-        line = alt.Chart(filtered_daily).mark_line(color='#DE0100', strokeWidth=4, interpolate='step-after').encode(x='Date:T', y='Cumulative:Q')
-        points = alt.Chart(chart_df).mark_circle(size=110, color='white', opacity=0.8, stroke='#DE0100', strokeWidth=2).encode(x='Date:T', y='Cumulative:Q', href='URL:N', tooltip=['Date:T', 'Title:N'])
-        st.altair_chart((line + points).interactive(), use_container_width=True)
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
+    chart_df = filtered_df.copy().sort_values('Date')
+    chart_df['Cumulative'] = range(1, len(chart_df) + 1)
+    
+    # 1. Progressive Line (Velocity)
+    line_chart = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
+        x=alt.X('Date:T', title='Timeline'),
+        y=alt.Y('Cumulative:Q', title='Total Actions'),
+        tooltip=['Date', 'Title']
+    ).properties(height=350).interactive()
+    st.altair_chart(line_chart, use_container_width=True)
 
-# 12. THEMES
+    # 2. Monthly Strategic Waves (Stacked Bar)
+    
+
+[Image of stacked bar chart over time]
+
+    df_monthly = filtered_df.copy()
+    df_monthly['Month'] = df_monthly['Date'].dt.strftime('%Y-%m')
+    long_cats = list(CATEGORY_MAP.keys())
+    df_melted = df_monthly.melt(id_vars=['Month'], value_vars=long_cats, var_name='Mapping', value_name='Active')
+    df_melted = df_melted[df_melted['Active'].str.strip().str.lower() == 'yes']
+    df_melted['Theme'] = df_melted['Mapping'].map(CATEGORY_MAP)
+    
+    monthly_counts = df_melted.groupby(['Month', 'Theme']).size().reset_index(name='Count')
+    
+    wave_chart = alt.Chart(monthly_counts).mark_bar().encode(
+        x=alt.X('Month:N', title="Month-by-Month"),
+        y=alt.Y('Count:Q', title="Actions"),
+        color=alt.Color('Theme:N', scale=alt.Scale(scheme='category10'), legend=alt.Legend(orient="bottom", columns=3)),
+        tooltip=['Month', 'Theme', 'Count']
+    ).properties(height=400).interactive()
+    st.altair_chart(wave_chart, use_container_width=True)
+
+# 11. THEMES: THE NIGHTINGALE ROSE
+
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Action Volume by Theme")
-cat_counts = []
-for long, short in CATEGORY_MAP.items():
-    if comparison_mode and short not in selected_compare: continue
-    count = (filtered_df[long].fillna('No').astype(str).str.strip().str.lower() == 'yes').sum()
-    if count > 0: cat_counts.append({'Theme': short, 'Count': count})
-if cat_counts:
-    st.altair_chart(alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x='Count:Q', y=alt.Y('Theme:N', sort='-x')), use_container_width=True)
-with st.expander("📖 Themes Glossary"): st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
-
-# 13. LATEST
-st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
-st.divider()
-st.subheader(f"📍 Latest Actions in Window")
+st.subheader("🌹 Thematic Distribution (Nightingale Rose)")
 if not filtered_df.empty:
-    latest_view = display_df.sort_values('Date', ascending=False).head(5)
-    for i, row in latest_view.iterrows():
-        with st.expander(f"📅 {row['Date'].strftime('%Y-%m-%d')} — {row['Title'][:90]}..."):
-            st.write(f"**Description:** {row['Title']}")
-            st.link_button("🚀 View Source", row['URL'])
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
+    rose_data = []
+    for long, short in CATEGORY_MAP.items():
+        count = (filtered_df[long].str.strip().str.lower() == 'yes').sum()
+        if count > 0:
+            rose_data.append({"value": int(count), "name": short})
 
-# 14. DEEP INSIGHTS (WITH CINEMATIC GAP)
-st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
-st.divider()
-st.subheader("🚨 Deep Insights: Strategic Diagnostic")
+    rose_options = {
+        "backgroundColor": "transparent",
+        "tooltip": {"trigger": "item", "formatter": "{b} : {c} ({d}%)"},
+        "series": [{
+            "type": "pie", "radius": [20, 140], "center": ["50%", "50%"],
+            "roseType": "area", "itemStyle": {"borderRadius": 8},
+            "data": rose_data,
+            "label": {"color": "inherit"}
+        }]
+    }
+    st_echarts(rose_options, height="500px")
 
-if not filtered_df.empty:
-    col_ins1, col_ins2 = st.columns(2)
-    with col_ins1:
-        st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate.")
-        st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {overlap:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously.")
-    with col_ins2:
-        st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**.")
-
-    st.markdown(f"""
-        <div class="quote-container">
-            <p style="font-style: italic; margin-bottom: 5px;">
-                "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts."
-            </p>
-            <p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p>
-        </div>
-    """, unsafe_allow_html=True)
-
-    v_left, v_mid, v_right = st.columns([1, 8, 1])
-    with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
-
-# 15. THEMATIC WORD CLOUD (NEON CONTRAST FIX)
-
-st.markdown("<div id='wordcloud'></div>", unsafe_allow_html=True)
+# 12. WORD CLOUD
+st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
-
 if not filtered_df.empty:
     stop_words = {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president', 'will', 'this', 'that'}
     all_titles = " ".join(filtered_df['Title'].values).lower()
     words = re.findall(r'\w+', all_titles)
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
-
-    # NEON PALETTE FOR UNIVERSAL VISIBILITY
-    js_color = """
-    function () {
-        var colors = ['#00f2ff', '#ff00ea', '#00ffaa', '#fffb00', '#ff4d00', '#DE0100', '#55ff00'];
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-    """
-
+    js_color = "function () { var colors = ['#00f2ff', '#ff00ea', '#00ffaa', '#fffb00', '#ff4d00', '#DE0100', '#55ff00']; return colors[Math.floor(Math.random() * colors.length)]; }"
     wordcloud_options = {
-        "backgroundColor": "transparent",
-        "tooltip": {"show": True},
+        "backgroundColor": "transparent", "tooltip": {"show": True},
         "series": [{
-            "type": "wordCloud",
-            "shape": "circle",
-            "gridSize": 15,
-            "sizeRange": [16, 70],
-            "rotationRange": [0, 0],
-            "textStyle": {
-                "fontFamily": "sans-serif",
-                "fontWeight": "bold",
-                "color": js_color
-            },
+            "type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0, 0],
+            "textStyle": {"fontWeight": "bold", "color": js_color},
             "data": [{"name": word, "value": count} for word, count in word_counts]
         }]
     }
     st_echarts(wordcloud_options, height="450px")
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 16. SEARCH DATA VAULT (SYNCED & CLICKABLE)
+# 13. INSIGHTS & VIDEO
+st.divider()
+st.markdown(f"""
+    <div class="quote-container">
+        <p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p>
+        <p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p>
+    </div>
+""", unsafe_allow_html=True)
+v_left, v_mid, v_right = st.columns([1, 8, 1])
+with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+
+# 14. SEARCH DATA VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
-st.text_input("Filter the vault directly...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
-
+st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
-    v_df = display_df.sort_values('Date', ascending=False)
     st.dataframe(
-        v_df[['Date', 'Title', 'URL', 'Themes_List']], 
-        column_config={
-            "URL": st.column_config.LinkColumn("Source"), 
-            "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")
-        },
+        filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), 
+        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")},
         use_container_width=True, hide_index=True
     )
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
-
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
