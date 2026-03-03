@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# THE OG SEO WORKAROUND (With Doubled Braces for Syntax Safety)
+# THE OG SEO WORKAROUND (Syntax-Safe with Doubled Braces)
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
@@ -24,7 +24,7 @@ st.markdown(f"""
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     <style>
-        /* SURGICAL SCROLL OFFSET */
+        /* SURGICAL SCROLL OFFSET - Hard Lock */
         [id^="section-"] {{
             scroll-margin-top: 85px !important;
         }}
@@ -131,7 +131,8 @@ st.sidebar.text_input("🔍 Search Actions", key="sidebar_search", on_change=syn
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_toggle")
 
 if comparison_mode:
-    selected_themes = st.sidebar.multiselect("Select Themes to Overlay", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES[:3])
+    # LOCK: All categories selected by default
+    selected_themes = st.sidebar.multiselect("Select Themes to Overlay", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
 else:
     selected_theme = st.sidebar.selectbox("Filter by Pillar", ["All Actions"] + SORTED_SHORT_NAMES)
 
@@ -139,7 +140,6 @@ if df is not None:
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
     selected_range = st.sidebar.slider("Timeline Scrub", min_value=min_date, max_value=max_date, value=(min_date, max_date), format="MMM DD")
     
-    # Filtering Logic
     mask = (df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])
     if st.session_state.search_term:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
@@ -160,7 +160,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 8. TIMELINE
+# 8. TIMELINE (Rich 4-Row Tooltip + Comparison Lock)
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.subheader("Action Progression")
 if not filtered_df.empty:
@@ -205,11 +205,12 @@ if not filtered_df.empty:
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
 
-# 10. INSIGHTS
+# 10. INSIGHTS (ALL ANALYTICS RESTORED)
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
 if not filtered_df.empty:
+    pace_per_month = (len(filtered_df) / 400) * 30.44 # Metric preserved
     ins_col1, ins_col2 = st.columns(2)
     with ins_col1:
         st.markdown("#### Strategic Velocity & Attrition")
