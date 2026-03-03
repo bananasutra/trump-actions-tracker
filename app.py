@@ -30,8 +30,29 @@ st.markdown(f"""
         #top {{ scroll-margin-top: 100px; }}
         [id^="section-"] {{ scroll-margin-top: 120px !important; }}
         
-        .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; }}
-        .hero-card {{ flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }}
+        .hero-container {{ 
+            display: flex; 
+            justify-content: space-between; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+            align-items: stretch; /* Ensures equal height across cards */
+        }}
+        .hero-card {{ 
+            flex: 1; 
+            background: rgba(128, 128, 128, 0.1); 
+            border: 1px solid rgba(128, 128, 128, 0.2); 
+            border-radius: 12px; 
+            padding: 20px; 
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Aligns header to top and subtext to bottom */
+            transition: all 0.2s ease;
+        }}
+        .hero-card:hover {{
+            border-color: rgba(128, 128, 128, 0.4);
+            transform: translateY(-2px);
+        }}
         .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
         .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -134,19 +155,25 @@ if df is not None:
     st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card">
-            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">CUMULATIVE IMPACT</p>
+            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">STRATEGIC VOLUME</p>
             <h2 style="margin:10px 0;">{len(f_df)}</h2>
-            <p style="margin:0; font-size:0.7rem; opacity:0.9;">Total recorded strikes against democratic pillars.</p>
-        </div>
-        <div class="hero-card" style="border-color:#DE0100; background: rgba(222, 1, 0, 0.05);">
-            <p style="margin:0; font-size:0.8rem; font-weight:bold; color:#DE0100;">PROCEDURAL SHOCK</p>
-            <h2 style="margin:10px 0; color:#DE0100;">{pace:.1f}/mo</h2>
-            <p style="margin:0; font-size:0.7rem; opacity:0.9;"><b>Saturation Strategy:</b> Rewrite speed designed to outpace judicial oversight.</p>
+            <p style="margin:0; font-size:0.75rem; opacity:0.9; line-height:1.4;">
+                <b>Institutional Footprint:</b> Total recorded strikes. Every action represents a structural rewrite of the American state.
+            </p>
         </div>
         <div class="hero-card">
-            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">STRATEGIC COMPLEXITY</p>
+            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">SYSTEMIC VELOCITY</p>
+            <h2 style="margin:10px 0;">{pace:.1f}/mo</h2>
+            <p style="margin:0; font-size:0.75rem; opacity:0.9; line-height:1.4;">
+                <b>Saturation Strategy:</b> The speed is the point. High-frequency actions are designed to outpace judicial oversight.
+            </p>
+        </div>
+        <div class="hero-card">
+            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">TACTICAL COMPLEXITY</p>
             <h2 style="margin:10px 0;">{overlap:.1f}%</h2>
-            <p style="margin:0; font-size:0.7rem; opacity:0.9;"><b>Norm-Collapse Loops:</b> % of actions hitting multiple pillars simultaneously.</p>
+            <p style="margin:0; font-size:0.75rem; opacity:0.9; line-height:1.4;">
+                <b>Interlocking Strategy:</b> The overlap is the point. Multi-pillar strikes ensure results even if one is blocked.
+            </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
