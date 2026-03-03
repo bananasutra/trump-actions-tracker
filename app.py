@@ -63,7 +63,7 @@ def load_data():
 
 df = load_data()
 
-# 4. STRATEGIC DIALOG (FACTS OVER OPINIONS)
+# 4. STRATEGIC DIALOG
 @st.dialog("Strategic Note on Facts")
 def show_welcome():
     st.markdown("""
@@ -199,6 +199,7 @@ st.markdown("""
         <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Themes</button></a>
         <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
         <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
+        <a href="#wordcloud" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Words</button></a>
         <a href="#search" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
@@ -218,7 +219,7 @@ if not filtered_df.empty:
         filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
         chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 11. TIMELINE & SECTIONS
+# 11. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode:
@@ -269,11 +270,11 @@ if not filtered_df.empty:
         st.markdown("#### Strategic Velocity & Attrition")
         st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate. In strategic terms, this volume induces 'procedural shock'—where the sheer number of executive orders and policy shifts exhausts the bandwidth of civil society, journalists, and the legal system.")
         st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {overlap:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously. For example, an action targeting federal civil service often simultaneously limits scientific research and restricts public access to information.")
+        st.write(f"**Interconnectivity:** {overlap:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point against this velocity, explaining the prioritization of Judicial and DOJ hollowing. Data shows that as federal checks weaken, the 'Blue State Shield' becomes the primary mechanism for preserving the Rule of Law.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite—where the cumulative weight of changes effectively creates a new, non-democratic operating system for the federal government.")
+        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation remains the primary friction point against this velocity, explaining the prioritization of Judicial hollowing.")
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite.")
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
@@ -282,11 +283,6 @@ if not filtered_df.empty:
                 "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts."
             </p>
             <p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p>
-            <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.8;">
-                In an era of administrative certainty, this tracker serves as a tool for the 'wise'—those who prefer 
-                verifiable data over rhetoric. By mapping the interconnectivity of executive actions, we move from 
-                doubt to a precise diagnostic of institutional change.
-            </p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -295,14 +291,14 @@ if not filtered_df.empty:
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 15. THEMATIC WORD CLOUD (NEW SECTION)
+# 15. THEMATIC WORD CLOUD (DARK MODE OPTIMIZED)
 st.markdown("<div id='wordcloud'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
-st.write("Visualizing the most frequent keywords across all tracked actions in the current window.")
+st.write("Hover over words to see frequency. Optimized for high contrast.")
 
 if not filtered_df.empty:
-    stop_words = {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president'}
+    stop_words = {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president', 'will', 'this', 'that'}
     all_titles = " ".join(filtered_df['Title'].values).lower()
     words = re.findall(r'\w+', all_titles)
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
@@ -313,38 +309,10 @@ if not filtered_df.empty:
         "series": [{
             "type": "wordCloud",
             "shape": "circle",
-            "gridSize": 10,
-            "sizeRange": [12, 60],
+            "gridSize": 12,
+            "sizeRange": [14, 65],
             "rotationRange": [-45, 90],
             "textStyle": {
                 "fontFamily": "sans-serif",
                 "fontWeight": "bold",
-                "color": "function () { return 'rgb(' + [Math.round(Math.random() * 160), Math.round(Math.random() * 160), Math.round(Math.random() * 160)].join(',') + ')'; }"
-            },
-            "data": [{"name": word, "value": count} for word, count in word_counts]
-        }]
-    }
-    st_echarts(wordcloud_options, height="400px")
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
-
-# 16. SEARCH DATA VAULT (SYNCED & CLICKABLE LINKS)
-st.markdown("<div id='search'></div>", unsafe_allow_html=True)
-st.divider()
-st.subheader("🔍 Search Data Vault")
-st.info("💡 Pro-tip: This box syncs with the Global Search in the sidebar.")
-st.text_input("Filter the vault directly...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term, placeholder="Type to filter results...")
-
-if not filtered_df.empty:
-    v_df = display_df.sort_values('Date', ascending=False)
-    st.dataframe(
-        v_df[['Date', 'Title', 'URL', 'Themes_List']], 
-        column_config={
-            "URL": st.column_config.LinkColumn("Source", help="Click to open primary source"),
-            "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")
-        },
-        use_container_width=True, 
-        hide_index=True
-    )
-st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
-
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
+                "color": "function () { return 'rgb(' + [Math.round(Math.random() * 200 + 55), Math.round(
