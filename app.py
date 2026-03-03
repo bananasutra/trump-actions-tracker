@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK (CRITICAL)
+# 1. PAGE CONFIG & SEO HACK
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -19,7 +19,6 @@ st.markdown(f"""
     <title>U.S. Democracy Gone Bananas</title>
     <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker">
-    <meta property="og:description" content="A real-time diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.">
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     </head>
@@ -40,18 +39,18 @@ if "first_visit" not in st.session_state:
     st.session_state.first_visit = True
     show_welcome()
 
-# 3. THEMES & RICH GLOSSARY DATA
+# 3. THEMES & RICH GLOSSARY
 THEME_GLOSSARY = [
-    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities, signaling a shift away from universal egalitarianism."},
-    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors for financial or personal gain, eroding the barrier between public service and private wealth."},
-    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating Democratic Norms & Rule of Law: The fracturing of checks and balances, the dismissal of constitutional constraints, and the direct targeting of the judiciary and press freedom."},
-    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking Intellectual & Cultural Autonomy: Restricting K-12 curricula, undermining university independence, and targeting cultural institutions to align national identity with state ideology."},
-    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing the State: The dismantling of federal expertise, mass dismissals of civil servants, and the hollowing out of agencies to diminish the state's capacity for oversight."},
-    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Global Destabilisation: An aggressive pivot in foreign policy that threatens traditional alliances, withdraws from global treaties, and aligns the U.S. with anti-democratic rivals."},
-    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Militarised Nationalism: The demonization of immigrants combined with expanded domestic surveillance and the use of militarized enforcement to define the 'other' within."},
-    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Information Control & Propaganda: The manufacturing of state-led narratives, the restriction of scientific data, and the active spread of misinformation to control public perception."},
-    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Ideological Control of Science: The suppression of climate research, the defunding of public health (vaccines), and the prioritization of industrial deregulation over scientific consensus."},
-    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Weaponising the State: Using executive power, legal threats, and law enforcement to target political rivals, critics, and dissenting cities as 'enemies' of the state."}
+    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities."},
+    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors."},
+    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating Democratic Norms & Rule of Law: The fracturing of checks and balances and dismissal of constitutional constraints."},
+    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking Intellectual & Cultural Autonomy: Restricting curricula and targeting cultural institutions."},
+    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing the State: Dismantling federal expertise and politicizing the civil service."},
+    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Global Destabilisation: An aggressive pivot that threatens traditional alliances and aligns with rivals."},
+    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Militarised Nationalism: The demonization of immigrants combined with expanded domestic surveillance."},
+    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Information Control: Manufacturing state narratives and restricting scientific data access."},
+    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Ideological Control of Science: Suppression of climate research and defunding of public health."},
+    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Weaponising the State: Using executive power to target political rivals and critics."}
 ]
 
 GLOSSARY_DF = pd.DataFrame(THEME_GLOSSARY).sort_values("Theme")
@@ -59,10 +58,10 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (NUCLEAR THEME HARD-LOCK)
+# 4. CSS (RESPONSIVE STACKING + MONOCHROME NAV)
 st.markdown("""
     <style>
-        /* KILL THE BLUE AT THE SOURCE */
+        /* KILL THE BLUE */
         div.stButton > button, .nav-container button {
             background-color: transparent !important;
             color: inherit !important;
@@ -72,29 +71,32 @@ st.markdown("""
             transition: 0.3s !important;
         }
         
-        a, .nav-container a { color: inherit !important; text-decoration: none !important; }
+        /* RESPONSIVE FLEX */
+        .nav-container, .hero-container {
+            display: flex !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            width: 100% !important;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-container, .hero-container { flex-direction: column !important; }
+            .nav-container a, .hero-card { width: 100% !important; }
+        }
 
-        /* STICKY NAV RE-ANCHOR */
+        /* STICKY NAV */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(20px) !important; padding: 10px 0 !important; 
         }
 
-        /* UI COMPONENTS */
         .hero-card {
-            flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
+            flex: 1; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
-            text-align: center; margin-bottom: 15px;
+            text-align: center;
         }
-        .hero-card h2 { margin: 10px 0; font-size: 2.2rem; }
-        .hero-card p.context { margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic; }
-        
-        .glossary-footnote { font-size: 11px !important; color: #888 !important; line-height: 1.3 !important; }
-        .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-        .glossary-footnote th, .glossary-footnote td { text-align: left; padding: 8px; font-weight: 400 !important; border-bottom: 1px solid rgba(128,128,128,0.2); }
         
         [id] { scroll-margin-top: 150px !important; }
-        .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -115,20 +117,29 @@ def load_data():
 
 df = load_data()
 
-# 6. SIDEBAR & RESET LOGIC
+# 6. HEADER & ATTRIBUTION
+st.markdown("<div id='top'></div>", unsafe_allow_html=True)
+st.markdown("""
+    <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px; margin-bottom:5px;">
+        <div style="font-size:2.5rem;">🍌</div>
+        <h1 style="margin:0; font-weight:700;">U.S. Democracy Gone Bananas</h1>
+    </a>
+    <p style="opacity:0.6; font-size:1.1rem; margin-bottom:5px; margin-left:65px;">
+        A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).
+    </p>
+    <p style="opacity:0.5; font-size:0.85rem; margin-bottom:30px; margin-left:65px;">
+        Dashboard by <b>Celine Nadeau</b> | Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color: inherit;"><b>Christina Pagel / Trump Action Tracker Info</b></a> | <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: inherit;"><b>CC BY 4.0</b></a>
+    </p>
+""", unsafe_allow_html=True)
+
+# 7. SIDEBAR & SEARCH
 if "search_term" not in st.session_state: st.session_state.search_term = ""
 def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_search
 def sync_vault(): st.session_state.search_term = st.session_state.vault_search
 
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
-st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
-
-if comparison_mode:
-    selected_themes = st.sidebar.multiselect("Select Themes", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
-else:
-    selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
 
 if df is not None:
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
@@ -143,25 +154,9 @@ if df is not None:
         st.session_state.sidebar_search = ""
         st.session_state.vault_search = ""
         st.session_state.comparison_mode = False
-        st.session_state.filter_area = "All Actions"
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 7. HEADER, SUBHEAD & SOURCE ATTRIBUTION (RESTORED TO TOP)
-st.markdown("<div id='top'></div>", unsafe_allow_html=True)
-st.markdown("""
-    <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px; margin-bottom:5px;">
-        <div style="font-size:2.5rem;">🍌</div>
-        <h1 style="margin:0; font-weight:700;">U.S. Democracy Gone Bananas</h1>
-    </a>
-    <p style="opacity:0.6; font-size:1.1rem; margin-bottom:5px; margin-left:65px;">
-        A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).
-    </p>
-    <p style="opacity:0.5; font-size:0.85rem; margin-bottom:30px; margin-left:65px;">
-        Dashboard by <b>Celine Nadeau</b> | Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color: inherit;"><b>Christina Pagel / Trump Action Tracker Info</b></a> | Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: inherit;"><b>CC BY 4.0</b></a>
-    </p>
-""", unsafe_allow_html=True)
-
-# 8. HERO CARDS (WITH RICH CONTEXT)
+# 8. HERO CARDS (DIAGNOSTIC CONTEXT LOCKED HERE)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -169,61 +164,53 @@ if not filtered_df.empty:
     overlap = (len(filtered_df[filtered_df['Cat_Count'] > 1]) / total_actions * 100)
 
     st.markdown(f"""
-    <div style="display: flex; justify-content: center; gap: 15px; width: 100%; flex-wrap: wrap;">
+    <div class="hero-container">
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
-            <h2>{total_actions}</h2>
-            <p class="context">Verifiable data vs. mere opinion.</p>
+            <h2 style="margin:10px 0; font-size:2.2rem;">{total_actions}</h2>
+            <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Verifiable data vs. mere opinion (Doubt).</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
-            <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p class="context">Institutional rewrite rate.</p>
+            <h2 style="margin:10px 0; font-size:2.2rem; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
+            <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
-            <h2>{overlap:.1f}%</h2>
-            <p class="context">Interlocking thematic strikes.</p>
+            <h2 style="margin:10px 0; font-size:2.2rem;">{overlap:.1f}%</h2>
+            <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Interlocking thematic strikes (Complexity).</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV (MONOCHROME FLEX)
+# 9. STICKY NAV
 st.markdown("""
-    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 10px; width: 100%;">
-        <a href="#timeline" style="flex: 1;"><button style="width:100%;">Timeline</button></a>
-        <a href="#themes" style="flex: 1;"><button style="width:100%;">Themes</button></a>
-        <a href="#insights" style="flex: 1;"><button style="width:100%;">Insights</button></a>
-        <a href="#words" style="flex: 1;"><button style="width:100%;">Words</button></a>
-        <a href="#search" style="flex: 1;"><button style="width:100%;">Search</button></a>
+    <div class="nav-container">
+        <a href="#timeline" style="flex:1;"><button style="width:100%;">Timeline</button></a>
+        <a href="#themes" style="flex:1;"><button style="width:100%;">Themes</button></a>
+        <a href="#insights" style="flex:1;"><button style="width:100%;">Insights</button></a>
+        <a href="#words" style="flex:1;"><button style="width:100%;">Words</button></a>
+        <a href="#search" style="flex:1;"><button style="width:100%;">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE
+# 10. TIMELINE (INTERACTIVE TIPS ANCHORED HERE)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
-    if comparison_mode and selected_themes:
-        st.subheader("Velocity Analysis: Comparative Theme Growth")
-        long_names = [SHORT_TO_LONG[s] for s in selected_themes]
-        comp_df = filtered_df.melt(id_vars=['Date', 'Title'], value_vars=long_names, var_name='Mapping', value_name='Active')
-        comp_df = comp_df[comp_df['Active'].str.strip().str.lower() == 'yes']
-        comp_df['Theme'] = comp_df['Mapping'].map(CATEGORY_MAP)
-        comp_df = comp_df.sort_values('Date').reset_index(drop=True)
-        comp_df['Cumulative'] = comp_df.groupby('Theme').cumcount() + 1
-        comp_chart = alt.Chart(comp_df).mark_line(interpolate='step-after', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', color='Theme:N', tooltip=['Date', 'Theme', 'Cumulative']).properties(width='container', height=400).interactive()
-        st.altair_chart(comp_chart, use_container_width=True)
-    else:
-        st.subheader(f"Timeline Progression: {selected_short if not comparison_mode else 'All Actions'}")
-        chart_df = filtered_df.copy().sort_values('Date')
-        if not comparison_mode and selected_short != "All Actions": chart_df = chart_df[chart_df[SHORT_TO_LONG[selected_short]].str.strip().str.lower() == 'yes']
-        chart_df['Cumulative'] = range(1, len(chart_df) + 1)
-        line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
-        st.altair_chart(line, use_container_width=True)
+    chart_df = filtered_df.copy().sort_values('Date')
+    chart_df['Cumulative'] = range(1, len(chart_df) + 1)
+    line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
+    st.altair_chart(line, use_container_width=True)
     
-    st.markdown("<p style='text-align: center; font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 Navigation: Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+        <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 <b>Navigation:</b> Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>
+        <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>🔗 <b>Links:</b> Graph links may be unstable due to administrative churn. Use the <b>Search Data Vault</b> below for verified URLs.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-# 11. THEMES (WIDE BAR & RICH GLOSSARY)
+# 11. THEMES & GLOSSARY
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -254,11 +241,12 @@ if not filtered_df.empty:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
-    st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
+    
+    st.markdown(f"""<div class="quote-container" style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD (HSL LUMINANCE-LOCKED NEON)
+# 13. WORD CLOUD (HSL NEON)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -267,18 +255,15 @@ if not filtered_df.empty:
     words = re.findall(r'\w+', all_titles)
     filtered_words = [w for w in words if w not in {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president', 'will', 'this', 'that'} and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
-    
-    # NEON FIX: HSL color with Lightness locked to 75-90%
     js_color = "function () { return 'hsl(' + (Math.random() * 360) + ', 100%, ' + (Math.round(Math.random() * 15) + 75) + '%)'; }"
-    
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 14. VAULT 
+# 14. VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. Data sourced from Pagel et al.")
+st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
