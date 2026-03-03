@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK
+# 1. PAGE CONFIG & SEO
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -14,17 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown(f"""
-    <head>
-    <title>U.S. Democracy Gone Bananas</title>
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
-    <meta property="og:description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
-    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
-    <meta name="twitter:card" content="summary_large_image">
-    </head>
-    """, unsafe_allow_html=True)
-
-# 2. THEMES & RICH GLOSSARY DATA
+# 2. THEMES & RICH GLOSSARY
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities, signaling a shift away from universal egalitarianism."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors for financial or personal gain, eroding the barrier between public service and private wealth."},
@@ -43,29 +33,26 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. CSS (THE ABSOLUTE HARD-LOCK)
+# 3. CSS (NAV & CARD HARD-LOCK)
 st.markdown("""
     <style>
-        /* 1. KILL THE BLUE AT THE SOURCE */
-        div.stButton > button, .nav-container button {
-            background-color: transparent !important;
-            color: inherit !important;
-            border: 1px solid currentColor !important;
-            box-shadow: none !important;
-            font-weight: bold !important;
-            transition: 0.3s !important;
+        /* 1. NAV CONTAINER & BUTTONS (MONOCHROME LOCK) */
+        .nav-container { display: flex !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; }
+        .nav-container a { flex: 1 !important; text-decoration: none !important; }
+        .nav-container button {
+            width: 100% !important; padding: 10px !important; border-radius: 5px !important;
+            font-weight: bold !important; cursor: pointer !important; background-color: transparent !important;
+            border: 1px solid currentColor !important; color: inherit !important; transition: 0.3s !important;
         }
-        
-        a, .nav-container a { color: inherit !important; text-decoration: none !important; }
+        .nav-container button:hover { opacity: 0.6 !important; }
 
-        /* 2. STICKY NAV RE-ANCHOR */
+        /* 2. STICKY NAV */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
-            position: sticky !important; top: 2.875rem !important; z-index: 999; 
-            background: inherit !important; backdrop-filter: blur(20px) !important; 
-            padding: 10px 0 !important; 
+            position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
+            background: inherit !important; backdrop-filter: blur(15px) !important; padding: 10px 0 !important; 
         }
 
-        /* 3. UI COMPONENTS */
+        /* 3. HERO CARDS */
         .hero-card {
             flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
@@ -73,14 +60,16 @@ st.markdown("""
         }
         .hero-card h2 { margin: 10px 0; font-size: 2.2rem; }
         .hero-card p.context { margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic; }
-        [id] { scroll-margin-top: 150px !important; }
+
+        /* 4. FOOTNOTE GLOSSARY */
         .glossary-footnote { font-size: 11px !important; color: #888 !important; line-height: 1.3 !important; }
         .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
         .glossary-footnote th, .glossary-footnote td { 
             text-align: left; padding: 8px; font-weight: 400 !important; 
             border-bottom: 1px solid rgba(128,128,128,0.2); 
         }
-        .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
+
+        [id] { scroll-margin-top: 150px !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -106,8 +95,7 @@ def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_sear
 def sync_vault(): st.session_state.search_term = st.session_state.vault_search
 
 st.sidebar.title("🎛️ Data Controls")
-st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
-st.sidebar.divider()
+st.sidebar.text_input("🔍 Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
 
 if comparison_mode:
@@ -132,7 +120,7 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
-# 7. HERO STATS (Top Only)
+# 7. HERO CARDS (WITH RICH CONTEXT)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -144,30 +132,33 @@ if not filtered_df.empty:
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
             <h2>{total_actions}</h2>
+            <p class="context">Verifiable data vs. mere opinion.</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
+            <p class="context">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
+            <p class="context">Interlocking thematic strikes.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 8. NAV (HARD-LOCKED MONOCHROME)
+# 8. STICKY NAV
 st.markdown("""
-    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 10px; width: 100%;">
-        <a href="#timeline" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Timeline</button></a>
-        <a href="#themes" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Themes</button></a>
-        <a href="#insights" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Insights</button></a>
-        <a href="#words" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Words</button></a>
-        <a href="#search" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Search</button></a>
+    <div class="nav-container">
+        <a href="#timeline"><button>Timeline</button></a>
+        <a href="#themes"><button>Themes</button></a>
+        <a href="#insights"><button>Insights</button></a>
+        <a href="#words"><button>Words</button></a>
+        <a href="#search"><button>Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 9. TIMELINE & DIAGNOSTIC TIPS
+# 9. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
@@ -189,12 +180,10 @@ if not filtered_df.empty:
         line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
 
-    t1, t2, t3 = st.columns(3)
-    with t1: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>📈 <b>Velocity</b><br><i>Institutional rewrite rate</i></div>", unsafe_allow_html=True)
-    with t2: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>🧩 <b>Complexity</b><br><i>Interlocking thematic strikes</i></div>", unsafe_allow_html=True)
-    with t3: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>⚖️ <b>Doubt</b><br><i>Verifiable data vs. opinion</i></div>", unsafe_allow_html=True)
+    # NEW: CLEAN TIMELINE NAVIGATION TIPS
+    st.markdown("<p style='text-align: center; font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 Navigation: Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>", unsafe_allow_html=True)
 
-# 10. THEMES (WIDE BAR & RICH GLOSSARY)
+# 10. THEMES (BAR CHART & GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -225,11 +214,12 @@ if not filtered_df.empty:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
+    
     st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 12. WORD CLOUD (HSL LUMINANCE-LOCKED NEON)
+# 12. WORD CLOUD (NEON VISIBILITY)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
