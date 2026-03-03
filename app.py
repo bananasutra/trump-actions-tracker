@@ -11,14 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown("""
-    <head>
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
-    <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025." />
-    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png" />
-    </head>
-    """, unsafe_allow_html=True)
-
 # 2. THEMES & GLOSSARY MAPPING
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights."},
@@ -157,7 +149,7 @@ st.markdown("""
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
-# 8. HERO STATS
+# 8. HERO STATS (RESPONSIVE)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -275,7 +267,7 @@ if not filtered_df.empty:
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 15. SEARCH DATA VAULT (SYNCED)
+# 15. SEARCH DATA VAULT (SYNCED & CLICKABLE LINKS)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
@@ -284,7 +276,16 @@ st.text_input("Filter the vault directly...", key="vault_search", on_change=sync
 
 if not filtered_df.empty:
     v_df = display_df.sort_values('Date', ascending=False)
-    st.dataframe(v_df[['Date', 'Title', 'URL', 'Themes_List']], use_container_width=True, hide_index=True)
+    # CRITICAL FIX: Explicit LinkColumn configuration
+    st.dataframe(
+        v_df[['Date', 'Title', 'URL', 'Themes_List']], 
+        column_config={
+            "URL": st.column_config.LinkColumn("Source", help="Click to open primary source"),
+            "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")
+        },
+        use_container_width=True, 
+        hide_index=True
+    )
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
 st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
