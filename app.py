@@ -11,11 +11,13 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# SEO Workaround for Social Media Previews
 st.markdown("""
     <head>
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
     <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025." />
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image">
     </head>
     """, unsafe_allow_html=True)
 
@@ -58,7 +60,27 @@ def load_data():
 
 df = load_data()
 
-# 4. SIDEBAR & RESET LOGIC
+# 4. STRATEGIC DIALOG (SOCRATIC ENTRY)
+@st.dialog("Strategic Diagnostic: A Note on Wit & Wisdom")
+def show_welcome():
+    st.markdown(f"""
+    ### Welcome to the Diagnostic
+    In an era defined by what Bertrand Russell called the "certainty of fanatics," this tracker is 
+    built for those who prioritize **verifiable doubt**.
+    
+    **How to Read This Engine:**
+    * **Velocity:** We track 'procedural shock'—the rate at which institutional norms are rewritten.
+    * **Strategic Overlap:** We map 'multi-tagged' actions that strike several democratic pillars at once.
+    * **The Goal:** To sharpen our wits against the magical (and often chaotic) things happening in 2025-2026.
+    
+    *Click anywhere outside this box to begin your investigation.*
+    """)
+
+if "first_visit" not in st.session_state:
+    st.session_state.first_visit = True
+    show_welcome()
+
+# 5. SIDEBAR & RESET LOGIC
 st.sidebar.title("🎛️ Data Controls")
 
 def reset_filters():
@@ -101,9 +123,21 @@ if df is not None:
 else:
     filtered_df = pd.DataFrame()
 
-# 5. HEADER & HERO
+# 6. BRANDED HEADER & HERO
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
-st.title("🙊 U.S. Democracy Gone Bananas")
+
+st.markdown("""
+    <style>
+        .brand-link { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px; margin-bottom: -10px; }
+        .brand-logo { font-size: 3rem; background: rgba(255, 255, 255, 0.05); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
+        .brand-logo:hover { background: rgba(222, 1, 0, 0.1); border-color: #DE0100; transform: scale(1.02); }
+    </style>
+    <a href="https://trump-actions-tracker.streamlit.app/" target="_self" class="brand-link">
+        <div class="brand-logo">🍌</div>
+        <div><h1 style="margin: 0;">U.S. Democracy Gone Bananas</h1></div>
+    </a>
+""", unsafe_allow_html=True)
+
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
@@ -130,7 +164,7 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 6. STICKY NAVIGATION
+# 7. STICKY NAV & ANCHOR STYLES
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {
@@ -138,7 +172,7 @@ st.markdown("""
             background-color: #0e1117; padding: 20px 0;
         }
         [id] { scroll-margin-top: 110px !important; }
-        .back-to-top { font-size: 0.75rem; color: #666; text-decoration: none; display: block; text-align: right; margin-top: 5px; font-weight: normal; }
+        .back-to-top { font-size: 0.75rem; color: #666; text-decoration: none; display: block; text-align: right; margin-top: 5px; }
         .back-to-top:hover { color: #DE0100; transition: 0.3s; }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
@@ -150,7 +184,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 7. DATA PROCESSING & TIMELINE
+# 8. DATA PROCESSING
 if not filtered_df.empty:
     if comparison_mode:
         long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
@@ -165,6 +199,7 @@ if not filtered_df.empty:
         filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
         chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
+# 9. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode:
@@ -184,7 +219,7 @@ if not filtered_df.empty:
         st.altair_chart((line + points).interactive(), use_container_width=True)
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 8. THEMES & GLOSSARY
+# 10. THEMES & GLOSSARY
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -205,7 +240,7 @@ with st.expander("📖 Themes Glossary"):
     st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 9. LATEST
+# 11. LATEST
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions in Window: {selected_short}")
@@ -218,10 +253,11 @@ if not filtered_df.empty:
             st.link_button("🚀 View Source", row['URL'])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 10. DEEP INSIGHTS
+# 12. DEEP INSIGHTS (WITH THE BERTRAND MOMENT)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
+
 if not filtered_df.empty:
     multi_ratio = (len(filtered_df[filtered_df['Cat_Count'] > 1]) / len(filtered_df) * 100)
     col_ins1, col_ins2 = st.columns(2)
@@ -229,18 +265,34 @@ if not filtered_df.empty:
         st.markdown("#### Strategic Velocity & Attrition")
         st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This volume induces 'procedural shock' designed to exhaust bandwidth.")
         st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass institutional checks.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition centers in CA, WA, NY, IL. Litigation remains the primary friction point.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**.")
+
+    # THE BERTRAND MOMENT
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style="background: rgba(255, 255, 255, 0.03); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px;">
+            <p style="font-style: italic; margin-bottom: 5px;">
+                "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts."
+            </p>
+            <p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p>
+            <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.8;">
+                In an era of administrative certainty, this tracker serves as a tool for the 'wise'—those who prefer 
+                verifiable data over rhetoric. By mapping the interconnectivity of executive actions, we move from 
+                doubt to a precise diagnostic of institutional change.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
     st.markdown("<br><h4 style='text-align: center;'>Methodology Context & Expert Analysis</h4>", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 11. SEARCH
+# 13. SEARCH (VAULT)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
