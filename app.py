@@ -289,7 +289,7 @@ if not filtered_df.empty:
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 15. WORD CLOUD (FIXED SYNTAX)
+# 15. THEMATIC WORD CLOUD (ULTIMATE CONTRAST)
 st.markdown("<div id='wordcloud'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -301,17 +301,18 @@ if not filtered_df.empty:
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
 
-    # REPAIRED JAVASCRIPT STRING
-    js_color = "function () { return 'rgb(' + [Math.round(Math.random() * 200 + 55), Math.round(Math.random() * 200 + 55), Math.round(Math.random() * 200 + 55)].join(',') + ')'; }"
+    # JS FIXED: Single line + Forced High Brightness (150-255 range)
+    js_color = "function () { return 'rgb(' + [Math.round(Math.random() * 105 + 150), Math.round(Math.random() * 105 + 150), Math.round(Math.random() * 105 + 150)].join(',') + ')'; }"
 
     wordcloud_options = {
+        "backgroundColor": "transparent",
         "tooltip": {"show": True},
         "series": [{
             "type": "wordCloud",
             "shape": "circle",
             "gridSize": 12,
             "sizeRange": [14, 65],
-            "rotationRange": [-45, 90],
+            "rotationRange": [0, 0],
             "textStyle": {
                 "fontFamily": "sans-serif",
                 "fontWeight": "bold",
@@ -320,10 +321,10 @@ if not filtered_df.empty:
             "data": [{"name": word, "value": count} for word, count in word_counts]
         }]
     }
-    st_echarts(wordcloud_options, height="450px", theme="dark")
+    st_echarts(wordcloud_options, height="450px")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 16. VAULT
+# 16. VAULT (WITH ACTIVE LINKS)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
@@ -333,7 +334,10 @@ if not filtered_df.empty:
     v_df = display_df.sort_values('Date', ascending=False)
     st.dataframe(
         v_df[['Date', 'Title', 'URL', 'Themes_List']], 
-        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")},
+        column_config={
+            "URL": st.column_config.LinkColumn("Source"), 
+            "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")
+        },
         use_container_width=True, hide_index=True
     )
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
