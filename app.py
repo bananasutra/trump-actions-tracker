@@ -118,18 +118,19 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    # GLOBAL INVESTIGATIVE DIAGNOSTIC BOX
+    # GLOBAL ORIENTATION BOX
     st.markdown(f"""
     <div style="background: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid rgba(128, 128, 128, 0.1);">
+        <p style="margin:0 0 8px 0; font-size:1rem; font-weight:bold; opacity:0.9;">How to use this dashboard</p>
         <p style="margin:0; font-size:0.85rem; opacity:0.85; line-height:1.4;">
-            🔍 <b>Investigative Diagnostic:</b> Metrics and charts sync to your search and/or filters. 
-            Use the sidebar to compare the <b>Velocity</b> and <b>Complexity</b> of specific democracy dismantling efforts, and isolate specific threats.
+            This is an investigative diagnostic tool for curious people: all metrics and charts on this dashboard sync to your search and/or filters. 
+            Use the sidebar to compare the <b>Volume</b>, <b>Velocity</b>, and <b>Complexity</b> of specific authoritarian efforts, and isolate specific threats to democracy.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
     st.divider()
-    st.subheader("◈ Institutional Health Diagnostic")
+    st.subheader("Institutional Health Diagnostic")
     st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card">
@@ -153,7 +154,7 @@ if df is not None:
 # 7. TIMELINE & THEMES GRAPHS
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("∿ Action Progression")
+st.subheader("Action Progression")
 if not f_df.empty:
     if comp_mode:
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
@@ -179,7 +180,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("⊞ Volume by Strategic Pillar")
+st.subheader("Volume by Strategic Pillar")
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
@@ -196,7 +197,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 # 8. DEEP INSIGHTS 
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("▼ Deep Insights: Strategic Diagnostic")
+st.subheader("Deep Insights: Strategic Diagnostic")
 c1, c2 = st.columns(2)
 with c1:
     st.markdown("#### Saturation Strategy & Attrition")
@@ -215,7 +216,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 # 10. VAULT SEARCH 
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("⌗ Search Trump Actions Data Vault")
+st.subheader("Search Trump Actions Data Vault")
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
