@@ -28,7 +28,7 @@ st.markdown(f"""
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; }}
         .hero-card {{ flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }}
         .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
-        .nav-container button {{ width: 100%; padding: 8px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
+        .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
@@ -115,10 +115,47 @@ if df is not None:
 # 6. STICKY NAV (RESTORED "WORDS")
 st.markdown("""<div class="nav-container"><a href="#section-timeline"><button>Timeline</button></a><a href="#section-themes"><button>Themes</button></a><a href="#section-insights"><button>Insights</button></a><a href="#section-words"><button>Words</button></a><a href="#section-search"><button>Search</button></a></div>""", unsafe_allow_html=True)
 
-# 7. TIMELINE & INSIGHTS (HARD-LOCKED CONTENT)
+# 7. TIMELINE & THEMES (RESTORED SECTIONS)
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
-# [Timeline logic remains same as per last stable mobile-friendly build]
+st.subheader("Action Progression")
+if not f_df.empty:
+    if comp_mode:
+        long_names = [SHORT_TO_LONG[s] for s in selected_themes]
+        comp_plot_df = f_df.melt(id_vars=['Date', 'Title', 'URL', 'Themes_List'], value_vars=long_names, var_name='Mapping', value_name='Active')
+        comp_plot_df = comp_plot_df[comp_plot_df['Active'].str.strip().str.lower() == 'yes']
+        comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
+        comp_plot_df['Cumulative'] = comp_plot_df.groupby('Theme').cumcount() + 1
+        
+        chart = alt.Chart(comp_plot_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
+            x='Date:T', y='Cumulative:Q', color='Theme:N', href='URL:N',
+            tooltip=['Date:T', 'Title:N', 'Theme:N', 'Cumulative:Q']
+        ).properties(width='container', height=400).interactive()
+    else:
+        chart_df = f_df.copy().sort_values('Date')
+        chart_df['Cumulative'] = range(1, len(chart_df) + 1)
+        chart = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
+            x='Date:T', y='Cumulative:Q', href='URL:N',
+            tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), alt.Tooltip('Title:N', title='Action'), alt.Tooltip('Themes_List:N', title='Themes Hit'), alt.Tooltip('URL:N', title='Source URL')]
+        ).properties(width='container', height=400).interactive()
+    st.altair_chart(chart, use_container_width=True)
+    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 Hover for diagnostic data. Click points for source URL. Scroll/pinch to zoom.</p>", unsafe_allow_html=True)
 
+st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
+st.divider()
+st.subheader("Action Volume by Pillar")
+if not f_df.empty:
+    cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
+    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
+    st.altair_chart(theme_bar, use_container_width=True)
+
+    with st.expander("📖 Strategic Themes Glossary"):
+        gloss_html = '<div style="font-size:0.85rem; opacity:0.9;"><table>'
+        for _, row in GLOSSARY_DF.iterrows():
+            gloss_html += f'<tr><td style="padding:8px; font-weight:bold; width:140px; border-bottom:1px solid rgba(128,128,128,0.2);">{row["Theme"]}</td><td style="padding:8px; border-bottom:1px solid rgba(128,128,128,0.2);">{row["Definition"]}</td></tr>'
+        gloss_html += '</table></div>'
+        st.markdown(gloss_html, unsafe_allow_html=True)
+
+# 8. INSIGHTS (HARD-LOCKED CONTENT)
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -136,7 +173,7 @@ with c2:
 # CENTERED VIDEO
 v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 8. WORDS (RESTORED NEON WORD CLOUD)
+# 9. WORDS (RESTORED NEON WORD CLOUD)
 st.markdown("<div id='section-words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -149,7 +186,7 @@ if not f_df.empty:
     wc_options = {"series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [15, 65], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 9. SEARCH & CAPTION
+# 10. SEARCH & CAPTION
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
