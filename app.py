@@ -43,23 +43,20 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. CSS (FLEX LAYOUT & THEME HARD-LOCK)
+# 3. CSS (NUCLEAR THEME & LAYOUT RESET)
 st.markdown("""
     <style>
-        /* 1. NAV CONTAINER FLEXBOX */
+        /* 1. THE NAV COLOR EXORCISM */
         .nav-container {
             display: flex !important;
             justify-content: space-between !important;
             gap: 10px !important;
             width: 100% !important;
         }
+        .nav-container a { flex: 1 !important; text-decoration: none !important; }
         
-        .nav-container a {
-            flex: 1 !important;
-            text-decoration: none !important;
-        }
-        
-        .nav-button {
+        /* Force buttons to inherit theme text and ignore Streamlit Blue */
+        .nav-container button {
             width: 100% !important;
             padding: 10px !important;
             border-radius: 5px !important;
@@ -70,7 +67,7 @@ st.markdown("""
             color: inherit !important;
             transition: 0.3s !important;
         }
-        .nav-button:hover { opacity: 0.6 !important; }
+        .nav-container button:hover { opacity: 0.6 !important; }
 
         /* 2. STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
@@ -86,12 +83,13 @@ st.markdown("""
             border-bottom: 1px solid rgba(128,128,128,0.2); 
         }
 
-        /* 4. HERO CARDS & ANCHORS */
+        /* 4. UI COMPONENTS */
         .hero-card {
             flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
             text-align: center; margin-bottom: 15px;
         }
+        .timeline-tip { font-size: 0.8rem; opacity: 0.7; font-style: italic; margin-top: 5px; }
         [id] { scroll-margin-top: 150px !important; }
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
@@ -117,19 +115,18 @@ def load_data():
 
 df = load_data()
 
-# 5. SEARCH SYNC & CALLBACKS
+# 5. SIDEBAR & SEARCH
 if "search_term" not in st.session_state: st.session_state.search_term = ""
 def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_search
 def sync_vault(): st.session_state.search_term = st.session_state.vault_search
 
-# 6. SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
 st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
 
 if comparison_mode:
-    selected_themes = st.sidebar.multiselect("Select Themes", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
+    selected_themes = st.sidebar.multiselect("Select Themes to Compare", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
 else:
     selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
 
@@ -141,7 +138,7 @@ if df is not None:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
     filtered_df = df.loc[mask]
 
-# 7. HEADER
+# 6. HEADER & HERO
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <a href="#top" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px; margin-bottom:30px;">
@@ -150,7 +147,6 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
-# 8. HERO CARDS
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -162,33 +158,33 @@ if not filtered_df.empty:
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
             <h2>{total_actions}</h2>
-            <p class="context">Scale of administrative rewrite in window.</p>
+            <p class="context">Total scale of administrative rewrite.</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p class="context">Institutional rewrite rate; pace of change.</p>
+            <p class="context">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
-            <p class="context">Complexity indicator: actions striking multiple pillars.</p>
+            <p class="context">Actions striking multiple democratic pillars.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV (FIXED FLEXBOX)
+# 7. STICKY NAV (FIXED LAYOUT & COLOR)
 st.markdown("""
     <div class="nav-container">
-        <a href="#timeline"><button class="nav-button">Timeline</button></a>
-        <a href="#themes"><button class="nav-button">Themes</button></a>
-        <a href="#insights"><button class="nav-button">Insights</button></a>
-        <a href="#words"><button class="nav-button">Words</button></a>
-        <a href="#search"><button class="nav-button">Search</button></a>
+        <a href="#timeline"><button>Timeline</button></a>
+        <a href="#themes"><button>Themes</button></a>
+        <a href="#insights"><button>Insights</button></a>
+        <a href="#words"><button>Words</button></a>
+        <a href="#search"><button>Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (RESPONSIVE)
+# 8. TIMELINE (WITH RESTORED TIPS)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode and selected_themes:
@@ -202,14 +198,20 @@ if not filtered_df.empty:
         comp_chart = alt.Chart(comp_df).mark_line(interpolate='step-after', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', color='Theme:N', tooltip=['Date', 'Theme', 'Cumulative']).properties(width='container', height=400).interactive()
         st.altair_chart(comp_chart, use_container_width=True)
     else:
-        st.subheader(f"Timeline Progression: {selected_short}")
+        st.subheader(f"Timeline Progression: {selected_short if not comparison_mode else 'All Actions'}")
         chart_df = filtered_df.copy().sort_values('Date')
-        if selected_short != "All Actions": chart_df = chart_df[chart_df[SHORT_TO_LONG[selected_short]].str.strip().str.lower() == 'yes']
+        if not comparison_mode and selected_short != "All Actions": chart_df = chart_df[chart_df[SHORT_TO_LONG[selected_short]].str.strip().str.lower() == 'yes']
         chart_df['Cumulative'] = range(1, len(chart_df) + 1)
         line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
+    
+    # RESTORED TIPS SECTION
+    t1, t2, t3 = st.columns(3)
+    with t1: st.markdown("<p class='timeline-tip'>📈 <b>Velocity:</b> institutional rewrite rate.</p>", unsafe_allow_html=True)
+    with t2: st.markdown("<p class='timeline-tip'>🧩 <b>Complexity:</b> interlocking thematic strikes.</p>", unsafe_allow_html=True)
+    with t3: st.markdown("<p class='timeline-tip'>⚖️ <b>Doubt:</b> verifiable data vs. mere opinion.</p>", unsafe_allow_html=True)
 
-# 11. THEMES (WIDE BAR & HTML GLOSSARY)
+# 9. THEMES (WIDE BAR & HTML GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -225,7 +227,7 @@ if not filtered_df.empty:
         glossary_html += '</table></div>'
         st.markdown(glossary_html, unsafe_allow_html=True)
 
-# 12. INSIGHTS (RESTORED ANALYSIS)
+# 10. INSIGHTS (RESTORED ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -240,12 +242,11 @@ if not filtered_df.empty:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
-
     st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD (NEON VISIBILITY)
+# 11. WORD CLOUD (NEON VISIBILITY)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -258,11 +259,11 @@ if not filtered_df.empty:
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 14. VAULT
+# 12. VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
