@@ -99,7 +99,7 @@ if df is not None:
 # 5. HEADER & HERO BOXES
 st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
 <p style="opacity:0.8; margin:10;">Documenting the actions, statements, and plans of President Trump and his administration that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.</p>
-<p style="font-size:0.8rem; opacity:0.5;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
+<p style="font-size:0.8rem; opacity:0.6; margin:10;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" style="color:inherit;" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
 
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
