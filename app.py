@@ -58,10 +58,10 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (PRECISION ANCHORING & TOOLTIP COMPACTION)
+# 4. CSS (PRECISION ANCHORING & SECTION LOCK)
 st.markdown("""
     <style>
-        /* 1. NUCLEAR NAV RESET (BLUE-FREE + TIGHT PADDING) */
+        /* 1. NUCLEAR NAV RESET (BLUE-FREE) */
         .nav-container { display: flex !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; }
         .nav-container a { flex: 1 !important; text-decoration: none !important; color: inherit !important; }
         .nav-container button, .nav-container button:hover, .nav-container button:active, .nav-container button:focus {
@@ -71,37 +71,27 @@ st.markdown("""
             box-shadow: none !important; transition: 0.2s !important;
         }
 
-        /* 2. PRECISION ANCHORING & SECTION BREATHING */
+        /* 2. PRECISION ANCHORING (FIXED SCALPING) */
         [id] { 
-            scroll-margin-top: 135px !important; 
-            padding-top: 25px !important; 
+            scroll-margin-top: 105px !important; 
         }
 
-        /* 3. COMPACT TOOLTIPS (NEGATIVE MARGIN LOCK) */
-        .compact-tips { 
-            margin-top: -40px !important; 
-            padding: 0 !important;
-            display: flex; 
-            justify-content: space-between; 
-            gap: 20px; 
-            flex-wrap: wrap; 
-        }
-        .compact-tips p { margin: 0 !important; padding: 0 !important; line-height: 1.1 !important; font-size: 0.72rem !important; opacity: 0.6; font-style: italic; }
-
-        /* 4. HEADER STYLING (LEFT ALIGNED) */
+        /* 3. HEADER & HERO STYLING */
         .main-header { font-size: 2.8rem !important; font-weight: 800; margin-bottom: 0px; text-align: left; }
         .sub-header { opacity: 0.7; font-size: 1.1rem; margin-top: -5px; margin-bottom: 5px; text-align: left; }
         .source-line { font-size: 0.8rem; opacity: 0.5; margin-bottom: 30px; text-align: left; }
+        .hero-card { flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-container { display: flex !important; justify-content: space-between !important; gap: 15px !important; width: 100% !important; margin-bottom: 15px; }
+        
+        /* 4. COMPACT TIPS */
+        .compact-tips { margin-top: -35px !important; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+        .compact-tips p { margin: 0 !important; font-size: 0.72rem !important; opacity: 0.6; font-style: italic; }
 
         /* 5. STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
         }
-
-        /* 6. UI HERO CARDS */
-        .hero-card { flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }
-        .hero-container { display: flex !important; justify-content: space-between !important; gap: 15px !important; width: 100% !important; margin-bottom: 10px; }
         
         @media (max-width: 768px) {
             .nav-container, .hero-container { flex-direction: column !important; }
@@ -116,7 +106,7 @@ def load_data():
     import os
     files = [f for f in os.listdir('.') if f.endswith('.csv')]
     if not files: return None
-    target = 'trump-actions.csv' if 'trump-actions.csv' in files else files[0]
+    target = files[0] # Use first CSV found
     df = pd.read_csv(target, skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date', ascending=True) 
@@ -127,7 +117,7 @@ def load_data():
 
 df = load_data()
 
-# 6. HEADER (LEFT-ALIGNED AUTHORITY)
+# 6. HEADER & ATTRIBUTION
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style="text-align: left;">
@@ -168,7 +158,7 @@ if df is not None:
         st.session_state.comparison_mode = False
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 8. HERO CARDS (DIAGNOSTIC CONTEXT)
+# 8. HERO CARDS
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -212,11 +202,7 @@ st.divider()
 if not filtered_df.empty:
     chart_df = filtered_df.copy().sort_values('Date')
     chart_df['Cumulative'] = range(1, len(chart_df) + 1)
-    line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
-        x='Date:T', 
-        y=alt.Y('Cumulative:Q', title="Actions"), 
-        tooltip=['Date', 'Title']
-    ).properties(width='container', height=400).interactive()
+    line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
     st.altair_chart(line, use_container_width=True)
     
     st.markdown("""
@@ -232,37 +218,37 @@ st.divider()
 st.subheader("Action Volume by Theme")
 if not filtered_df.empty:
     cat_counts = [{'Theme': short, 'Count': (filtered_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
-    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
-        x=alt.X('Count:Q', title="Actions"), 
-        y=alt.Y('Theme:N', sort='-x', title=None), 
-        tooltip=['Theme', 'Count']
-    ).properties(height=400).interactive()
+    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
 
-    with st.expander("📖 Themes Glossary (Strategic Definitions)"):
+    with st.expander("📖 Themes Glossary"):
         gloss_html = '<div style="font-size:0.8rem; opacity:0.8;"><table>'
         for _, row in GLOSSARY_DF.iterrows():
             gloss_html += f'<tr><td style="padding:5px; font-weight:bold; width:120px;">{row["Theme"]}</td><td style="padding:5px;">{row["Definition"]}</td></tr>'
         gloss_html += '</table></div>'
         st.markdown(gloss_html, unsafe_allow_html=True)
 
-# 12. INSIGHTS (SATURATION ANALYSIS)
+# 12. INSIGHTS (RESTORED TEXT)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🚨 Strategic Diagnostic")
-col_ins1, col_ins2 = st.columns(2)
-with col_ins1:
-    st.markdown("#### Saturation & Attrition")
-    st.write(f"Moving at **{pace_per_month:.1f} actions/mo**, this volume induces 'procedural shock'—institutional rewrite outpaces judicial processing latency.")
-with col_ins2:
-    st.markdown("#### Norm-Collapse Loops")
-    st.write(f"**Interconnectivity:** {overlap:.1f}% of events strike multiple democratic pillars simultaneously, bypassing single-domain resistance.")
+st.subheader("🚨 Deep Insights: Strategic Diagnostic")
+if not filtered_df.empty:
+    # Use a nested grid within the main layout to prevent truncation
+    ins_col1, ins_col2 = st.columns(2)
+    with ins_col1:
+        st.markdown("#### Strategic Velocity & Attrition")
+        st.write(f"The administration is moving at **{pace_per_month:.1f} actions/mo**. This volume is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring the rate of institutional rewrite exceeds the processing latency of the judicial system.")
+    with ins_col2:
+        st.markdown("#### Norm-Collapse Loops")
+        st.write(f"**Interconnectivity:** {overlap:.1f}% of events strike multiple democratic pillars simultaneously. This creates 'Norm-Collapse Loops' where legal resistance in one domain is bypassed by executive action in another.")
+    
+    st.markdown(f"""<div style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px; margin-top: 20px;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
+    st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-st.markdown(f"""<div style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px; margin: 30px 0;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
-
-# 13. WORD CLOUD (HSL NEON)
+# 13. WORD CLOUD (RESTORED TITLE)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
+st.subheader("☁️ Thematic Word Cloud")
 if not filtered_df.empty:
     all_titles = " ".join(filtered_df['Title'].values).lower()
     words = re.findall(r'\w+', all_titles)
@@ -275,7 +261,7 @@ if not filtered_df.empty:
 # 14. VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🔍 Data Vault")
+st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
