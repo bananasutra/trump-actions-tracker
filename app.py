@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK (DO NOT REMOVE - CRITICAL FOR SOCIAL PREVIEWS)
+# 1. PAGE CONFIG & SEO HACK (DO NOT REMOVE)
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -14,11 +14,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# THE OG SEO WORKAROUND
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
-    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite in the U.S. (2025-2026).">
+    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
     <meta property="og:description" content="A real-time diagnostic of systemic democratic erosion since Jan 2025.">
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
@@ -60,7 +59,7 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (PRECISION ANCHORING & SECTION LOCK)
+# 4. CSS (TOTAL PRECISION LOCK)
 st.markdown("""
     <style>
         /* 1. NUCLEAR NAV RESET (BLUE-FREE) */
@@ -73,10 +72,10 @@ st.markdown("""
             box-shadow: none !important; transition: 0.2s !important;
         }
 
-        /* 2. PRECISION ANCHORING - Kills the overlap line */
+        /* 2. PRECISION ANCHORING (20px buffer) */
         [id] { 
-            scroll-margin-top: 105px !important; 
-            border-top: 1px solid transparent !important; 
+            scroll-margin-top: 100px !important; 
+            padding-top: 20px !important; 
         }
 
         /* 3. HEADER & HERO STYLING */
@@ -120,7 +119,7 @@ def load_data():
 
 df = load_data()
 
-# 6. HEADER & ATTRIBUTION
+# 6. HEADER (LEFT-ALIGNED)
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style="text-align: left;">
@@ -176,7 +175,7 @@ if not filtered_df.empty:
             <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Verifiable data (Doubt).</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
-            <p style="margin:0; font-size:0.75rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
+            <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="margin:10px 0; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 0.9rem;">/mo</span></h2>
             <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Institutional rewrite rate.</p>
         </div>
@@ -188,7 +187,7 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 9. NAV
+# 9. STICKY NAV
 st.markdown("""
     <div class="nav-container">
         <a href="#timeline"><button>Timeline</button></a>
@@ -199,25 +198,16 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (4-ROW TOOLTIP & CLICK)
+# 10. TIMELINE (4-ROW INTERACTIVE)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
     chart_df = filtered_df.copy().sort_values('Date')
     chart_df['Cumulative'] = range(1, len(chart_df) + 1)
-    
     line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
-        x='Date:T', 
-        y='Cumulative:Q', 
-        href='URL:N',
-        tooltip=[
-            alt.Tooltip('Date:T', format='%Y-%m-%d'),
-            alt.Tooltip('Title:N', title='Action'),
-            alt.Tooltip('Themes_List:N', title='Themes'),
-            alt.Tooltip('Cat_Count:Q', title='Count')
-        ]
+        x='Date:T', y='Cumulative:Q', href='URL:N',
+        tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), alt.Tooltip('Title:N', title='Action'), alt.Tooltip('Themes_List:N', title='Themes'), alt.Tooltip('Cat_Count:Q', title='Count')]
     ).properties(width='container', height=400).interactive()
-    
     st.altair_chart(line, use_container_width=True)
     st.markdown("""<div class="compact-tips"><p>💡 <b>Nav:</b> Hover for 4-row data. Click points for source. Scroll/pinch to zoom.</p></div>""", unsafe_allow_html=True)
 
@@ -237,7 +227,7 @@ if not filtered_df.empty:
         gloss_html += '</table></div>'
         st.markdown(gloss_html, unsafe_allow_html=True)
 
-# 12. INSIGHTS
+# 12. INSIGHTS (RESTORED ANALYTICS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -245,18 +235,19 @@ if not filtered_df.empty:
     ins_col1, ins_col2 = st.columns(2)
     with ins_col1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"Moving at **{pace_per_month:.1f} actions/mo**, this volume is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring the rate of institutional rewrite exceeds the processing latency of the judicial system.")
+        st.write(f"The administration is moving at **{pace_per_month:.1f} actions/mo**. This volume is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring the rate of institutional rewrite exceeds the processing latency of the judicial system.")
     with ins_col2:
         st.markdown("#### The Resistance Heatmap & Projection")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, NY). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
     
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown(f"""<div style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+    st.markdown(f"""<div style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px; margin: 25px 0;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
+    
+    # THEATRICAL VIDEO LAYOUT
+    v_l, v_c, v_r = st.columns([1, 8, 1])
+    with v_c: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD
+# 13. WORD CLOUD (HSL NEON)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
