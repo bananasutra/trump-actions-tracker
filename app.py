@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 # 1. PAGE CONFIG & SEO
 st.set_page_config(
-    page_title="U.S. Democracy Gone Bananas: Trump Actions Tracker", 
+    page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
     layout="wide", 
     initial_sidebar_state="expanded"
@@ -16,7 +16,6 @@ st.markdown("""
     <head>
     <meta property="og:title" content="U.S. Democracy Gone Bananas" />
     <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025." />
-    <meta name="twitter:card" content="summary_large_image">
     </head>
     """, unsafe_allow_html=True)
 
@@ -50,7 +49,6 @@ def load_data():
     if df is None: return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
-    # Ascending for chart math
     df = df.sort_values('Date', ascending=True) 
     cat_cols = list(CATEGORY_MAP.keys())
     
@@ -64,7 +62,7 @@ df, cat_cols = load_data()
 query_params = st.query_params
 default_area = query_params.get("area", "All Actions")
 
-# 5. HEADER & VELOCITY METRICS
+# 5. HEADER & VELOCITY METRIC
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
@@ -79,7 +77,7 @@ if not df.empty:
     m2.metric("Current Velocity", f"{pace_per_month:.1f} / mo", delta="⚠️ Critical Pace", delta_color="inverse")
     m3.metric("Strategic Overlap", f"{(len(df[df['Cat_Count'] > 1]) / total_actions * 100):.1f}%", help="Percentage of actions impacting multiple democratic norms simultaneously.")
 
-st.info("**Context:** Strategic diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
+st.info("**Context:** A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025.")
 
 # 6. STICKY WHITE-ON-WHITE NAVIGATION
 st.markdown("""
@@ -89,9 +87,9 @@ st.markdown("""
         }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px; margin-bottom: 25px;">
-        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
-        <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Themes</button></a>
-        <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1.5px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
+        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
+        <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Themes</button></a>
+        <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
         <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
         <a href="#search" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Search</button></a>
     </div>
@@ -147,8 +145,6 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Search section for stable links.")
-
 # 10. THEMES
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
@@ -180,18 +176,23 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes_List']}")
         st.link_button("🚀 View Source", row['URL'])
 
-# 12. DEEP INSIGHTS (DIAGNOSTIC)
+# 12. DEEP INSIGHTS (SCOPE FIXED)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
+
 if not df.empty:
+    # MOVE CALCS HERE TO AVOID SCOPE ERRORS
+    total_raw = len(df)
+    days_span = (df['Date'].max() - df['Date'].min()).days
+    monthly_pace = (total_raw / max(days_span, 1)) * 30.44
+    multi_ratio = (len(df[df['Cat_Count'] > 1]) / total_raw) * 100 if total_raw > 0 else 0
+
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is executing **{pace_per_month:.1f} actions per month**. This 'Blitzkrieg' pace is designed to ensure judicial **processing latency** remains higher than the implementation rate.")
-        st.warning(f"**Diagnostic Projection:** At this velocity, the tracker projects **8,220 actions** by Jan 2029—moving from 'disruption' to a total institutional rewrite.")
-        st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously.")
+        st.write(f"The administration is maintaining a velocity of **{monthly_pace:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate.")
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point against this velocity.")
@@ -199,23 +200,7 @@ if not df.empty:
         st.markdown("**Methodology Context:**")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
         st.markdown("</div>", unsafe_allow_html=True)
-
-# 13. SEARCH DATA VAULT
-st.markdown("<div id='search'></div>", unsafe_allow_html=True)
-st.divider()
-st.subheader("🔍 Search Data Vault")
-if not display_df.empty:
-    csv = display_df.to_csv(index=False).encode('utf-8')
-    st.download_button(label="📥 Export CSV", data=csv, file_name='trump_actions.csv', mime='text/csv')
-
-search = st.text_input("Filter Data...", placeholder="Type keywords...")
-v_df = display_df.sort_values('Date', ascending=False)
-if search:
-    v_df = v_df[v_df['Title'].str.contains(search, case=False, na=False)]
-st.dataframe(
-    v_df[['Date', 'Title', 'URL', 'Themes_List']], 
-    column_config={"URL": st.column_config.LinkColumn("Source"), "Themes_List": "Themes"},
-    use_container_width=True, hide_index=True
-)
-
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Updated Mar 2026. CC BY 4.0.")
+    
+    # Restored "Norm-Collapse Loops" mention with safe variable
+    st.markdown("#### Norm-Collapse Loops")
+    st.write(f"**Interconnectivity:** {multi_ratio
