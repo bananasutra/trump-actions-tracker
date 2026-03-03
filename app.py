@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK
+# 1. PAGE CONFIG & SEO HACK (DO NOT REMOVE)
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -24,7 +24,7 @@ st.markdown(f"""
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     <style>
-        /* SURGICAL SCROLL OFFSET - No extra tags needed */
+        /* SURGICAL SCROLL OFFSET */
         [id^="section-"] {{
             scroll-margin-top: 85px !important;
         }}
@@ -35,7 +35,7 @@ st.markdown(f"""
             justify-content: space-between !important; 
             gap: 10px !important; 
             width: 100% !important; 
-            margin-bottom: -10px !important; /* Pulls content up */
+            margin-bottom: -10px !important; 
         }}
         .nav-container a {{ flex: 1 !important; text-decoration: none !important; color: inherit !important; }}
         .nav-container button, .nav-container button:hover, .nav-container button:active, .nav-container button:focus {{
@@ -121,22 +121,33 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 6. SIDEBAR & LOGIC
+# 6. SIDEBAR & SEARCH LOGIC
+st.sidebar.title("🎛️ Data Controls")
 if "search_term" not in st.session_state: st.session_state.search_term = ""
 def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_search
-def sync_vault(): st.session_state.search_term = st.session_state.vault_search
 
-st.sidebar.title("🎛️ Data Controls")
-st.sidebar.text_input("🔍 Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
+st.sidebar.text_input("🔍 Search Actions", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
+
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_toggle")
+
+if comparison_mode:
+    selected_themes = st.sidebar.multiselect("Select Themes to Overlay", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES[:3])
+else:
+    selected_theme = st.sidebar.selectbox("Filter by Pillar", ["All Actions"] + SORTED_SHORT_NAMES)
 
 if df is not None:
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
     selected_range = st.sidebar.slider("Timeline Scrub", min_value=min_date, max_value=max_date, value=(min_date, max_date), format="MMM DD")
+    
+    # Filtering Logic
     mask = (df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])
     if st.session_state.search_term:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
+    
     filtered_df = df.loc[mask]
+    
+    if not comparison_mode and selected_theme != "All Actions":
+        filtered_df = filtered_df[filtered_df[SHORT_TO_LONG[selected_theme]].str.strip().str.lower() == 'yes']
 
 # 7. STICKY NAV
 st.markdown("""
@@ -153,8 +164,7 @@ st.markdown("""
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.subheader("Action Progression")
 if not filtered_df.empty:
-    if st.session_state.comparison_toggle:
-        selected_themes = st.sidebar.multiselect("Select Themes to Overlay", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES[:3])
+    if comparison_mode:
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
         comp_df = filtered_df.melt(id_vars=['Date', 'Title', 'URL', 'Themes_List'], value_vars=long_names, var_name='Mapping', value_name='Active')
         comp_df = comp_df[comp_df['Active'].str.strip().str.lower() == 'yes']
@@ -233,7 +243,6 @@ if not filtered_df.empty:
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
-st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
 st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
