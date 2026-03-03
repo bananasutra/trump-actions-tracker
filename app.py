@@ -109,7 +109,8 @@ if df is not None:
 
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
-    st.markdown(f"""
+    st.divider()
+	st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card"><p style="margin:0; font-size:0.8rem; opacity:0.7;">Total Actions</p><h2>{len(f_df)}</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Verifiable data vs opinion.</p></div>
         <div class="hero-card" style="border-color:#DE0100;"><p style="margin:0; font-size:0.8rem; color:#DE0100;">Velocity</p><h2 style="color:#DE0100;">{pace:.1f}/mo</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Institutional rewrite rate.</p></div>
