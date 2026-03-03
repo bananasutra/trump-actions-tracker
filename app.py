@@ -14,33 +14,27 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- THE SEO HACK ---
-# This injects metadata for social media crawlers
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
-    <meta name="description" content="A strategic diagnostic of systemic democratic erosion and institutional dismantling in the U.S. since Jan 2025.">
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker">
-    <meta property="og:description" content="Strategic diagnostic of administrative velocity and institutional rewrite in the U.S. (2025-2026).">
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
+    <meta property="og:description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
-    <meta property="og:url" content="https://trump-actions-tracker.streamlit.app/">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="U.S. Democracy Gone Bananas">
-    <meta name="twitter:description" content="Diagnostic of systemic democratic erosion since Jan 2025.">
     </head>
     """, unsafe_allow_html=True)
 
 # 2. THEMES & GLOSSARY
 THEME_GLOSSARY = [
-    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights."},
-    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Actions that directly enrich the president or his inner circle."},
-    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Weakening checks and balances or restricting press freedom."},
-    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Restricting K-12 education and targeting cultural institutions."},
-    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Dismantling federal institutions and politicizing government roles."},
+    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing protections for marginalized groups."},
+    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Actions that directly enrich the president, his family, or his cabinet."},
+    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Weakening checks and balances, press freedom, or the Constitution."},
+    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Restricting K-12 topics and targeting cultural institutions."},
+    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Dismantling federal institutions and politicizing civil service."},
     {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Threatening allies and aligning with anti-democratic rivals."},
     {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Demonizing immigrants and expanding domestic surveillance."},
     {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Manufacturing evidence to support state policy."},
-    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Restricting research and attacking public health."},
+    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Restricting research and attacking public health standards."},
     {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Weaponizing executive power against rivals and critics."}
 ]
 
@@ -77,8 +71,7 @@ def sync_vault(): st.session_state.search_term = st.session_state.vault_search
 @st.dialog("Strategic Note on Facts")
 def show_welcome():
     st.markdown("""
-    **Opinions shall not trump the data.**
-    In an era of certainty, this tracker is built for **verifiable doubt**.
+    **Opinions shall not trump the data.** In an era of certainty, this tracker is built for **verifiable doubt**.
     * **Velocity:** institutional rewrite rate.
     * **Complexity:** interlocking strikes.
     ---
@@ -89,12 +82,16 @@ if "first_visit" not in st.session_state:
     st.session_state.first_visit = True
     show_welcome()
 
-# 5. SIDEBAR
+# 5. SIDEBAR & COMPARISON INTERFACE
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
 st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
-selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
+
+if comparison_mode:
+    selected_themes = st.sidebar.multiselect("Select Themes to Compare", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES[:3])
+else:
+    selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
 
 if df is not None:
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
@@ -113,7 +110,7 @@ if df is not None:
         st.session_state.date_range = (min_date, max_date)
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
 
-# 6. CSS OVERRIDES (THEME-PROOF NAV & MOBILE)
+# 6. CSS (THEME-PROOF NAV & MOBILE STACKING)
 st.markdown("""
     <style>
         .nav-button {
@@ -123,8 +120,6 @@ st.markdown("""
             color: inherit !important; 
             font-weight: bold; cursor: pointer;
             text-decoration: none !important;
-            display: inline-block;
-            text-align: center;
         }
         .nav-button:hover { opacity: 0.6; }
         [id] { scroll-margin-top: 150px !important; }
@@ -137,7 +132,6 @@ st.markdown("""
             text-align: center; margin-bottom: 15px;
         }
         .hero-card h2 { margin: 10px 0; font-size: 2.2rem; }
-        .hero-card p.label { margin: 0; font-size: 0.85rem; opacity: 0.7; text-transform: uppercase; }
         .hero-card p.context { margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic; }
         
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
@@ -152,7 +146,7 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
-# 8. HERO CARDS
+# 8. HERO CARDS (MOBILE-STACK READY)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -162,19 +156,19 @@ if not filtered_df.empty:
     st.markdown(f"""
     <div style="display: flex; justify-content: center; gap: 15px; width: 100%; flex-wrap: wrap;">
         <div class="hero-card">
-            <p class="label">Total Actions</p>
+            <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
             <h2>{total_actions}</h2>
-            <p class="context">Total scale of administrative rewrite in the selected window.</p>
+            <p class="context">Total scale of administrative rewrite in window.</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
-            <p class="label" style="color: #DE0100;">Velocity</p>
+            <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p class="context">Institutional rewrite rate; the pace of procedural change.</p>
+            <p class="context">Institutional rewrite rate; pace of change.</p>
         </div>
         <div class="hero-card">
-            <p class="label">Strategic Overlap</p>
+            <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
-            <p class="context">Complexity indicator: actions striking multiple democratic pillars.</p>
+            <p class="context">Complexity indicator: actions striking multiple pillars.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -190,13 +184,14 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (RESPONSIVE FIX)
+# 10. TIMELINE (RESTORED COMPARISON & RESPONSIVE FIX)
+
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
-    if comparison_mode:
-        st.subheader("Velocity Analysis: Comparative Growth")
-        long_cats = [c for c in df.columns if c in CATEGORY_MAP.keys()]
-        comp_df = filtered_df.melt(id_vars=['Date', 'Title'], value_vars=long_cats, var_name='Mapping', value_name='Active')
+    if comparison_mode and selected_themes:
+        st.subheader("Velocity Analysis: Comparative Theme Growth")
+        long_names = [SHORT_TO_LONG[s] for s in selected_themes]
+        comp_df = filtered_df.melt(id_vars=['Date', 'Title'], value_vars=long_names, var_name='Mapping', value_name='Active')
         comp_df = comp_df[comp_df['Active'].str.strip().str.lower() == 'yes']
         comp_df['Theme'] = comp_df['Mapping'].map(CATEGORY_MAP)
         comp_df = comp_df.sort_values('Date')
@@ -226,7 +221,7 @@ if not filtered_df.empty:
 # 11. THEMES (DONUT)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🍩 Thematic Distribution (Donut)")
+st.subheader("🌹 Thematic Distribution (Donut)")
 if not filtered_df.empty:
     donut_data = [{"value": int((filtered_df[long].str.strip().str.lower() == 'yes').sum()), "name": short} 
                   for long, short in CATEGORY_MAP.items() if (filtered_df[long].str.strip().str.lower() == 'yes').sum() > 0]
@@ -246,17 +241,17 @@ if not filtered_df.empty:
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This volume induces 'procedural shock' designed to exhaust judicial oversight.")
+        st.write(f"Velocity: **{pace_per_month:.1f} actions/mo**. This induces 'procedural shock' designed to exhaust judicial bandwidth.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is currently concentrated in state-level hubs. Litigation remains the primary friction point.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**.")
+        st.write("Opposition is concentrated in state-level hubs. Litigation remains the primary friction point.")
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, projects **8,220 actions**.")
 
     st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD
+# 13. WORD CLOUD (NEON)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
