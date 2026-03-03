@@ -26,7 +26,10 @@ st.markdown(f"""
             .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
             .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         }}
-        [id^="section-"] {{ scroll-margin-top: 75px !important; padding-top: 10px !important; }}
+        /* Refined Anchor Offsets */
+        #top {{ scroll-margin-top: 100px; }}
+        [id^="section-"] {{ scroll-margin-top: 120px !important; }}
+        
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; }}
         .hero-card {{ flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }}
         .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
