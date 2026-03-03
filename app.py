@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK
+# 1. PAGE CONFIG & SEO HACK (CRITICAL)
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -17,9 +17,9 @@ st.set_page_config(
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
-    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite in the U.S. (2025-2026).">
+    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker">
-    <meta property="og:description" content="A real-time diagnostic of systemic democratic erosion since Jan 2025.">
+    <meta property="og:description" content="A real-time diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.">
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     </head>
@@ -59,9 +59,10 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (THE ABSOLUTE HARD-LOCK)
+# 4. CSS (NUCLEAR THEME HARD-LOCK)
 st.markdown("""
     <style>
+        /* KILL THE BLUE AT THE SOURCE */
         div.stButton > button, .nav-container button {
             background-color: transparent !important;
             color: inherit !important;
@@ -70,11 +71,16 @@ st.markdown("""
             font-weight: bold !important;
             transition: 0.3s !important;
         }
+        
         a, .nav-container a { color: inherit !important; text-decoration: none !important; }
+
+        /* STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
-            position: sticky !important; top: 2.875rem !important; z-index: 999; 
+            position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(20px) !important; padding: 10px 0 !important; 
         }
+
+        /* UI COMPONENTS */
         .hero-card {
             flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
@@ -82,9 +88,11 @@ st.markdown("""
         }
         .hero-card h2 { margin: 10px 0; font-size: 2.2rem; }
         .hero-card p.context { margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic; }
+        
         .glossary-footnote { font-size: 11px !important; color: #888 !important; line-height: 1.3 !important; }
         .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
         .glossary-footnote th, .glossary-footnote td { text-align: left; padding: 8px; font-weight: 400 !important; border-bottom: 1px solid rgba(128,128,128,0.2); }
+        
         [id] { scroll-margin-top: 150px !important; }
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
@@ -138,15 +146,18 @@ if df is not None:
         st.session_state.filter_area = "All Actions"
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 7. HEADER & SUBHEAD
+# 7. HEADER, SUBHEAD & SOURCE ATTRIBUTION (RESTORED TO TOP)
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px; margin-bottom:5px;">
         <div style="font-size:2.5rem;">🍌</div>
         <h1 style="margin:0; font-weight:700;">U.S. Democracy Gone Bananas</h1>
     </a>
-    <p style="opacity:0.6; font-size:1.1rem; margin-bottom:30px; margin-left:65px;">
+    <p style="opacity:0.6; font-size:1.1rem; margin-bottom:5px; margin-left:65px;">
         A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).
+    </p>
+    <p style="opacity:0.5; font-size:0.85rem; margin-bottom:30px; margin-left:65px;">
+        Dashboard by <b>Celine Nadeau</b> | Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color: inherit;"><b>Christina Pagel / Trump Action Tracker Info</b></a> | Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: inherit;"><b>CC BY 4.0</b></a>
     </p>
 """, unsafe_allow_html=True)
 
@@ -243,7 +254,6 @@ if not filtered_df.empty:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
-    
     st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
@@ -264,11 +274,11 @@ if not filtered_df.empty:
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 14. VAULT (WITH SOURCE CREDIT)
+# 14. VAULT 
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau. Data Source: Christina Pagel / Trump Action Tracker Info. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. Data sourced from Pagel et al.")
