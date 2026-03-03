@@ -20,7 +20,22 @@ st.markdown("""
     </head>
     """, unsafe_allow_html=True)
 
-# 2. CATEGORY MAPPING
+# 2. UPDATED GLOSSARY DATA (Alphabetical & Expanded)
+# Using a dictionary for the new expanded definitions
+GLOSSARY_DATA = {
+    "Aggressive Foreign Policy & Global Destabilisation": "Threatening allies, using tariffs to extract concessions, withdrawing from international treaties (like the WHO or Paris Climate Treaty), and aligning with anti-democratic rivals.",
+    "Anti-immigrant or Militarised Nationalism": "Using language that demonizes immigrants, deploying military-type enforcement (like the National Guard) within the U.S., and expanding domestic surveillance.",
+    "Attacking Universities, Schools, Museums, Culture": "Undermining the independence of universities, restricting K-12 education topics, and targeting information within museums and national parks.",
+    "Control of Science to Align with State Ideology": "Restricting scientific research (e.g., on climate change), expanding drilling against environmental evidence, and attacking public health through vaccine restrictions or funding cuts.",
+    "Controlling Information including Spreading Misinformation": "Manufacturing evidence to support state policy, restricting access to contradicting evidence, and spreading propaganda.",
+    "Corruption and Enrichment": "Actions that directly enrich the president, his family, or his cabinet, or that trade political favors for wealth.",
+    "Dismantling Social Protections & Rights": "Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights.",
+    "Hollowing State / Weakening Federal Institutions": "Dismantling federal institutions, mass firings of staff, or politicizing government roles.",
+    "Suppressing Dissent / Weaponising State Power": "Punishing opponents, instituting loyalty tests, and weaponizing executive power or legal action against rivals, critics, and perceived enemy states or cities.",
+    "Violating Democratic Norms / Rule of Law": "Actions that weaken checks and balances, restrict press freedom, undermine states' rights, violate court orders or the Constitution, or reduce the independence of oversight bodies."
+}
+
+# 3. CATEGORY MAPPING (For Data Processing)
 CATEGORY_MAP = {
     "Violating Democratic Norms, Undermining Rule of Law": "Democratic Norms",
     "Hollowing State / Weakening Federal Institutions": "Federal Institutions",
@@ -36,7 +51,7 @@ CATEGORY_MAP = {
 SORTED_SHORT_NAMES = sorted(list(CATEGORY_MAP.values()))
 SHORT_TO_LONG = {v: k for k, v in CATEGORY_MAP.items()}
 
-# 3. LOAD DATA
+# 4. LOAD DATA
 @st.cache_data
 def load_data():
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
@@ -45,8 +60,7 @@ def load_data():
         try:
             df = pd.read_csv(file, skiprows=2)
             break
-        except:
-            continue
+        except: continue
     if df is None: return None, None
 
     df['Date'] = pd.to_datetime(df['Date'])
@@ -59,16 +73,12 @@ def load_data():
 
 df, cat_cols = load_data()
 
-# 4. DEEP LINK LOGIC
-query_params = st.query_params
-default_area = query_params.get("area", "All Actions")
-
-# 5. HEADER (RESTRUCTURED)
+# 5. HEADER (REFINED PADDING & SUBHEAD)
 st.title("🙊 U.S. Democracy Gone Bananas")
-# Subheader moved right under title
-st.markdown("#### A strategic diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
+# 1.1 Shortened subheadline for single-line fit
+st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 
-# Source information moved into st.info
+# 1.2 Padding around source context
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
 if not df.empty:
@@ -81,14 +91,16 @@ if not df.empty:
     m2.metric("Current Velocity", f"{pace_per_month:.1f} / mo", delta="⚠️ Critical Pace", delta_color="inverse")
     m3.metric("Strategic Overlap", f"{(len(df[df['Cat_Count'] > 1]) / total_actions * 100):.1f}%")
 
-# 6. STICKY GHOST NAVIGATION
+# 6. STICKY GHOST NAVIGATION (EXTRA VERTICAL PADDING)
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {
-            position: sticky; top: 2.875rem; z-index: 999; background-color: #0e1117; padding: 10px 0;
+            position: sticky; top: 2.875rem; z-index: 999; 
+            background-color: #0e1117; 
+            padding: 25px 0 25px 0; /* Added more vertical padding */
         }
     </style>
-    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px; margin-bottom: 25px;">
+    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
         <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
         <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Themes</button></a>
         <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
@@ -100,6 +112,9 @@ st.markdown("""
 # 7. SIDEBAR & URL SYNC
 st.sidebar.title("Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", value=False)
+query_params = st.query_params
+default_area = query_params.get("area", "All Actions")
+
 if comparison_mode:
     selected_compare = st.sidebar.multiselect("Categories", SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
     selected_short = "Comparison View"
@@ -126,7 +141,7 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 9. TIMELINE (SPACING ADJUSTED)
+# 9. TIMELINE
 st.markdown("<div id='timeline' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Theme Growth")
@@ -149,7 +164,7 @@ else:
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Search section for stable links.")
 st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for direct source links.")
 
-# 10. THEMES (LABEL COLUMN OPTIMIZED)
+# 10. THEMES (OPTIMIZED BAR LABELS)
 st.markdown("<div id='themes' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -161,14 +176,17 @@ for long, short in CATEGORY_MAP.items():
 
 if cat_counts:
     bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
-    # y=alt.Y with more space (fit for desktop, adaptive for mobile)
     st.altair_chart(alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
         x=alt.X('Count:Q', title='Volume'),
         y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300))
     ).properties(height=len(bar_df) * 40 + 50), use_container_width=True)
 
-with st.expander("📖 Category Glossary"):
-    st.table(pd.DataFrame({"Theme": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
+# THEMES GLOSSARY (REORDERED & EXPANDED)
+with st.expander("📖 Themes Glossary"):
+    # Create DF from alphabetical sorted dictionary
+    glossary_df = pd.DataFrame(list(GLOSSARY_DATA.items()), columns=["Theme", "Definition"]).sort_values("Theme")
+    # Using st.write for unbolded footnote-style table content
+    st.table(glossary_df)
 
 # 11. LATEST
 st.markdown("<div id='latest' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
@@ -181,7 +199,7 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes_List']}")
         st.link_button("🚀 View Source", row['URL'])
 
-# 12. DEEP INSIGHTS
+# 12. DEEP INSIGHTS (RESTORED DEPTH)
 st.markdown("<div id='insights' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -223,5 +241,5 @@ st.dataframe(
     use_container_width=True, hide_index=True
 )
 
-# 14. FOOTER (UPDATED AS REQUESTED)
+# 14. FOOTER
 st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
