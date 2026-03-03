@@ -61,41 +61,57 @@ SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 # 4. CSS (RESPONSIVE STACKING + MONOCHROME NAV)
 st.markdown("""
     <style>
-        /* KILL THE BLUE */
-        div.stButton > button, .nav-container button {
+        /* 1. NUCLEAR NAV RESET (NO BLUE + FIXED PADDING) */
+        .nav-container { display: flex !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; }
+        .nav-container a { flex: 1 !important; text-decoration: none !important; color: inherit !important; }
+        
+        .nav-container button, 
+        .nav-container button:hover, 
+        .nav-container button:active, 
+        .nav-container button:focus {
+            width: 100% !important; 
+            padding: 8px 16px !important; /* Fixed Vertical Padding */
+            border-radius: 5px !important;
+            font-weight: bold !important; 
+            cursor: pointer !important; 
             background-color: transparent !important;
-            color: inherit !important;
-            border: 1px solid currentColor !important;
+            border: 1px solid currentColor !important; 
+            color: inherit !important; 
             box-shadow: none !important;
-            font-weight: bold !important;
             transition: 0.3s !important;
         }
-        
-        /* RESPONSIVE FLEX */
-        .nav-container, .hero-container {
-            display: flex !important;
-            justify-content: space-between !important;
-            gap: 10px !important;
-            width: 100% !important;
+
+        /* 2. HEADER STYLING (LEFT ALIGNED + AUTHORITY FONT) */
+        .main-header { font-size: 3rem !important; font-weight: 800; margin-bottom: 0px; text-align: left; }
+        .sub-header { opacity: 0.7; font-size: 1.1rem; margin-top: -5px; margin-bottom: 10px; text-align: left; }
+        .source-line { font-size: 0.85rem; opacity: 0.5; margin-bottom: 35px; text-align: left; }
+        .source-line a { color: inherit !important; text-decoration: underline !important; font-weight: 600; }
+
+        /* 3. STICKY NAV RE-ANCHOR */
+        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
+            position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
+            background: inherit !important; backdrop-filter: blur(20px) !important; padding: 5px 0 !important; 
         }
+
+        /* 4. UI COMPONENTS (RESPONSIVE FLEX) */
+        .hero-card {
+            flex: 1; background: rgba(128, 128, 128, 0.1); 
+            border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
+            text-align: center;
+        }
+        .hero-container { display: flex !important; justify-content: space-between !important; gap: 15px !important; width: 100% !important; margin-bottom: 20px; }
         
         @media (max-width: 768px) {
             .nav-container, .hero-container { flex-direction: column !important; }
             .nav-container a, .hero-card { width: 100% !important; }
         }
 
-        /* STICKY NAV */
-        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
-            position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
-            background: inherit !important; backdrop-filter: blur(20px) !important; padding: 10px 0 !important; 
-        }
-
-        .hero-card {
-            flex: 1; background: rgba(128, 128, 128, 0.1); 
-            border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
-            text-align: center;
-        }
+        /* TIGHTEN TIPS UNDER GRAPH */
+        .tight-tips { margin-top: -30px !important; }
         
+        .glossary-footnote { font-size: 11px !important; color: #888 !important; }
+        .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        .glossary-footnote th, .glossary-footnote td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.2); }
         [id] { scroll-margin-top: 150px !important; }
     </style>
 """, unsafe_allow_html=True)
@@ -117,19 +133,21 @@ def load_data():
 
 df = load_data()
 
-# 6. HEADER & ATTRIBUTION
+# 6. HEADER & ATTRIBUTION (LEFT ALIGNED)
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
-    <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px; margin-bottom:5px;">
-        <div style="font-size:2.5rem;">🍌</div>
-        <h1 style="margin:0; font-weight:700;">U.S. Democracy Gone Bananas</h1>
-    </a>
-    <p style="opacity:0.6; font-size:1.1rem; margin-bottom:5px; margin-left:65px;">
-        A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).
-    </p>
-    <p style="opacity:0.5; font-size:0.85rem; margin-bottom:30px; margin-left:65px;">
-        Dashboard by <b>Celine Nadeau</b> | Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color: inherit;"><b>Christina Pagel / Trump Action Tracker Info</b></a> | <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color: inherit;"><b>CC BY 4.0</b></a>
-    </p>
+    <div style="text-align: left;">
+        <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px;">
+            <div style="font-size:3rem;">🍌</div>
+            <h1 class="main-header">U.S. Democracy Gone Bananas</h1>
+        </a>
+        <p class="sub-header">A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).</p>
+        <p class="source-line">
+            Dashboard by <b>Celine Nadeau</b> | 
+            Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank">Christina Pagel / Trump Action Tracker Info</a> | 
+            Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+        </p>
+    </div>
 """, unsafe_allow_html=True)
 
 # 7. SIDEBAR & SEARCH
@@ -167,17 +185,17 @@ if not filtered_df.empty:
     <div class="hero-container">
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
-            <h2 style="margin:10px 0; font-size:2.2rem;">{total_actions}</h2>
+            <h2 style="margin:10px 0;">{total_actions}</h2>
             <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Verifiable data vs. mere opinion (Doubt).</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
-            <h2 style="margin:10px 0; font-size:2.2rem; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
+            <h2 style="margin:10px 0; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
             <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
-            <h2 style="margin:10px 0; font-size:2.2rem;">{overlap:.1f}%</h2>
+            <h2 style="margin:10px 0;">{overlap:.1f}%</h2>
             <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Interlocking thematic strikes (Complexity).</p>
         </div>
     </div>
@@ -186,11 +204,11 @@ if not filtered_df.empty:
 # 9. STICKY NAV
 st.markdown("""
     <div class="nav-container">
-        <a href="#timeline" style="flex:1;"><button style="width:100%;">Timeline</button></a>
-        <a href="#themes" style="flex:1;"><button style="width:100%;">Themes</button></a>
-        <a href="#insights" style="flex:1;"><button style="width:100%;">Insights</button></a>
-        <a href="#words" style="flex:1;"><button style="width:100%;">Words</button></a>
-        <a href="#search" style="flex:1;"><button style="width:100%;">Search</button></a>
+        <a href="#timeline"><button>Timeline</button></a>
+        <a href="#themes"><button>Themes</button></a>
+        <a href="#insights"><button>Insights</button></a>
+        <a href="#words"><button>Words</button></a>
+        <a href="#search"><button>Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
@@ -203,10 +221,11 @@ if not filtered_df.empty:
     line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
     st.altair_chart(line, use_container_width=True)
     
+    # TIGHTENED INTERACTIVE TIPS
     st.markdown("""
-    <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+    <div class="tight-tips" style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
         <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 <b>Navigation:</b> Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>
-        <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>🔗 <b>Links:</b> Graph links may be unstable due to administrative churn. Use the <b>Search Data Vault</b> below for verified URLs.</p>
+        <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>🔗 <b>Links:</b> Graph links may be unstable due to churn. Use the <b>Search Data Vault</b> below for verified URLs.</p>
     </div>
     """, unsafe_allow_html=True)
 
