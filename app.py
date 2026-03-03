@@ -18,7 +18,7 @@ st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
     <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker">
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     </head>
@@ -58,58 +58,55 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (THE ABSOLUTE HARD-LOCK)
+# 4. CSS (PRECISION ANCHORING & TOOLTIP COMPACTION)
 st.markdown("""
     <style>
-        /* 1. NUCLEAR NAV RESET (NO BLUE + FIXED PADDING) */
+        /* 1. NUCLEAR NAV RESET (BLUE-FREE + TIGHT PADDING) */
         .nav-container { display: flex !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; }
         .nav-container a { flex: 1 !important; text-decoration: none !important; color: inherit !important; }
-        
         .nav-container button, .nav-container button:hover, .nav-container button:active, .nav-container button:focus {
-            width: 100% !important; 
-            padding: 8px 16px !important; 
-            border-radius: 5px !important;
-            font-weight: bold !important; 
-            cursor: pointer !important; 
-            background-color: transparent !important;
-            border: 1px solid currentColor !important; 
-            color: inherit !important; 
-            box-shadow: none !important;
-            transition: 0.2s !important;
+            width: 100% !important; padding: 6px 12px !important; border-radius: 5px !important;
+            font-weight: bold !important; background-color: transparent !important;
+            border: 1px solid currentColor !important; color: inherit !important; 
+            box-shadow: none !important; transition: 0.2s !important;
         }
 
-        /* 2. PRECISION ANCHORING (FIXED GAP) */
-        [id] { scroll-margin-top: 110px !important; }
+        /* 2. PRECISION ANCHORING & SECTION BREATHING */
+        [id] { 
+            scroll-margin-top: 135px !important; 
+            padding-top: 25px !important; 
+        }
 
-        /* 3. HEADER STYLING (LEFT ALIGNED) */
-        .main-header { font-size: 3rem !important; font-weight: 800; margin-bottom: 0px; text-align: left; }
-        .sub-header { opacity: 0.7; font-size: 1.1rem; margin-top: -5px; margin-bottom: 10px; text-align: left; }
-        .source-line { font-size: 0.85rem; opacity: 0.5; margin-bottom: 35px; text-align: left; }
-        .source-line a { color: inherit !important; text-decoration: underline !important; font-weight: 600; }
+        /* 3. COMPACT TOOLTIPS (NEGATIVE MARGIN LOCK) */
+        .compact-tips { 
+            margin-top: -40px !important; 
+            padding: 0 !important;
+            display: flex; 
+            justify-content: space-between; 
+            gap: 20px; 
+            flex-wrap: wrap; 
+        }
+        .compact-tips p { margin: 0 !important; padding: 0 !important; line-height: 1.1 !important; font-size: 0.72rem !important; opacity: 0.6; font-style: italic; }
 
-        /* 4. STICKY NAV RE-ANCHOR */
+        /* 4. HEADER STYLING (LEFT ALIGNED) */
+        .main-header { font-size: 2.8rem !important; font-weight: 800; margin-bottom: 0px; text-align: left; }
+        .sub-header { opacity: 0.7; font-size: 1.1rem; margin-top: -5px; margin-bottom: 5px; text-align: left; }
+        .source-line { font-size: 0.8rem; opacity: 0.5; margin-bottom: 30px; text-align: left; }
+
+        /* 5. STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
-            background: inherit !important; backdrop-filter: blur(20px) !important; padding: 5px 0 !important; 
+            background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
         }
 
-        /* 5. UI COMPONENTS & RESPONSIVE */
-        .hero-card {
-            flex: 1; background: rgba(128, 128, 128, 0.1); 
-            border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
-            text-align: center;
-        }
-        .hero-container { display: flex !important; justify-content: space-between !important; gap: 15px !important; width: 100% !important; margin-bottom: 20px; }
+        /* 6. UI HERO CARDS */
+        .hero-card { flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }
+        .hero-container { display: flex !important; justify-content: space-between !important; gap: 15px !important; width: 100% !important; margin-bottom: 10px; }
         
         @media (max-width: 768px) {
             .nav-container, .hero-container { flex-direction: column !important; }
             .nav-container a, .hero-card { width: 100% !important; }
         }
-
-        .tight-tips { margin-top: -30px !important; }
-        .glossary-footnote { font-size: 11px !important; color: #888 !important; }
-        .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-        .glossary-footnote th, .glossary-footnote td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.2); }
     </style>
 """, unsafe_allow_html=True)
 
@@ -130,19 +127,19 @@ def load_data():
 
 df = load_data()
 
-# 6. HEADER & ATTRIBUTION (LEFT ALIGNED)
+# 6. HEADER (LEFT-ALIGNED AUTHORITY)
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style="text-align: left;">
-        <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px;">
-            <div style="font-size:3rem;">🍌</div>
+        <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:15px;">
+            <div style="font-size:2.5rem;">🍌</div>
             <h1 class="main-header">U.S. Democracy Gone Bananas</h1>
         </a>
         <p class="sub-header">A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).</p>
         <p class="source-line">
             Dashboard by <b>Celine Nadeau</b> | 
-            Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank">Christina Pagel / Trump Action Tracker Info</a> | 
-            Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
+            Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration:underline;">Christina Pagel / Trump Action Tracker</a> | 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration:underline;">CC BY 4.0</a>
         </p>
     </div>
 """, unsafe_allow_html=True)
@@ -181,19 +178,19 @@ if not filtered_df.empty:
     st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card">
-            <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
-            <h2 style="margin:10px 0;">{total_actions}</h2>
-            <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Verifiable data vs. mere opinion (Doubt).</p>
+            <p style="margin:0; font-size:0.75rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
+            <h2 style="margin:5px 0;">{total_actions}</h2>
+            <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Verifiable data (Doubt).</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
-            <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
-            <h2 style="margin:10px 0; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Institutional rewrite rate.</p>
+            <p style="margin:0; font-size:0.75rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
+            <h2 style="margin:5px 0; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 0.9rem;">/mo</span></h2>
+            <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
-            <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
-            <h2 style="margin:10px 0;">{overlap:.1f}%</h2>
-            <p style="margin:0; font-size:0.75rem; opacity:0.6; font-style:italic;">Interlocking thematic strikes (Complexity).</p>
+            <p style="margin:0; font-size:0.75rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
+            <h2 style="margin:5px 0;">{overlap:.1f}%</h2>
+            <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Thematic strikes (Complexity).</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -209,19 +206,23 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (TIGHT INTERACTIVE TIPS)
+# 10. TIMELINE (COMPACT TIPS)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
     chart_df = filtered_df.copy().sort_values('Date')
     chart_df['Cumulative'] = range(1, len(chart_df) + 1)
-    line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
+    line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
+        x='Date:T', 
+        y=alt.Y('Cumulative:Q', title="Actions"), 
+        tooltip=['Date', 'Title']
+    ).properties(width='container', height=400).interactive()
     st.altair_chart(line, use_container_width=True)
     
     st.markdown("""
-    <div class="tight-tips" style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-        <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 <b>Navigation:</b> Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>
-        <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>🔗 <b>Links:</b> Graph links may be unstable due to churn. Use the <b>Search Data Vault</b> below for verified URLs.</p>
+    <div class="compact-tips">
+        <p>💡 <b>Nav:</b> Hover for titles. Scroll/pinch to zoom.</p>
+        <p>🔗 <b>Links:</b> Fallback to <b>Data Vault</b> if URLs are unstable.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -230,41 +231,38 @@ st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
 if not filtered_df.empty:
-    cat_counts = [{'Theme': short, 'Count': (filtered_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items() if (filtered_df[long].str.strip().str.lower() == 'yes').sum() > 0]
-    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300)), tooltip=['Theme', 'Count']).properties(height=400).interactive()
+    cat_counts = [{'Theme': short, 'Count': (filtered_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
+    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
+        x=alt.X('Count:Q', title="Actions"), 
+        y=alt.Y('Theme:N', sort='-x', title=None), 
+        tooltip=['Theme', 'Count']
+    ).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
 
-    with st.expander("📖 Themes Glossary (Rich Reference)"):
-        glossary_html = '<div class="glossary-footnote"><table><tr><th>Theme</th><th>Rich Description</th></tr>'
+    with st.expander("📖 Themes Glossary (Strategic Definitions)"):
+        gloss_html = '<div style="font-size:0.8rem; opacity:0.8;"><table>'
         for _, row in GLOSSARY_DF.iterrows():
-            glossary_html += f'<tr><td>{row["Theme"]}</td><td>{row["Definition"]}</td></tr>'
-        glossary_html += '</table></div>'
-        st.markdown(glossary_html, unsafe_allow_html=True)
+            gloss_html += f'<tr><td style="padding:5px; font-weight:bold; width:120px;">{row["Theme"]}</td><td style="padding:5px;">{row["Definition"]}</td></tr>'
+        gloss_html += '</table></div>'
+        st.markdown(gloss_html, unsafe_allow_html=True)
 
-# 12. INSIGHTS
+# 12. INSIGHTS (SATURATION ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🚨 Deep Insights: Strategic Diagnostic")
-if not filtered_df.empty:
-    col_ins1, col_ins2 = st.columns(2)
-    with col_ins1:
-        st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is moving at **{pace_per_month:.1f} actions/mo**. This volume is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring the rate of institutional rewrite exceeds the processing latency of the judicial system.")
-        st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {overlap:.1f}% of events strike multiple democratic pillars simultaneously. This creates 'Norm-Collapse Loops' where legal resistance in one domain is bypassed by executive action in another.")
-    with col_ins2:
-        st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
-    
-    st.markdown(f"""<div class="quote-container" style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
-    v_left, v_mid, v_right = st.columns([1, 8, 1])
-    with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+st.subheader("🚨 Strategic Diagnostic")
+col_ins1, col_ins2 = st.columns(2)
+with col_ins1:
+    st.markdown("#### Saturation & Attrition")
+    st.write(f"Moving at **{pace_per_month:.1f} actions/mo**, this volume induces 'procedural shock'—institutional rewrite outpaces judicial processing latency.")
+with col_ins2:
+    st.markdown("#### Norm-Collapse Loops")
+    st.write(f"**Interconnectivity:** {overlap:.1f}% of events strike multiple democratic pillars simultaneously, bypassing single-domain resistance.")
+
+st.markdown(f"""<div style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px; margin: 30px 0;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
 
 # 13. WORD CLOUD (HSL NEON)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("☁️ Thematic Word Cloud")
 if not filtered_df.empty:
     all_titles = " ".join(filtered_df['Title'].values).lower()
     words = re.findall(r'\w+', all_titles)
@@ -277,7 +275,7 @@ if not filtered_df.empty:
 # 14. VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🔍 Search Data Vault")
+st.subheader("🔍 Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
