@@ -75,13 +75,11 @@ st.markdown("""
             border: 1px solid currentColor !important; 
             color: inherit !important; 
             box-shadow: none !important;
-            transition: 0.3s !important;
+            transition: 0.2s !important;
         }
 
-        /* 2. FIXED ANCHORING (NO MORE SCALPING) */
-        [id] { 
-            scroll-margin-top: 180px !important; 
-        }
+        /* 2. PRECISION ANCHORING (FIXED GAP) */
+        [id] { scroll-margin-top: 110px !important; }
 
         /* 3. HEADER STYLING (LEFT ALIGNED) */
         .main-header { font-size: 3rem !important; font-weight: 800; margin-bottom: 0px; text-align: left; }
@@ -95,6 +93,7 @@ st.markdown("""
             background: inherit !important; backdrop-filter: blur(20px) !important; padding: 5px 0 !important; 
         }
 
+        /* 5. UI COMPONENTS & RESPONSIVE */
         .hero-card {
             flex: 1; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
@@ -210,7 +209,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (TIGHT TIPS)
+# 10. TIMELINE (TIGHT INTERACTIVE TIPS)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
@@ -242,7 +241,7 @@ if not filtered_df.empty:
         glossary_html += '</table></div>'
         st.markdown(glossary_html, unsafe_allow_html=True)
 
-# 12. INSIGHTS (SATURATION ANALYSIS)
+# 12. INSIGHTS
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -257,6 +256,7 @@ if not filtered_df.empty:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
+    
     st.markdown(f"""<div class="quote-container" style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
