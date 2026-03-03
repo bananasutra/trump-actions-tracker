@@ -14,7 +14,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# SEO Meta Tags
 st.markdown("""
     <head>
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
@@ -162,7 +161,7 @@ st.markdown("""
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
-# 8. HERO STATS
+# 8. HERO STATS (RESPONSIVE)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -186,21 +185,35 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV
+# 9. STICKY NAV (THEME-PROOF & GAP FIX)
 st.markdown("""
     <style>
-        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { position: sticky; top: 2.875rem; z-index: 999; background-color: #0e1117; padding: 20px 0; }
-        [id] { scroll-margin-top: 110px !important; }
+        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
+            position: sticky; top: 2.875rem; z-index: 999; 
+            background-color: transparent !important; 
+            padding: 15px 0;
+            backdrop-filter: blur(5px);
+        }
+        [id] { scroll-margin-top: 130px !important; }
         .back-to-top { font-size: 0.75rem; color: #666; text-decoration: none; display: block; text-align: right; margin-top: 5px; }
         .back-to-top:hover { color: #DE0100; transition: 0.3s; }
+        
+        /* Padding fix for Quote to Video */
+        .quote-container {
+            background: rgba(255, 255, 255, 0.05); 
+            border-left: 5px solid #DE0100; 
+            padding: 25px; 
+            border-radius: 5px;
+            margin-bottom: 50px !important;
+        }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
-        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
-        <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Themes</button></a>
-        <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Latest</button></a>
-        <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Insights</button></a>
-        <a href="#wordcloud" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Words</button></a>
-        <a href="#search" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Search</button></a>
+        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Timeline</button></a>
+        <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Themes</button></a>
+        <a href="#latest" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Latest</button></a>
+        <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Insights</button></a>
+        <a href="#wordcloud" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Words</button></a>
+        <a href="#search" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
@@ -259,7 +272,7 @@ if not filtered_df.empty:
             st.link_button("🚀 View Source", row['URL'])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 14. DEEP INSIGHTS
+# 14. DEEP INSIGHTS (WITH CINEMATIC GAP)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -276,8 +289,8 @@ if not filtered_df.empty:
         st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**.")
 
-    st.markdown("""
-        <div style="background: rgba(255, 255, 255, 0.03); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px;">
+    st.markdown(f"""
+        <div class="quote-container">
             <p style="font-style: italic; margin-bottom: 5px;">
                 "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts."
             </p>
@@ -289,7 +302,8 @@ if not filtered_df.empty:
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 15. THEMATIC WORD CLOUD (ULTIMATE CONTRAST)
+# 15. THEMATIC WORD CLOUD (NEON CONTRAST FIX)
+
 st.markdown("<div id='wordcloud'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -301,8 +315,13 @@ if not filtered_df.empty:
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
 
-    # JS FIXED: Single line + Forced High Brightness (150-255 range)
-    js_color = "function () { return 'rgb(' + [Math.round(Math.random() * 105 + 150), Math.round(Math.random() * 105 + 150), Math.round(Math.random() * 105 + 150)].join(',') + ')'; }"
+    # NEON PALETTE FOR UNIVERSAL VISIBILITY
+    js_color = """
+    function () {
+        var colors = ['#00f2ff', '#ff00ea', '#00ffaa', '#fffb00', '#ff4d00', '#DE0100', '#55ff00'];
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+    """
 
     wordcloud_options = {
         "backgroundColor": "transparent",
@@ -310,8 +329,8 @@ if not filtered_df.empty:
         "series": [{
             "type": "wordCloud",
             "shape": "circle",
-            "gridSize": 12,
-            "sizeRange": [14, 65],
+            "gridSize": 15,
+            "sizeRange": [16, 70],
             "rotationRange": [0, 0],
             "textStyle": {
                 "fontFamily": "sans-serif",
@@ -324,7 +343,7 @@ if not filtered_df.empty:
     st_echarts(wordcloud_options, height="450px")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 16. VAULT (WITH ACTIVE LINKS)
+# 16. SEARCH DATA VAULT (SYNCED & CLICKABLE)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
