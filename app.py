@@ -118,7 +118,7 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    st.subheader("🛡️ Institutional Health Diagnostic")
+    st.subheader("Democratic Health Risks Diagnostic")
     st.markdown(f"""
     <div style="background: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(128, 128, 128, 0.1);">
         <p style="margin:0; font-size:0.85rem; opacity:0.8;">
