@@ -94,7 +94,7 @@ if df is not None:
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
 # 5. HEADER & HERO BOXES (RESTORED INFO)
-st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1><p style="opacity:0.7; margin:0;">Strategic diagnostic of institutional dismantle (2025–2026).</p><p style="font-size:0.8rem; opacity:0.5;">Dashboard by Celine Nadeau | Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a></p></div>""", unsafe_allow_html=True)
+st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1><p style="opacity:0.7; margin:0;">Strategic diagnostic of institutional dismantle (2025–2026).</p><p style="font-size:0.8rem; opacity:0.5;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a></p></div>""", unsafe_allow_html=True)
 
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
@@ -192,4 +192,4 @@ st.divider()
 st.subheader("🔍 Search Data Vault")
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
