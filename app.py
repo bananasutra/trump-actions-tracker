@@ -6,13 +6,23 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG
+# 1. PAGE CONFIG & SEO HACK
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
+
+st.markdown(f"""
+    <head>
+    <title>U.S. Democracy Gone Bananas</title>
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
+    <meta property="og:description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
+    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    </head>
+    """, unsafe_allow_html=True)
 
 # 2. THEMES & RICH GLOSSARY DATA
 THEME_GLOSSARY = [
@@ -33,29 +43,43 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. CSS (STRUCTURAL HARD-LOCKS)
+# 3. CSS (THE ABSOLUTE HARD-LOCK)
 st.markdown("""
     <style>
-        /* STICKY NAV RE-ANCHOR */
+        /* 1. KILL THE BLUE AT THE SOURCE */
+        div.stButton > button, .nav-container button {
+            background-color: transparent !important;
+            color: inherit !important;
+            border: 1px solid currentColor !important;
+            box-shadow: none !important;
+            font-weight: bold !important;
+            transition: 0.3s !important;
+        }
+        
+        a, .nav-container a { color: inherit !important; text-decoration: none !important; }
+
+        /* 2. STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
-            position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
-            background: inherit !important; backdrop-filter: blur(15px) !important; padding: 10px 0 !important; 
+            position: sticky !important; top: 2.875rem !important; z-index: 999; 
+            background: inherit !important; backdrop-filter: blur(20px) !important; 
+            padding: 10px 0 !important; 
         }
 
-        /* GLOSSARY FOOTNOTE STYLING */
+        /* 3. UI COMPONENTS */
+        .hero-card {
+            flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
+            border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
+            text-align: center; margin-bottom: 15px;
+        }
+        .hero-card h2 { margin: 10px 0; font-size: 2.2rem; }
+        .hero-card p.context { margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic; }
+        [id] { scroll-margin-top: 150px !important; }
         .glossary-footnote { font-size: 11px !important; color: #888 !important; line-height: 1.3 !important; }
         .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
         .glossary-footnote th, .glossary-footnote td { 
             text-align: left; padding: 8px; font-weight: 400 !important; 
             border-bottom: 1px solid rgba(128,128,128,0.2); 
         }
-
-        .hero-card {
-            flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
-            border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
-            text-align: center; margin-bottom: 15px;
-        }
-        [id] { scroll-margin-top: 150px !important; }
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
 """, unsafe_allow_html=True)
@@ -63,14 +87,10 @@ st.markdown("""
 # 4. LOAD DATA
 @st.cache_data
 def load_data():
-    files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
-    df = None
-    for file in files_to_try:
-        try:
-            df = pd.read_csv(file, skiprows=2)
-            break
-        except: continue
-    if df is None: return None
+    import os
+    files = [f for f in os.listdir('.') if f.endswith('.csv')]
+    if not files: return None
+    df = pd.read_csv(files[0], skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
     df = df.sort_values('Date', ascending=True) 
     cat_cols = list(CATEGORY_MAP.keys())
@@ -136,24 +156,14 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 8. STICKY NAV (INLINE STYLE HARD-LOCK)
+# 8. NAV (HARD-LOCKED MONOCHROME)
 st.markdown("""
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 10px; width: 100%;">
-        <a href="#timeline" style="flex: 1; text-decoration: none;">
-            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Timeline</button>
-        </a>
-        <a href="#themes" style="flex: 1; text-decoration: none;">
-            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Themes</button>
-        </a>
-        <a href="#insights" style="flex: 1; text-decoration: none;">
-            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Insights</button>
-        </a>
-        <a href="#words" style="flex: 1; text-decoration: none;">
-            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Words</button>
-        </a>
-        <a href="#search" style="flex: 1; text-decoration: none;">
-            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Search</button>
-        </a>
+        <a href="#timeline" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Timeline</button></a>
+        <a href="#themes" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Themes</button></a>
+        <a href="#insights" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Insights</button></a>
+        <a href="#words" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Words</button></a>
+        <a href="#search" style="flex: 1;"><button style="width:100%; padding:10px; background:transparent; border:1px solid currentColor; color:inherit; font-weight:bold; border-radius:5px;">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
@@ -162,7 +172,7 @@ st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
     if comparison_mode and selected_themes:
-        st.subheader("Velocity Analysis: Comparative Growth")
+        st.subheader("Velocity Analysis: Comparative Theme Growth")
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
         comp_df = filtered_df.melt(id_vars=['Date', 'Title'], value_vars=long_names, var_name='Mapping', value_name='Active')
         comp_df = comp_df[comp_df['Active'].str.strip().str.lower() == 'yes']
@@ -179,13 +189,12 @@ if not filtered_df.empty:
         line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
 
-    # THE CLEAN DIAGNOSTIC TIPS (RESTORED ROW)
     t1, t2, t3 = st.columns(3)
     with t1: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>📈 <b>Velocity</b><br><i>Institutional rewrite rate</i></div>", unsafe_allow_html=True)
     with t2: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>🧩 <b>Complexity</b><br><i>Interlocking thematic strikes</i></div>", unsafe_allow_html=True)
     with t3: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>⚖️ <b>Doubt</b><br><i>Verifiable data vs. opinion</i></div>", unsafe_allow_html=True)
 
-# 10. THEMES (WIDE BAR & HTML GLOSSARY)
+# 10. THEMES (WIDE BAR & RICH GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -194,14 +203,14 @@ if not filtered_df.empty:
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300)), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
 
-    with st.expander("📖 Themes Glossary (Reference)"):
-        glossary_html = '<div class="glossary-footnote"><table><tr><th>Theme</th><th>Description (Rich Explanation)</th></tr>'
+    with st.expander("📖 Themes Glossary (Rich Reference)"):
+        glossary_html = '<div class="glossary-footnote"><table><tr><th>Theme</th><th>Rich Description</th></tr>'
         for _, row in GLOSSARY_DF.iterrows():
             glossary_html += f'<tr><td>{row["Theme"]}</td><td>{row["Definition"]}</td></tr>'
         glossary_html += '</table></div>'
         st.markdown(glossary_html, unsafe_allow_html=True)
 
-# 11. INSIGHTS (RESTORED SATURATION ANALYSIS)
+# 11. INSIGHTS (SATURATION ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -220,7 +229,7 @@ if not filtered_df.empty:
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 12. WORD CLOUD (NEON VISIBILITY)
+# 12. WORD CLOUD (HSL LUMINANCE-LOCKED NEON)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -229,7 +238,10 @@ if not filtered_df.empty:
     words = re.findall(r'\w+', all_titles)
     filtered_words = [w for w in words if w not in {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president', 'will', 'this', 'that'} and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
-    js_color = "function () { var colors = ['#00f2ff', '#ff00ea', '#00ffaa', '#fffb00', '#ff4d00', '#55ff00', '#ffffff']; return colors[Math.floor(Math.random() * colors.length)]; }"
+    
+    # NEON FIX: Lock Lightness to 75-90% to prevent dark-on-dark
+    js_color = "function () { return 'hsl(' + (Math.random() * 360) + ', 100%, ' + (Math.round(Math.random() * 15) + 75) + '%)'; }"
+    
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
@@ -240,4 +252,4 @@ st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
