@@ -127,8 +127,9 @@ if df is not None:
 
 # 5. HEADER & HERO BOXES
 st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-<p style="opacity:0.8; margin:10;">Documenting the actions, statements, and plans of President Trump and his administration that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.</p>
-<p style="font-size:0.8rem; opacity:0.6; margin:10;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" style="color:inherit;" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
+<p style="font-style: italic; opacity:0.7; margin:15px 0 5px 0; line-height:1.4;">"The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt." — Bertrand Russell</p>
+<p style="opacity:0.8; margin:5px 0 15px 0; line-height:1.6;">Authoritarianism thrives on "cocksure" rhetoric that obscures institutional reality. This interactive diagnostic is a sanctuary for the curious: a place to measure the exact volume and velocity of the democratic dismantle. It is time to replace doubt with documentation. In this vault, data trumps opinion.</p>
+<p style="font-size:0.8rem; opacity:0.6; margin:0;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" style="color:inherit;" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
 
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
