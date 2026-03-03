@@ -108,6 +108,7 @@ if df is not None:
 st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
 <p style="opacity:0.8; margin:10;">Documenting the actions, statements, and plans of President Trump and his administration that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.</p>
 <p style="font-size:0.8rem; opacity:0.6; margin:10;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" style="color:inherit;" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
+
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
     f_df = f_df[f_df['Title'].str.contains(st.session_state.q, case=False, na=False)]
@@ -116,11 +117,31 @@ if df is not None:
 
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
+    
+    st.subheader("🛡️ Institutional Health Diagnostic")
     st.markdown(f"""
+    <div style="background: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(128, 128, 128, 0.1);">
+        <p style="margin:0; font-size:0.85rem; opacity:0.8;">
+            💡 <b>Dynamic Analysis:</b> These metrics update in real-time as you filter or search. 
+            <i>Try searching "Elon" or filtering by "Civil Rights" to see specific dismantle velocities.</i>
+        </p>
+    </div>
     <div class="hero-container">
-        <div class="hero-card"><p style="margin:0; font-size:0.8rem; opacity:0.7;">Total Actions</p><h2>{len(f_df)}</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Verifiable data vs opinion.</p></div>
-        <div class="hero-card" style="border-color:#DE0100;"><p style="margin:0; font-size:0.8rem; color:#DE0100;">Velocity</p><h2 style="color:#DE0100;">{pace:.1f}/mo</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Institutional rewrite rate.</p></div>
-        <div class="hero-card"><p style="margin:0; font-size:0.8rem; opacity:0.7;">Strategic Overlap</p><h2>{overlap:.1f}%</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Interlocking thematic strikes.</p></div>
+        <div class="hero-card">
+            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">CUMULATIVE IMPACT</p>
+            <h2 style="margin:10px 0;">{len(f_df)}</h2>
+            <p style="margin:0; font-size:0.7rem; opacity:0.9;">Total recorded strikes against democratic pillars.</p>
+        </div>
+        <div class="hero-card" style="border-color:#DE0100; background: rgba(222, 1, 0, 0.05);">
+            <p style="margin:0; font-size:0.8rem; font-weight:bold; color:#DE0100;">PROCEDURAL SHOCK</p>
+            <h2 style="margin:10px 0; color:#DE0100;">{pace:.1f}/mo</h2>
+            <p style="margin:0; font-size:0.7rem; opacity:0.9;"><b>Saturation Strategy:</b> Rewrite speed designed to outpace judicial oversight.</p>
+        </div>
+        <div class="hero-card">
+            <p style="margin:0; font-size:0.8rem; font-weight:bold; opacity:0.7;">STRATEGIC COMPLEXITY</p>
+            <h2 style="margin:10px 0;">{overlap:.1f}%</h2>
+            <p style="margin:0; font-size:0.7rem; opacity:0.9;"><b>Norm-Collapse Loops:</b> % of actions hitting multiple pillars simultaneously.</p>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
