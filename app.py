@@ -63,25 +63,40 @@ def load_data():
 
 df = load_data()
 
-# 4. SEARCH SYNC
+# 4. SEARCH SYNC & DIALOG
 if "search_term" not in st.session_state: st.session_state.search_term = ""
 def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_search
 def sync_vault(): st.session_state.search_term = st.session_state.vault_search
 
-# 5. SIDEBAR
+@st.dialog("Strategic Note on Facts")
+def show_welcome():
+    st.markdown("""
+    **Opinions shall not trump the data.** In an era of certainty, this tracker is built for **verifiable doubt**.
+    * **Velocity:** institutional rewrite rate.
+    * **Complexity:** interlocking strikes.
+    ---
+    Now, if you’re curious 👀 click anywhere outside this box to begin your investigation.
+    """)
+
+if "first_visit" not in st.session_state:
+    st.session_state.first_visit = True
+    show_welcome()
+
+# 5. SIDEBAR & COMPARISON (DEFAULT: ALL SELECTED)
 st.sidebar.title("🎛️ Data Controls")
-st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
+st.sidebar.text_input("🔍 Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
 st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
 
 if comparison_mode:
-    selected_themes = st.sidebar.multiselect("Select Themes to Compare", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES[:3])
+    # Fix 1: All categories selected by default
+    selected_themes = st.sidebar.multiselect("Select Themes", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
 else:
     selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
 
 if df is not None:
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
-    selected_range = st.sidebar.slider("Timeline Scrub", min_value=min_date, max_value=max_date, value=(min_date, max_date), key="date_range", format="MMM DD")
+    selected_range = st.sidebar.slider("Timeline Scrub", min_value=min_date, max_value=max_date, value=(min_date, max_date), format="MMM DD")
     mask = (df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])
     if st.session_state.search_term:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
@@ -93,10 +108,9 @@ if df is not None:
         st.session_state.vault_search = ""
         st.session_state.comparison_mode = False
         st.session_state.filter_area = "All Actions"
-        st.session_state.date_range = (min_date, max_date)
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
 
-# 6. CSS OVERRIDES (STRICT STICKY NAV & ADAPTIVE COLORS)
+# 6. CSS OVERRIDES (STRICT MONOCHROME NAV & STICKY FIX)
 st.markdown("""
     <style>
         /* STICKY NAV FIX */
@@ -105,7 +119,7 @@ st.markdown("""
             background: transparent !important; backdrop-filter: blur(12px) !important; padding: 15px 0 !important; 
         }
         
-        /* ADAPTIVE NAV BUTTONS (HARD COLOR OVERRIDE) */
+        /* ADAPTIVE NAV BUTTONS (KILL THE BLUE) */
         .nav-button {
             width: 100%; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer;
             background: transparent !important; text-decoration: none !important;
@@ -114,10 +128,6 @@ st.markdown("""
             color: inherit !important;
         }
         .nav-button:hover { opacity: 0.6; }
-        
-        /* THEME SELECTORS FOR NAV */
-        [data-theme="light"] .nav-button { color: black !important; border-color: black !important; }
-        [data-theme="dark"] .nav-button { color: white !important; border-color: white !important; }
         
         [id] { scroll-margin-top: 150px !important; }
         
@@ -144,7 +154,7 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
-# 8. HERO CARDS (INTEGRATED CONTEXT)
+# 8. HERO CARDS
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -156,33 +166,33 @@ if not filtered_df.empty:
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
             <h2>{total_actions}</h2>
-            <p class="context">Total scale of administrative rewrite in the selected window.</p>
+            <p class="context">Scale of administrative rewrite in window.</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p class="context">Institutional rewrite rate; the pace of procedural change.</p>
+            <p class="context">Institutional rewrite rate; pace of change.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
-            <p class="context">Complexity indicator: actions striking multiple democratic pillars.</p>
+            <p class="context">Complexity indicator: actions striking multiple pillars.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV
+# 9. STICKY NAV (ADAPTIVE MONOCHROME)
 st.markdown("""
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
-        <a href="#timeline" style="flex: 1;"><button class="nav-button">Timeline</button></a>
-        <a href="#themes" style="flex: 1;"><button class="nav-button">Themes</button></a>
-        <a href="#insights" style="flex: 1;"><button class="nav-button">Insights</button></a>
-        <a href="#words" style="flex: 1;"><button class="nav-button">Words</button></a>
-        <a href="#search" style="flex: 1;"><button class="nav-button">Search</button></a>
+        <a href="#timeline" style="flex: 1; text-decoration: none;"><button class="nav-button">Timeline</button></a>
+        <a href="#themes" style="flex: 1; text-decoration: none;"><button class="nav-button">Themes</button></a>
+        <a href="#insights" style="flex: 1; text-decoration: none;"><button class="nav-button">Insights</button></a>
+        <a href="#words" style="flex: 1; text-decoration: none;"><button class="nav-button">Words</button></a>
+        <a href="#search" style="flex: 1; text-decoration: none;"><button class="nav-button">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (COMPARISON & RESPONSIVE)
+# 10. TIMELINE (RESPONSIVE FIX)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode and selected_themes:
@@ -215,7 +225,7 @@ if not filtered_df.empty:
         ).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
 
-# 11. THEMES (HORIZONTAL BARS & GLOSSARY)
+# 11. THEMES (BAR CHART & GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -233,7 +243,7 @@ if not filtered_df.empty:
     with st.expander("📖 Themes Glossary & Definitions"):
         st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 
-# 12. INSIGHTS (RESTORED MASTER CONTENT)
+# 12. INSIGHTS (RESTORED FULL ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -241,19 +251,19 @@ if not filtered_df.empty:
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is moving at **{pace_per_month:.1f} actions per month**. This volume is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring the rate of institutional rewrite exceeds the processing latency of the judicial system.")
+        st.write(f"The administration is moving at **{pace_per_month:.1f} actions/mo**. This is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring institutional rewrite exceeds judicial processing latency.")
         st.markdown("#### Norm-Collapse Loops")
         st.write(f"**Interconnectivity:** {overlap:.1f}% of events strike multiple democratic pillars simultaneously. This creates 'Norm-Collapse Loops' where legal resistance in one domain is bypassed by executive action in another.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
+        st.write("Opposition is concentrated in state-level hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite of the federal state.")
 
     st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD (NEON HIGH-BRIGHTNESS)
+# 13. WORD CLOUD (NEON VISIBILITY FIX)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -264,7 +274,7 @@ if not filtered_df.empty:
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
     
-    # NEON COLOR PALETTE
+    # NEON COLOR PALETTE: Curated high-vibrancy for Dark/Light mode visibility
     js_color = """
     function () {
         var colors = ['#00f2ff', '#ff00ea', '#00ffaa', '#fffb00', '#ff4d00', '#55ff00', '#ffffff'];
@@ -275,7 +285,7 @@ if not filtered_df.empty:
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 14. VAULT
+# 14. SEARCH VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
@@ -284,4 +294,4 @@ if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), 
                  column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")},
                  use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
