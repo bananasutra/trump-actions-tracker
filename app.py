@@ -19,63 +19,19 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 # 2. THEMES & GLOSSARY MAPPING (UNIFIED)
-# Column 1: Theme (Nav Name)
-# Column 2: Data Categories (Mapping)
-# Column 3: Definition (Deep Dive)
 THEME_GLOSSARY = [
-    {
-        "Theme": "Civil Rights",
-        "Mapping": "Weakening Civil Rights",
-        "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights."
-    },
-    {
-        "Theme": "Corruption",
-        "Mapping": "Corruption & Enrichment",
-        "Definition": "Corruption and Enrichment: Actions that directly enrich the president, his family, or his cabinet, or that trade political favors for wealth."
-    },
-    {
-        "Theme": "Democratic Norms",
-        "Mapping": "Violating Democratic Norms, Undermining Rule of Law",
-        "Definition": "Violating democratic norms, undermining rule of law: Actions that weaken checks and balances, restrict press freedom, undermine states' rights, violate court orders or the Constitution, or reduce the independence of oversight bodies."
-    },
-    {
-        "Theme": "Education & Culture",
-        "Mapping": "Attacking Universities, Schools, Museums, Culture",
-        "Definition": "Attacking universities, schools, museums, culture: Undermining the independence of universities, restricting K-12 education topics, and targeting information within museums and national parks."
-    },
-    {
-        "Theme": "Federal Institutions",
-        "Mapping": "Hollowing State / Weakening Federal Institutions",
-        "Definition": "Hollowing state / weakening federal institutions: Dismantling federal institutions, mass firings of staff, or politicizing government roles."
-    },
-    {
-        "Theme": "Foreign Policy",
-        "Mapping": "Aggressive Foreign Policy & Global Destabilisation",
-        "Definition": "Aggressive Foreign Policy & Global Destabilisation: Threatening allies, using tariffs to extract concessions, withdrawing from international treaties (like the WHO or Paris Climate Treaty), and aligning with anti-democratic rivals."
-    },
-    {
-        "Theme": "Immigration & Nationalism",
-        "Mapping": "Anti-immigrant or Militarised Nationalism",
-        "Definition": "Anti-immigrant or Militarised Nationalism: Using language that demonizes immigrants, deploying military-type enforcement (like the National Guard) within the U.S., and expanding domestic surveillance."
-    },
-    {
-        "Theme": "Info Control",
-        "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda",
-        "Definition": "Controlling information including spreading misinformation and propaganda: Manufacturing evidence to support state policy, restricting access to contradicting evidence, and spreading propaganda."
-    },
-    {
-        "Theme": "Science & Health",
-        "Mapping": "Control of Science & Health to Align with State Ideology",
-        "Definition": "Control of science to align with state ideology: Restricting scientific research (e.g., on climate change), expanding drilling against environmental evidence, and attacking public health through vaccine restrictions or funding cuts."
-    },
-    {
-        "Theme": "Suppressing Dissent",
-        "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'",
-        "Definition": "Suppressing dissent / Weaponising state power against 'enemies': Punishing opponents, instituting loyalty tests, and weaponizing executive power or legal action against rivals, critics, and perceived enemy states or cities."
-    }
+    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights."},
+    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption and Enrichment: Actions that directly enrich the president, his family, or his cabinet, or that trade political favors for wealth."},
+    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating democratic norms, undermining rule of law: Actions that weaken checks and balances, restrict press freedom, undermine states' rights, violate court orders or the Constitution, or reduce the independence of oversight bodies."},
+    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking universities, schools, museums, culture: Undermining the independence of universities, restricting K-12 education topics, and targeting information within museums and national parks."},
+    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing state / weakening federal institutions: Dismantling federal institutions, mass firings of staff, or politicizing government roles."},
+    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Aggressive Foreign Policy & Global Destabilisation: Threatening allies, using tariffs to extract concessions, withdrawing from international treaties (like the WHO or Paris Climate Treaty), and aligning with anti-democratic rivals."},
+    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Anti-immigrant or Militarised Nationalism: Using language that demonizes immigrants, deploying military-type enforcement (like the National Guard) within the U.S., and expanding domestic surveillance."},
+    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Controlling information including spreading misinformation and propaganda: Manufacturing evidence to support state policy, restricting access to contradicting evidence, and spreading propaganda."},
+    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Control of science to align with state ideology: Restricting scientific research (e.g., on climate change), expanding drilling against environmental evidence, and attacking public health through vaccine restrictions or funding cuts."},
+    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Suppressing dissent / Weaponising state power against 'enemies': Punishing opponents, instituting loyalty tests, and weaponizing executive power or legal action against rivals, critics, and perceived enemy states or cities."}
 ]
 
-# Convert to DF for logic and alphabetization
 GLOSSARY_DF = pd.DataFrame(THEME_GLOSSARY).sort_values("Theme")
 CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
@@ -129,7 +85,7 @@ if df is not None:
     </div>
     """, unsafe_allow_html=True)
 
-# 5. STICKY NAVIGATION
+# 5. STICKY NAVIGATION (SPACED)
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {
@@ -175,14 +131,13 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. TIMELINE
+# 8. TIMELINE (40px padding fixed)
 st.markdown("<div id='timeline' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Theme Growth")
     if not display_df.empty:
         comp_chart = alt.Chart(display_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
-            x=alt.X('Date:T', title='Timeline'),
-            y=alt.Y('Cumulative:Q', title='Actions'),
+            x=alt.X('Date:T', title='Timeline'), y=alt.Y('Cumulative:Q', title='Actions'),
             color=alt.Color('Category_Short:N', legend=alt.Legend(orient='bottom', columns=2))
         ).interactive().properties(height=450)
         st.altair_chart(comp_chart, use_container_width=True)
@@ -198,7 +153,7 @@ else:
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Search section for stable links.")
 st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Search section for direct source links.")
 
-# 9. THEMES & GLOSSARY
+# 9. THEMES & GLOSSARY (40px padding fixed)
 st.markdown("<div id='themes' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -216,10 +171,9 @@ if cat_counts:
     ).properties(height=len(bar_df) * 40 + 50), use_container_width=True)
 
 with st.expander("📖 Themes Glossary"):
-    # Unified table with Theme, Original Mapping, and Deep Definition
     st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 
-# 10. LATEST
+# 10. LATEST (40px padding fixed)
 st.markdown("<div id='latest' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
@@ -230,7 +184,7 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes_List']}")
         st.link_button("🚀 View Source", row['URL'])
 
-# 11. INSIGHTS
+# 11. DEEP INSIGHTS (RESTORED FULL STRATEGIC ANALYSIS)
 st.markdown("<div id='insights' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -239,18 +193,21 @@ if df is not None:
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"Maintaining a velocity of **{pace_per_month:.1f} actions/month**. Projection: **8,220 actions** by Jan 2029.")
+        st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate. In strategic terms, this volume induces 'procedural shock'—where the sheer number of executive orders and policy shifts exhausts the bandwidth of civil society, journalists, and the legal system.")
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite—where the cumulative weight of changes effectively creates a new, non-democratic operating system for the federal government.")
+        
         st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously. For example, an action targeting federal civil service (Hollowing State) often simultaneously limits scientific research (Control of Science) and restricts public access to information (Info Control).")
+
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is concentrated in state hubs (CA, WA, NY, IL).")
+        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point against this velocity, explaining the administration's prioritization of Judicial and DOJ hollowing. Data shows that as federal checks weaken, the 'Blue State Shield' becomes the primary mechanism for preserving the Rule of Law, though its efficacy is increasingly challenged by federal pre-emption orders.")
         st.markdown("<div style='padding-top: 20px;'>", unsafe_allow_html=True)
         st.markdown("**Methodology Context:**")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 12. SEARCH
+# 12. SEARCH (40px padding fixed)
 st.markdown("<div id='search' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
