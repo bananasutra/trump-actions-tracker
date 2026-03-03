@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK
+# 1. PAGE CONFIG & SEO
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -46,6 +46,7 @@ SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 # 3. DATA LOADING
 @st.cache_data
 def load_data():
+    # Update this filename to match your repository exactly
     files_to_try = ['trump-actions-3-1-26.csv', 'trump-actions.csv']
     df = None
     for file in files_to_try:
@@ -82,7 +83,7 @@ if "first_visit" not in st.session_state:
     st.session_state.first_visit = True
     show_welcome()
 
-# 5. SIDEBAR & RESET LOGIC
+# 5. SIDEBAR & COMPARISON INTERFACE
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
 st.sidebar.divider()
@@ -110,20 +111,26 @@ if df is not None:
         st.session_state.date_range = (min_date, max_date)
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
 
-# 6. CSS (THEME-PROOF NAV & MOBILE)
+# 6. CSS (STRICT STICKY NAV & THEME ADAPTATION)
 st.markdown("""
     <style>
-        .nav-button {
-            width: 100%; padding: 10px; border-radius: 5px; 
-            border: 1px solid currentColor !important; 
-            background: transparent !important; 
-            color: inherit !important; 
-            font-weight: bold; cursor: pointer;
-            text-decoration: none !important;
-            display: inline-block;
-            text-align: center;
+        /* STICKY NAV FIX */
+        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
+            position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
+            background: transparent !important; backdrop-filter: blur(12px) !important; padding: 15px 0 !important; 
         }
-        .nav-button:hover { opacity: 0.6; }
+        
+        /* ADAPTIVE NAV BUTTONS (HARD COLOR OVERRIDE) */
+        .nav-button {
+            width: 100%; padding: 10px; border-radius: 5px; font-weight: bold; cursor: pointer;
+            background: transparent !important; text-decoration: none !important;
+            transition: 0.3s; border: 1px solid currentColor !important; color: inherit !important;
+        }
+        
+        /* THEME SELECTORS */
+        [data-theme="light"] .nav-button { color: black !important; border-color: black !important; }
+        [data-theme="dark"] .nav-button { color: white !important; border-color: white !important; }
+        
         [id] { scroll-margin-top: 150px !important; }
         
         .hero-card {
@@ -171,14 +178,14 @@ if not filtered_df.empty:
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
-            <p class="context">Complexity indicator: actions striking multiple pillars.</p>
+            <p class="context">Complexity indicator: actions striking multiple democratic pillars.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 # 9. STICKY NAV
 st.markdown("""
-    <div style="display: flex; justify-content: space-between; gap: 8px; position: sticky; top: 0; z-index: 999; backdrop-filter: blur(8px); padding: 15px 0;">
+    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
         <a href="#timeline" style="flex: 1;"><button class="nav-button">Timeline</button></a>
         <a href="#themes" style="flex: 1;"><button class="nav-button">Themes</button></a>
         <a href="#insights" style="flex: 1;"><button class="nav-button">Insights</button></a>
@@ -187,7 +194,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (COMPARISON & RESPONSIVE FIX)
+# 10. TIMELINE (RESPONSIVE FIX)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode and selected_themes:
@@ -220,7 +227,7 @@ if not filtered_df.empty:
         ).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
 
-# 11. THEMES (RESTORED BAR CHART & GLOSSARY)
+# 11. THEMES (BAR CHART & GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -238,7 +245,7 @@ if not filtered_df.empty:
     with st.expander("📖 Themes Glossary & Definitions"):
         st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 
-# 12. INSIGHTS (RESTORED ANALYSIS)
+# 12. INSIGHTS (RESTORED MASTER ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -246,17 +253,19 @@ if not filtered_df.empty:
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is moving at **{pace_per_month:.1f} actions/mo**. This volume induces 'procedural shock' designed to exhaust judicial oversight.")
+        st.write(f"The administration is moving at **{pace_per_month:.1f} actions per month**. This volume is a deliberate **Saturation Strategy**; it induces 'procedural shock' by ensuring the rate of institutional rewrite exceeds the processing latency of the judicial system.")
+        st.markdown("#### Norm-Collapse Loops")
+        st.write(f"**Interconnectivity:** {overlap:.1f}% of events strike multiple democratic pillars simultaneously. This creates 'Norm-Collapse Loops' where legal resistance in one domain is bypassed by executive action in another.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is concentrated in state-level hubs. Litigation remains the primary friction point.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, projects over **8,220 actions**.")
+        st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite of the federal state.")
 
     st.markdown(f"""<div class="quote-container"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD
+# 13. WORD CLOUD (NEON VISIBILITY FIX)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -266,7 +275,10 @@ if not filtered_df.empty:
     words = re.findall(r'\w+', all_titles)
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
-    js_color = "function () { var colors = ['#00f2ff', '#ff00ea', '#00ffaa', '#fffb00', '#ff4d00', '#DE0100', '#55ff00']; return colors[Math.floor(Math.random() * colors.length)]; }"
+    
+    # NEON COLOR FIX: Forced into a high brightness range (200-255)
+    js_color = "function () { return 'rgb(' + [Math.round(Math.random() * 55 + 200), Math.round(Math.random() * 55 + 200), Math.round(Math.random() * 55 + 200)].join(',') + ')'; }"
+    
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
