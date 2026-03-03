@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO
+# 1. PAGE CONFIG & SEO HACK (CRITICAL: Targets Social Media Crawlers)
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -14,7 +14,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. THEMES & RICH GLOSSARY
+# THE SEO HACK
+st.markdown(f"""
+    <head>
+    <title>U.S. Democracy Gone Bananas</title>
+    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite in the U.S. (2025-2026).">
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker">
+    <meta property="og:description" content="A real-time diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
+    <meta property="og:url" content="https://trump-actions-tracker.streamlit.app/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="U.S. Democracy Gone Bananas">
+    <meta name="twitter:description" content="Verifiable data tracking the administrative rewrite of the federal state.">
+    </head>
+    """, unsafe_allow_html=True)
+
+# 2. THEMES & RICH GLOSSARY DATA
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities, signaling a shift away from universal egalitarianism."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors for financial or personal gain, eroding the barrier between public service and private wealth."},
@@ -70,6 +85,7 @@ st.markdown("""
         }
 
         [id] { scroll-margin-top: 150px !important; }
+        .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -180,10 +196,9 @@ if not filtered_df.empty:
         line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
 
-    # NEW: CLEAN TIMELINE NAVIGATION TIPS
     st.markdown("<p style='text-align: center; font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 Navigation: Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>", unsafe_allow_html=True)
 
-# 10. THEMES (BAR CHART & GLOSSARY)
+# 10. THEMES (WIDE BAR & RICH GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -219,7 +234,7 @@ if not filtered_df.empty:
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 12. WORD CLOUD (NEON VISIBILITY)
+# 12. WORD CLOUD (HSL LUMINANCE-LOCKED NEON)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -229,7 +244,6 @@ if not filtered_df.empty:
     filtered_words = [w for w in words if w not in {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president', 'will', 'this', 'that'} and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
     
-    # NEON FIX: Lock Lightness to 75-90% to prevent dark-on-dark
     js_color = "function () { return 'hsl(' + (Math.random() * 360) + ', 100%, ' + (Math.round(Math.random() * 15) + 75) + '%)'; }"
     
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
@@ -242,4 +256,4 @@ st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka banasutra. Last updated 03-03-2026. CC BY 4.0.")
