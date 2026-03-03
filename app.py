@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK
+# 1. PAGE CONFIG
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -14,28 +14,18 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.markdown(f"""
-    <head>
-    <title>U.S. Democracy Gone Bananas</title>
-    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
-    <meta property="og:description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
-    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
-    <meta name="twitter:card" content="summary_large_image">
-    </head>
-    """, unsafe_allow_html=True)
-
-# 2. THEMES & GLOSSARY DATA
+# 2. THEMES & RICH GLOSSARY DATA
 THEME_GLOSSARY = [
-    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing protections for marginalized groups like LGBTQ+ communities and immigrants."},
-    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Actions that directly enrich the president, his family, or his cabinet, or trade political favors."},
-    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Weakening checks and balances, press freedom, or violating the Constitution/court orders."},
-    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Undermining university independence, restricting K-12 topics, and targeting cultural institutions."},
-    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Dismantling federal institutions, mass firings, and politicizing government roles."},
-    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Threatening allies, withdrawing from treaties, and aligning with anti-democratic rivals."},
-    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Demonizing immigrants, using militarized domestic enforcement, and expanding surveillance."},
-    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Manufacturing evidence for policy and restricting access to contradicting evidence."},
-    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Restricting research (climate change), attacking public health (vaccine funding), and environmental deregulation."},
-    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Weaponizing executive power/legal action against rivals, critics, and perceived 'enemy' states/cities."}
+    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities, signaling a shift away from universal egalitarianism."},
+    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors for financial or personal gain, eroding the barrier between public service and private wealth."},
+    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating Democratic Norms & Rule of Law: The fracturing of checks and balances, the dismissal of constitutional constraints, and the direct targeting of the judiciary and press freedom."},
+    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking Intellectual & Cultural Autonomy: Restricting K-12 curricula, undermining university independence, and targeting cultural institutions to align national identity with state ideology."},
+    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing the State: The dismantling of federal expertise, mass dismissals of civil servants, and the hollowing out of agencies to diminish the state's capacity for oversight."},
+    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Global Destabilisation: An aggressive pivot in foreign policy that threatens traditional alliances, withdraws from global treaties, and aligns the U.S. with anti-democratic rivals."},
+    {"Theme": "Immigration & Nationalism", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Militarised Nationalism: The demonization of immigrants combined with expanded domestic surveillance and the use of militarized enforcement to define the 'other' within."},
+    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Information Control & Propaganda: The manufacturing of state-led narratives, the restriction of scientific data, and the active spread of misinformation to control public perception."},
+    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Ideological Control of Science: The suppression of climate research, the defunding of public health (vaccines), and the prioritization of industrial deregulation over scientific consensus."},
+    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Weaponising the State: Using executive power, legal threats, and law enforcement to target political rivals, critics, and dissenting cities as 'enemies' of the state."}
 ]
 
 GLOSSARY_DF = pd.DataFrame(THEME_GLOSSARY).sort_values("Theme")
@@ -43,53 +33,28 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. CSS (NUCLEAR THEME & LAYOUT RESET)
+# 3. CSS (STRUCTURAL HARD-LOCKS)
 st.markdown("""
     <style>
-        /* 1. THE NAV COLOR EXORCISM */
-        .nav-container {
-            display: flex !important;
-            justify-content: space-between !important;
-            gap: 10px !important;
-            width: 100% !important;
-        }
-        .nav-container a { flex: 1 !important; text-decoration: none !important; }
-        
-        /* Force buttons to inherit theme text and ignore Streamlit Blue */
-        .nav-container button {
-            width: 100% !important;
-            padding: 10px !important;
-            border-radius: 5px !important;
-            font-weight: bold !important;
-            cursor: pointer !important;
-            background-color: transparent !important;
-            border: 1px solid currentColor !important;
-            color: inherit !important;
-            transition: 0.3s !important;
-        }
-        .nav-container button:hover { opacity: 0.6 !important; }
-
-        /* 2. STICKY NAV RE-ANCHOR */
+        /* STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 10px 0 !important; 
         }
 
-        /* 3. FOOTNOTE GLOSSARY (STRICT NON-BOLD) */
-        .glossary-footnote { font-size: 11px !important; color: #888 !important; }
+        /* GLOSSARY FOOTNOTE STYLING */
+        .glossary-footnote { font-size: 11px !important; color: #888 !important; line-height: 1.3 !important; }
         .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
         .glossary-footnote th, .glossary-footnote td { 
-            text-align: left; padding: 6px; font-weight: 400 !important; 
+            text-align: left; padding: 8px; font-weight: 400 !important; 
             border-bottom: 1px solid rgba(128,128,128,0.2); 
         }
 
-        /* 4. UI COMPONENTS */
         .hero-card {
             flex: 1; min-width: 280px; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
             text-align: center; margin-bottom: 15px;
         }
-        .timeline-tip { font-size: 0.8rem; opacity: 0.7; font-style: italic; margin-top: 5px; }
         [id] { scroll-margin-top: 150px !important; }
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
@@ -126,7 +91,7 @@ st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
 
 if comparison_mode:
-    selected_themes = st.sidebar.multiselect("Select Themes to Compare", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
+    selected_themes = st.sidebar.multiselect("Select Themes", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
 else:
     selected_short = st.sidebar.selectbox("Filter Area", ["All Actions"] + SORTED_SHORT_NAMES, key="filter_area")
 
@@ -138,7 +103,7 @@ if df is not None:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
     filtered_df = df.loc[mask]
 
-# 6. HEADER & HERO
+# 6. HEADER
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <a href="#top" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:20px; margin-bottom:30px;">
@@ -147,6 +112,7 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
+# 7. HERO STATS (Top Only)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -158,37 +124,45 @@ if not filtered_df.empty:
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
             <h2>{total_actions}</h2>
-            <p class="context">Total scale of administrative rewrite.</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p class="context">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
-            <p class="context">Actions striking multiple democratic pillars.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 7. STICKY NAV (FIXED LAYOUT & COLOR)
+# 8. STICKY NAV (INLINE STYLE HARD-LOCK)
 st.markdown("""
-    <div class="nav-container">
-        <a href="#timeline"><button>Timeline</button></a>
-        <a href="#themes"><button>Themes</button></a>
-        <a href="#insights"><button>Insights</button></a>
-        <a href="#words"><button>Words</button></a>
-        <a href="#search"><button>Search</button></a>
+    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 10px; width: 100%;">
+        <a href="#timeline" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Timeline</button>
+        </a>
+        <a href="#themes" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Themes</button>
+        </a>
+        <a href="#insights" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Insights</button>
+        </a>
+        <a href="#words" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Words</button>
+        </a>
+        <a href="#search" style="flex: 1; text-decoration: none;">
+            <button style="width: 100%; padding: 10px; background: transparent; border: 1px solid currentColor; color: inherit; font-weight: bold; border-radius: 5px; cursor: pointer;">Search</button>
+        </a>
     </div>
 """, unsafe_allow_html=True)
 
-# 8. TIMELINE (WITH RESTORED TIPS)
+# 9. TIMELINE & DIAGNOSTIC TIPS
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
+st.divider()
 if not filtered_df.empty:
     if comparison_mode and selected_themes:
-        st.subheader("Velocity Analysis: Comparative Theme Growth")
+        st.subheader("Velocity Analysis: Comparative Growth")
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
         comp_df = filtered_df.melt(id_vars=['Date', 'Title'], value_vars=long_names, var_name='Mapping', value_name='Active')
         comp_df = comp_df[comp_df['Active'].str.strip().str.lower() == 'yes']
@@ -204,14 +178,14 @@ if not filtered_df.empty:
         chart_df['Cumulative'] = range(1, len(chart_df) + 1)
         line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
         st.altair_chart(line, use_container_width=True)
-    
-    # RESTORED TIPS SECTION
-    t1, t2, t3 = st.columns(3)
-    with t1: st.markdown("<p class='timeline-tip'>📈 <b>Velocity:</b> institutional rewrite rate.</p>", unsafe_allow_html=True)
-    with t2: st.markdown("<p class='timeline-tip'>🧩 <b>Complexity:</b> interlocking thematic strikes.</p>", unsafe_allow_html=True)
-    with t3: st.markdown("<p class='timeline-tip'>⚖️ <b>Doubt:</b> verifiable data vs. mere opinion.</p>", unsafe_allow_html=True)
 
-# 9. THEMES (WIDE BAR & HTML GLOSSARY)
+    # THE CLEAN DIAGNOSTIC TIPS (RESTORED ROW)
+    t1, t2, t3 = st.columns(3)
+    with t1: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>📈 <b>Velocity</b><br><i>Institutional rewrite rate</i></div>", unsafe_allow_html=True)
+    with t2: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>🧩 <b>Complexity</b><br><i>Interlocking thematic strikes</i></div>", unsafe_allow_html=True)
+    with t3: st.markdown("<div style='text-align: center; opacity: 0.7; font-size: 0.85rem;'>⚖️ <b>Doubt</b><br><i>Verifiable data vs. opinion</i></div>", unsafe_allow_html=True)
+
+# 10. THEMES (WIDE BAR & HTML GLOSSARY)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -221,13 +195,13 @@ if not filtered_df.empty:
     st.altair_chart(theme_bar, use_container_width=True)
 
     with st.expander("📖 Themes Glossary (Reference)"):
-        glossary_html = '<div class="glossary-footnote"><table><tr><th>Theme</th><th>Description</th></tr>'
+        glossary_html = '<div class="glossary-footnote"><table><tr><th>Theme</th><th>Description (Rich Explanation)</th></tr>'
         for _, row in GLOSSARY_DF.iterrows():
             glossary_html += f'<tr><td>{row["Theme"]}</td><td>{row["Definition"]}</td></tr>'
         glossary_html += '</table></div>'
         st.markdown(glossary_html, unsafe_allow_html=True)
 
-# 10. INSIGHTS (RESTORED ANALYSIS)
+# 11. INSIGHTS (RESTORED SATURATION ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -246,7 +220,7 @@ if not filtered_df.empty:
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 11. WORD CLOUD (NEON VISIBILITY)
+# 12. WORD CLOUD (NEON VISIBILITY)
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
@@ -259,7 +233,7 @@ if not filtered_df.empty:
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 12. VAULT
+# 13. VAULT
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
