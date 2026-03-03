@@ -25,7 +25,7 @@ st.markdown(f"""
             .hero-card {{ width: 100% !important; margin-bottom: 10px; }}
  .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
         .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
-	.
+    .
         }}
         [id^="section-"] {{ scroll-margin-top: 75px !important; padding-top: 10px !important; }}
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; }}
@@ -108,7 +108,7 @@ if df is not None:
 
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
-	st.markdown(f"""
+    st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card"><p style="margin:0; font-size:0.8rem; opacity:0.7;">Total Actions</p><h2>{len(f_df)}</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Verifiable data vs opinion.</p></div>
         <div class="hero-card" style="border-color:#DE0100;"><p style="margin:0; font-size:0.8rem; color:#DE0100;">Velocity</p><h2 style="color:#DE0100;">{pace:.1f}/mo</h2><p style="margin:0; font-size:0.65rem; opacity:0.6;">Institutional rewrite rate.</p></div>
@@ -182,7 +182,7 @@ v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?
 # st.divider()
 # st.subheader("☁️ Thematic Word Cloud")
 # if not f_df.empty:
-#   all_titles = " ".join(f_df['Title'].values).lower()
+#    all_titles = " ".join(f_df['Title'].values).lower()
 #    words = re.findall(r'\w+', all_titles)
 #    filtered_words = [w for w in words if len(w) > 4 and w not in {'trump', 'administration', 'order', 'federal'}]
 #    word_counts = Counter(filtered_words).most_common(50)
