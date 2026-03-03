@@ -147,7 +147,7 @@ if not f_df.empty:
 
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader(“Trump Actions: Volume by Pillar")
+st.subheader("Trump Actions: Volume by Pillar")
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
