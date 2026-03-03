@@ -43,19 +43,35 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. CSS (HARD-LOCK THEME RESET)
+# 3. CSS (FLEX LAYOUT & THEME HARD-LOCK)
 st.markdown("""
     <style>
-        /* 1. THE BLUE NAV KILLER - FORCE INHERIT COLORS */
-        .nav-container button, .nav-container a {
-            color: inherit !important;
-            border: 1px solid currentColor !important;
-            background-color: transparent !important;
-            box-shadow: none !important;
-            text-decoration: none !important;
-            font-weight: bold !important;
+        /* 1. NAV CONTAINER FLEXBOX */
+        .nav-container {
+            display: flex !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            width: 100% !important;
         }
         
+        .nav-container a {
+            flex: 1 !important;
+            text-decoration: none !important;
+        }
+        
+        .nav-button {
+            width: 100% !important;
+            padding: 10px !important;
+            border-radius: 5px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            background-color: transparent !important;
+            border: 1px solid currentColor !important;
+            color: inherit !important;
+            transition: 0.3s !important;
+        }
+        .nav-button:hover { opacity: 0.6 !important; }
+
         /* 2. STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
@@ -63,7 +79,7 @@ st.markdown("""
         }
 
         /* 3. FOOTNOTE GLOSSARY (STRICT NON-BOLD) */
-        .glossary-footnote { font-size: 11px !important; color: #888 !important; line-height: 1.2 !important; }
+        .glossary-footnote { font-size: 11px !important; color: #888 !important; }
         .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
         .glossary-footnote th, .glossary-footnote td { 
             text-align: left; padding: 6px; font-weight: 400 !important; 
@@ -76,8 +92,6 @@ st.markdown("""
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
             text-align: center; margin-bottom: 15px;
         }
-        .hero-card h2 { margin: 10px 0; font-size: 2.2rem; }
-        .hero-card p.context { margin-top: 10px; font-size: 0.75rem; opacity: 0.6; font-style: italic; }
         [id] { scroll-margin-top: 150px !important; }
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
@@ -103,7 +117,7 @@ def load_data():
 
 df = load_data()
 
-# 5. SEARCH SYNC & DIALOG
+# 5. SEARCH SYNC & CALLBACKS
 if "search_term" not in st.session_state: st.session_state.search_term = ""
 def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_search
 def sync_vault(): st.session_state.search_term = st.session_state.vault_search
@@ -148,29 +162,29 @@ if not filtered_df.empty:
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
             <h2>{total_actions}</h2>
-            <p class="context">Total scale of administrative rewrite.</p>
+            <p class="context">Scale of administrative rewrite in window.</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.85rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
             <h2 style="color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 1rem;">/mo</span></h2>
-            <p class="context">Institutional rewrite rate.</p>
+            <p class="context">Institutional rewrite rate; pace of change.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.85rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
             <h2>{overlap:.1f}%</h2>
-            <p class="context">Actions striking multiple democratic pillars.</p>
+            <p class="context">Complexity indicator: actions striking multiple pillars.</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV (ADAPTIVE THEME)
+# 9. STICKY NAV (FIXED FLEXBOX)
 st.markdown("""
-    <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
-        <a href="#timeline" style="flex: 1;"><button class="nav-button">Timeline</button></a>
-        <a href="#themes" style="flex: 1;"><button class="nav-button">Themes</button></a>
-        <a href="#insights" style="flex: 1;"><button class="nav-button">Insights</button></a>
-        <a href="#words" style="flex: 1;"><button class="nav-button">Words</button></a>
-        <a href="#search" style="flex: 1;"><button class="nav-button">Search</button></a>
+    <div class="nav-container">
+        <a href="#timeline"><button class="nav-button">Timeline</button></a>
+        <a href="#themes"><button class="nav-button">Themes</button></a>
+        <a href="#insights"><button class="nav-button">Insights</button></a>
+        <a href="#words"><button class="nav-button">Words</button></a>
+        <a href="#search"><button class="nav-button">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
