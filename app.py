@@ -61,7 +61,6 @@ df = load_data()
 # 4. SIDEBAR & RESET LOGIC
 st.sidebar.title("🎛️ Data Controls")
 
-# Reset Function
 def reset_filters():
     st.session_state.global_search = ""
     st.session_state.comparison_mode = False
@@ -69,10 +68,8 @@ def reset_filters():
     if df is not None:
         st.session_state.date_range = (df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime())
 
-# Global Keyword Search
 global_search = st.sidebar.text_input("🔍 Global Search", key="global_search", placeholder="e.g. Musk, Border, DOJ")
 
-# Category Filter
 st.sidebar.divider()
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", key="comparison_mode")
 query_params = st.query_params
@@ -87,20 +84,12 @@ else:
     selected_short = st.sidebar.selectbox("Filter Area", options, index=start_index, key="filter_area")
     st.query_params["area"] = selected_short
 
-# Date Slider
 if df is not None:
     st.sidebar.divider()
     st.sidebar.subheader("📅 Timeline Scrub")
     min_date = df['Date'].min().to_pydatetime()
     max_date = df['Date'].max().to_pydatetime()
-    
-    selected_range = st.sidebar.slider(
-        "Select Window",
-        min_value=min_date, max_value=max_date,
-        value=(min_date, max_date),
-        key="date_range",
-        format="MMM DD"
-    )
+    selected_range = st.sidebar.slider("Select Window", min_value=min_date, max_value=max_date, value=(min_date, max_date), key="date_range", format="MMM DD")
     
     mask = (df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])
     if global_search:
@@ -113,7 +102,6 @@ else:
     filtered_df = pd.DataFrame()
 
 # 5. HEADER & HERO
-# Anchor for "Back to Top" functionality
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
@@ -150,8 +138,8 @@ st.markdown("""
             background-color: #0e1117; padding: 20px 0;
         }
         [id] { scroll-margin-top: 110px !important; }
-        .back-to-nav { font-size: 0.8rem; color: #888; text-decoration: none; display: block; text-align: right; margin-top: 10px; }
-        .back-to-nav:hover { color: #FFFFFF; }
+        .back-to-top { font-size: 0.75rem; color: #666; text-decoration: none; display: block; text-align: right; margin-top: 5px; font-weight: normal; }
+        .back-to-top:hover { color: #DE0100; transition: 0.3s; }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
         <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #FFFFFF; background: transparent; color: #FFFFFF; font-weight: bold; cursor: pointer;">Timeline</button></a>
@@ -162,7 +150,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 7. DATA PROCESSING
+# 7. DATA PROCESSING & TIMELINE
 if not filtered_df.empty:
     if comparison_mode:
         long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
@@ -177,7 +165,6 @@ if not filtered_df.empty:
         filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
         chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode:
@@ -195,9 +182,9 @@ if not filtered_df.empty:
             tooltip=[alt.Tooltip('Date:T', title='Date', format='%Y-%m-%d'), 'Title:N', 'Themes_List:N']
         )
         st.altair_chart((line + points).interactive(), use_container_width=True)
-st.markdown("<a href='#top' class='back-to-nav'>↑ Back to Navigation</a>", unsafe_allow_html=True)
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 9. THEMES & GLOSSARY
+# 8. THEMES & GLOSSARY
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -216,9 +203,9 @@ if cat_counts:
 
 with st.expander("📖 Themes Glossary"):
     st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
-st.markdown("<a href='#top' class='back-to-nav'>↑ Back to Navigation</a>", unsafe_allow_html=True)
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 10. LATEST
+# 9. LATEST
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions in Window: {selected_short}")
@@ -229,13 +216,12 @@ if not filtered_df.empty:
             st.write(f"**Description:** {row['Title']}")
             st.write(f"**Themes:** {row['Themes_List']}")
             st.link_button("🚀 View Source", row['URL'])
-st.markdown("<a href='#top' class='back-to-nav'>↑ Back to Navigation</a>", unsafe_allow_html=True)
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 11. DEEP INSIGHTS
+# 10. DEEP INSIGHTS
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
-
 if not filtered_df.empty:
     multi_ratio = (len(filtered_df[filtered_df['Cat_Count'] > 1]) / len(filtered_df) * 100)
     col_ins1, col_ins2 = st.columns(2)
@@ -252,9 +238,9 @@ if not filtered_df.empty:
     st.markdown("<br><h4 style='text-align: center;'>Methodology Context & Expert Analysis</h4>", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-st.markdown("<a href='#top' class='back-to-nav'>↑ Back to Navigation</a>", unsafe_allow_html=True)
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 12. SEARCH (DATA VAULT)
+# 11. SEARCH
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
@@ -265,6 +251,6 @@ if not filtered_df.empty:
         column_config={"URL": st.column_config.LinkColumn("Source"), "Themes_List": "Themes"},
         use_container_width=True, hide_index=True
     )
-st.markdown("<a href='#top' class='back-to-nav'>↑ Back to Navigation</a>", unsafe_allow_html=True)
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
 st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
