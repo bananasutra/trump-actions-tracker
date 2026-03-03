@@ -6,13 +6,25 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK
+# 1. PAGE CONFIG & SEO HACK (DO NOT REMOVE - CRITICAL FOR SOCIAL PREVIEWS)
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
     layout="wide", 
     initial_sidebar_state="expanded"
 )
+
+# THE OG SEO WORKAROUND
+st.markdown(f"""
+    <head>
+    <title>U.S. Democracy Gone Bananas</title>
+    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite in the U.S. (2025-2026).">
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Tracker">
+    <meta property="og:description" content="A real-time diagnostic of systemic democratic erosion since Jan 2025.">
+    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    </head>
+    """, unsafe_allow_html=True)
 
 # 2. WELCOME DIALOG
 @st.dialog("Strategic Note on Facts")
@@ -29,7 +41,7 @@ if "first_visit" not in st.session_state:
     st.session_state.first_visit = True
     show_welcome()
 
-# 3. THEMES & RICH GLOSSARY DATA
+# 3. THEMES & RICH GLOSSARY
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors."},
@@ -48,7 +60,7 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (TOTAL PRECISION LOCK)
+# 4. CSS (PRECISION ANCHORING & SECTION LOCK)
 st.markdown("""
     <style>
         /* 1. NUCLEAR NAV RESET (BLUE-FREE) */
@@ -61,7 +73,7 @@ st.markdown("""
             box-shadow: none !important; transition: 0.2s !important;
         }
 
-        /* 2. PRECISION ANCHORING - Kills section overlap */
+        /* 2. PRECISION ANCHORING - Kills the overlap line */
         [id] { 
             scroll-margin-top: 105px !important; 
             border-top: 1px solid transparent !important; 
@@ -83,6 +95,11 @@ st.markdown("""
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
         }
+        
+        @media (max-width: 768px) {
+            .nav-container, .hero-container { flex-direction: column !important; }
+            .nav-container a, .hero-card { width: 100% !important; }
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -103,7 +120,7 @@ def load_data():
 
 df = load_data()
 
-# 6. HEADER
+# 6. HEADER & ATTRIBUTION
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style="text-align: left;">
@@ -120,7 +137,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 7. SIDEBAR & LOGIC
+# 7. SIDEBAR & SEARCH
 if "search_term" not in st.session_state: st.session_state.search_term = ""
 def sync_sidebar(): st.session_state.search_term = st.session_state.sidebar_search
 def sync_vault(): st.session_state.search_term = st.session_state.vault_search
@@ -155,17 +172,17 @@ if not filtered_df.empty:
     <div class="hero-container">
         <div class="hero-card">
             <p style="margin:0; font-size:0.75rem; opacity:0.7; text-transform:uppercase;">Total Actions</p>
-            <h2 style="margin:5px 0;">{total_actions}</h2>
+            <h2 style="margin:10px 0;">{total_actions}</h2>
             <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Verifiable data (Doubt).</p>
         </div>
         <div class="hero-card" style="border-color: #DE0100; background: rgba(222, 1, 0, 0.05);">
             <p style="margin:0; font-size:0.75rem; color:#DE0100; text-transform:uppercase;">Velocity</p>
-            <h2 style="margin:5px 0; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 0.9rem;">/mo</span></h2>
+            <h2 style="margin:10px 0; color: #DE0100;">{pace_per_month:.1f}<span style="font-size: 0.9rem;">/mo</span></h2>
             <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Institutional rewrite rate.</p>
         </div>
         <div class="hero-card">
             <p style="margin:0; font-size:0.75rem; opacity:0.7; text-transform:uppercase;">Strategic Overlap</p>
-            <h2 style="margin:5px 0;">{overlap:.1f}%</h2>
+            <h2 style="margin:10px 0;">{overlap:.1f}%</h2>
             <p style="margin:0; font-size:0.65rem; opacity:0.6; font-style:italic;">Thematic strikes (Complexity).</p>
         </div>
     </div>
@@ -220,7 +237,7 @@ if not filtered_df.empty:
         gloss_html += '</table></div>'
         st.markdown(gloss_html, unsafe_allow_html=True)
 
-# 12. INSIGHTS (RESTORED CONTENT & SPACING)
+# 12. INSIGHTS
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -239,7 +256,7 @@ if not filtered_df.empty:
     st.markdown("<br>", unsafe_allow_html=True)
     st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 13. WORD CLOUD (TITLE RESTORED)
+# 13. WORD CLOUD
 st.markdown("<div id='words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
