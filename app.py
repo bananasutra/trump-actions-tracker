@@ -23,9 +23,8 @@ st.markdown(f"""
         @media (max-width: 768px) {{
             .hero-container, .nav-container {{ flex-direction: column !important; }}
             .hero-card {{ width: 100% !important; margin-bottom: 10px; }}
- .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
-        .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
-    .
+            .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
+            .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         }}
         [id^="section-"] {{ scroll-margin-top: 75px !important; padding-top: 10px !important; }}
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; }}
@@ -36,9 +35,15 @@ st.markdown(f"""
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
         }}
+        .back-to-top {{ text-align: right; font-size: 0.75rem; opacity: 0.6; }}
+        .back-to-top a {{ color: inherit; text-decoration: none; }}
     </style>
     </head>
+    <div id="top"></div>
     """, unsafe_allow_html=True)
+
+# Helper for the back-to-top link
+back_to_top = '<div class="back-to-top"><a href="#top">⌃ back to top</a></div>'
 
 # 2. THEMES & RICH GLOSSARY DATA
 THEME_GLOSSARY = [
@@ -116,9 +121,6 @@ if df is not None:
     </div>
     """, unsafe_allow_html=True)
 
-# HIDDEN 6. STICKY NAV (RESTORED "WORDS")
-# st.markdown("""<div class="nav-container"><a href="#section-timeline"><button>Timeline</button></a><a href="#section-themes"><button>Themes</button></a><a href="#section-insights"><button>Insights</button></a><a href="#section-words"><button>Words</button></a><a href="#section-search"><button>Search</button></a></div>""", unsafe_allow_html=True)
-
 # 7. TIMELINE & THEMES GRAPHS
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.subheader("Action Progression")
@@ -143,6 +145,7 @@ if not f_df.empty:
         ).properties(width='container', height=400).interactive()
     st.altair_chart(chart, use_container_width=True)
     st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 Hover for diagnostic data. Click points for source URL. Scroll/pinch to zoom.</p>", unsafe_allow_html=True)
+st.markdown(back_to_top, unsafe_allow_html=True)
 
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
@@ -158,6 +161,7 @@ if not f_df.empty:
             gloss_html += f'<tr><td style="padding:8px; font-weight:bold; width:140px; border-bottom:1px solid rgba(128,128,128,0.2);">{row["Theme"]}</td><td style="padding:8px; border-bottom:1px solid rgba(128,128,128,0.2);">{row["Definition"]}</td></tr>'
         gloss_html += '</table></div>'
         st.markdown(gloss_html, unsafe_allow_html=True)
+st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 8. DEEP INSIGHTS 
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
@@ -176,20 +180,7 @@ with c2:
 
 # CENTERED VIDEO
 v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-
-# HIDE 9. WORDS (RESTORED NEON WORD CLOUD)
-# st.markdown("<div id='section-words'></div>", unsafe_allow_html=True)
-# st.divider()
-# st.subheader("☁️ Thematic Word Cloud")
-# if not f_df.empty:
-#    all_titles = " ".join(f_df['Title'].values).lower()
-#    words = re.findall(r'\w+', all_titles)
-#    filtered_words = [w for w in words if len(w) > 4 and w not in {'trump', 'administration', 'order', 'federal'}]
-#    word_counts = Counter(filtered_words).most_common(50)
-#    js_color = "function () { return 'hsl(' + (Math.random() * 360) + ', 100%, ' + (Math.round(Math.random() * 15) + 75) + '%)'; }"
-#    wc_options = {"series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [15, 65], "rotationRange": [0,0], "textStyle": 
-# {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
-#    st_echarts(wc_options, height="450px")
+st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 10. VAULT SEARCH 
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
@@ -197,6 +188,7 @@ st.divider()
 st.subheader("🔍 Search Trump Actions Data Vault")
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
+st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 11. FOOTER
 st.divider()
