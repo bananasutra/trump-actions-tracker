@@ -1,7 +1,10 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import re
+from collections import Counter
 from datetime import datetime
+from streamlit_echarts import st_echarts
 
 # 1. PAGE CONFIG & SEO
 st.set_page_config(
@@ -10,6 +13,16 @@ st.set_page_config(
     layout="wide", 
     initial_sidebar_state="expanded"
 )
+
+# SEO Meta Tags
+st.markdown("""
+    <head>
+    <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
+    <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image">
+    </head>
+    """, unsafe_allow_html=True)
 
 # 2. THEMES & GLOSSARY MAPPING
 THEME_GLOSSARY = [
@@ -262,12 +275,59 @@ if not filtered_df.empty:
         st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point against this velocity, explaining the prioritization of Judicial and DOJ hollowing. Data shows that as federal checks weaken, the 'Blue State Shield' becomes the primary mechanism for preserving the Rule of Law.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite—where the cumulative weight of changes effectively creates a new, non-democratic operating system for the federal government.")
 
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style="background: rgba(255, 255, 255, 0.03); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px;">
+            <p style="font-style: italic; margin-bottom: 5px;">
+                "The whole problem with the world is that fools and fanatics are always so certain of themselves, and wiser people so full of doubts."
+            </p>
+            <p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p>
+            <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.8;">
+                In an era of administrative certainty, this tracker serves as a tool for the 'wise'—those who prefer 
+                verifiable data over rhetoric. By mapping the interconnectivity of executive actions, we move from 
+                doubt to a precise diagnostic of institutional change.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("<br><h4 style='text-align: center;'>Methodology Context & Expert Analysis</h4>", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 15. SEARCH DATA VAULT (SYNCED & CLICKABLE LINKS)
+# 15. THEMATIC WORD CLOUD (NEW SECTION)
+st.markdown("<div id='wordcloud'></div>", unsafe_allow_html=True)
+st.divider()
+st.subheader("☁️ Thematic Word Cloud")
+st.write("Visualizing the most frequent keywords across all tracked actions in the current window.")
+
+if not filtered_df.empty:
+    stop_words = {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president'}
+    all_titles = " ".join(filtered_df['Title'].values).lower()
+    words = re.findall(r'\w+', all_titles)
+    filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
+    word_counts = Counter(filtered_words).most_common(50)
+
+    wordcloud_options = {
+        "tooltip": {"show": True},
+        "series": [{
+            "type": "wordCloud",
+            "shape": "circle",
+            "gridSize": 10,
+            "sizeRange": [12, 60],
+            "rotationRange": [-45, 90],
+            "textStyle": {
+                "fontFamily": "sans-serif",
+                "fontWeight": "bold",
+                "color": "function () { return 'rgb(' + [Math.round(Math.random() * 160), Math.round(Math.random() * 160), Math.round(Math.random() * 160)].join(',') + ')'; }"
+            },
+            "data": [{"name": word, "value": count} for word, count in word_counts]
+        }]
+    }
+    st_echarts(wordcloud_options, height="400px")
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
+
+# 16. SEARCH DATA VAULT (SYNCED & CLICKABLE LINKS)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
@@ -276,7 +336,6 @@ st.text_input("Filter the vault directly...", key="vault_search", on_change=sync
 
 if not filtered_df.empty:
     v_df = display_df.sort_values('Date', ascending=False)
-    # CRITICAL FIX: Explicit LinkColumn configuration
     st.dataframe(
         v_df[['Date', 'Title', 'URL', 'Themes_List']], 
         column_config={
