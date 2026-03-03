@@ -71,7 +71,7 @@ if "first_visit" not in st.session_state:
     st.session_state.first_visit = True
     show_welcome()
 
-# 5. SEARCH SYNC
+# 5. SEARCH SYNC CALLBACKS
 if "search_term" not in st.session_state:
     st.session_state.search_term = ""
 
@@ -81,7 +81,7 @@ def sync_sidebar():
 def sync_vault():
     st.session_state.search_term = st.session_state.vault_search
 
-# 6. SIDEBAR
+# 6. SIDEBAR & RESET LOGIC
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Global Search", key="sidebar_search", on_change=sync_sidebar, value=st.session_state.search_term)
 st.sidebar.divider()
@@ -97,6 +97,17 @@ if df is not None:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
     filtered_df = df.loc[mask]
 
+    def reset_filters():
+        st.session_state.search_term = ""
+        st.session_state.sidebar_search = ""
+        st.session_state.vault_search = ""
+        st.session_state.comparison_mode = False
+        st.session_state.filter_area = "All Actions"
+        st.session_state.date_range = (min_date, max_date)
+
+    st.sidebar.divider()
+    st.sidebar.button("🧹 Clear All Filters", on_click=reset_filters, use_container_width=True)
+
 # 7. BRANDED HEADER
 st.markdown("""
     <style>
@@ -111,7 +122,7 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
-# 8. HERO STATS (THEME-PROOF)
+# 8. HERO STATS & RESTORED TIPS
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -135,37 +146,78 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV
+    st.markdown(f"""
+    <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: -10px; padding: 0 5px; opacity: 0.8; font-size: 0.85rem;">
+        <div style="flex: 1;">⚡ <b>Velocity:</b> Institutional rewrite rate.</div>
+        <div style="flex: 1; text-align: center;">🧩 <b>Complexity:</b> interlocking strikes.</div>
+        <div style="flex: 1; text-align: right;">🔭 <b>Verifiable Doubt</b> > Certainty.</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# 9. STICKY NAV (ADAPTIVE BUTTONS FIX)
 st.markdown("""
     <style>
-        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { position: sticky; top: 2.875rem; z-index: 999; background: transparent; backdrop-filter: blur(8px); padding: 10px 0; }
-        [id] { scroll-margin-top: 130px !important; }
+        div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
+            position: sticky; top: 2.875rem; z-index: 999; 
+            background: transparent; backdrop-filter: blur(8px); padding: 10px 0; 
+        }
+        /* Adaptive Border/Text based on current theme */
+        .nav-button {
+            width: 100%; padding: 10px; border-radius: 5px; 
+            border: 1px solid currentColor; 
+            background: transparent; 
+            color: inherit; 
+            font-weight: bold; cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+        .nav-button:hover { opacity: 0.6; }
+        /* Anchor Padding Fix */
+        [id] { scroll-margin-top: 150px !important; }
         .quote-container { background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px; }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
-        <a href="#timeline" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Timeline</button></a>
-        <a href="#themes" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Themes</button></a>
-        <a href="#insights" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Insights</button></a>
-        <a href="#words" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Words</button></a>
-        <a href="#search" style="text-decoration: none; flex: 1;"><button style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #DE0100; background: transparent; color: inherit; font-weight: bold; cursor: pointer;">Search</button></a>
+        <a href="#timeline" style="text-decoration: none; flex: 1;"><button class="nav-button">Timeline</button></a>
+        <a href="#themes" style="text-decoration: none; flex: 1;"><button class="nav-button">Themes</button></a>
+        <a href="#insights" style="text-decoration: none; flex: 1;"><button class="nav-button">Insights</button></a>
+        <a href="#words" style="text-decoration: none; flex: 1;"><button class="nav-button">Words</button></a>
+        <a href="#search" style="text-decoration: none; flex: 1;"><button class="nav-button">Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE
+# 10. TIMELINE (RESTORED COMPARISON CHART)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
-    chart_df = filtered_df.copy().sort_values('Date')
-    chart_df['Cumulative'] = range(1, len(chart_df) + 1)
-    
-    line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
-        x=alt.X('Date:T', title='Timeline'),
-        y=alt.Y('Cumulative:Q', title='Total Actions'),
-        tooltip=['Date', 'Title', 'Themes_List']
-    ).properties(height=400).interactive()
-    st.altair_chart(line, use_container_width=True)
+    if comparison_mode:
+        st.subheader("Velocity Analysis: Comparative Growth")
+        long_cats = list(CATEGORY_MAP.keys())
+        comp_df = filtered_df.melt(id_vars=['Date', 'Title'], value_vars=long_cats, var_name='Mapping', value_name='Active')
+        comp_df = comp_df[comp_df['Active'].str.strip().str.lower() == 'yes']
+        comp_df['Theme'] = comp_df['Mapping'].map(CATEGORY_MAP)
+        comp_df = comp_df.sort_values('Date')
+        comp_df['Cumulative'] = comp_df.groupby('Theme').cumcount() + 1
+        
+        comp_chart = alt.Chart(comp_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
+            x=alt.X('Date:T', title='Timeline'),
+            y=alt.Y('Cumulative:Q', title='Actions'),
+            color=alt.Color('Theme:N', scale=alt.Scale(scheme='category10')),
+            tooltip=['Date', 'Theme', 'Cumulative']
+        ).properties(height=450).interactive()
+        st.altair_chart(comp_chart, use_container_width=True)
+    else:
+        st.subheader(f"Timeline Progression: {selected_short}")
+        chart_df = filtered_df.copy().sort_values('Date')
+        if selected_short != "All Actions":
+            chart_df = chart_df[chart_df[SHORT_TO_LONG[selected_short]].str.strip().str.lower() == 'yes']
+        chart_df['Cumulative'] = range(1, len(chart_df) + 1)
+        
+        line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(
+            x=alt.X('Date:T', title='Timeline'),
+            y=alt.Y('Cumulative:Q', title='Total Actions'),
+            tooltip=['Date', 'Title']
+        ).properties(height=400).interactive()
+        st.altair_chart(line, use_container_width=True)
 
-# 11. THEMES (THEMATIC DONUT)
-
+# 11. THEMES (DONUT)
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🌹 Thematic Distribution (Donut)")
@@ -187,7 +239,7 @@ if not filtered_df.empty:
     }
     st_echarts(donut_options, height="450px")
 
-# 12. INSIGHTS (RESTORED FULL CONTENT)
+# 12. INSIGHTS (RESTORED ANALYSIS)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -221,11 +273,18 @@ if not filtered_df.empty:
     wc_options = {"backgroundColor": "transparent", "series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [16, 70], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
     st_echarts(wc_options, height="450px")
 
-# 14. VAULT
+# 14. SEARCH VAULT (ACTIVE LINKS)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
-    st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
+    st.dataframe(
+        filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), 
+        column_config={
+            "URL": st.column_config.LinkColumn("Source"), 
+            "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")
+        },
+        use_container_width=True, hide_index=True
+    )
 st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
