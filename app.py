@@ -63,7 +63,7 @@ def load_data():
 
 df = load_data()
 
-# 4. STRATEGIC DIALOG
+# 4. STRATEGIC DIALOG (FACTS OVER OPINIONS)
 @st.dialog("Strategic Note on Facts")
 def show_welcome():
     st.markdown("""
@@ -162,7 +162,7 @@ st.markdown("""
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
-# 8. HERO STATS (RESPONSIVE)
+# 8. HERO STATS
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -186,7 +186,7 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 9. STICKY NAV & ANCHOR STYLES
+# 9. STICKY NAV
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { position: sticky; top: 2.875rem; z-index: 999; background-color: #0e1117; padding: 20px 0; }
@@ -233,7 +233,7 @@ if not filtered_df.empty:
         st.altair_chart((line + points).interactive(), use_container_width=True)
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 12. THEMES & GLOSSARY
+# 12. THEMES
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -259,7 +259,7 @@ if not filtered_df.empty:
             st.link_button("🚀 View Source", row['URL'])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 14. DEEP INSIGHTS (RESTORED ANALYSIS)
+# 14. DEEP INSIGHTS
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -268,15 +268,14 @@ if not filtered_df.empty:
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate. In strategic terms, this volume induces 'procedural shock'—where the sheer number of executive orders and policy shifts exhausts the bandwidth of civil society, journalists, and the legal system.")
+        st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate.")
         st.markdown("#### Norm-Collapse Loops")
         st.write(f"**Interconnectivity:** {overlap:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation remains the primary friction point against this velocity, explaining the prioritization of Judicial hollowing.")
-        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite.")
+        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point.")
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**.")
 
-    st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
         <div style="background: rgba(255, 255, 255, 0.03); border-left: 5px solid #DE0100; padding: 20px; border-radius: 5px;">
             <p style="font-style: italic; margin-bottom: 5px;">
@@ -286,16 +285,14 @@ if not filtered_df.empty:
         </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("<br><h4 style='text-align: center;'>Methodology Context & Expert Analysis</h4>", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 15. THEMATIC WORD CLOUD (DARK MODE OPTIMIZED)
+# 15. WORD CLOUD (FIXED SYNTAX)
 st.markdown("<div id='wordcloud'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
-st.write("Hover over words to see frequency. Optimized for high contrast.")
 
 if not filtered_df.empty:
     stop_words = {'the', 'and', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from', 'up', 'about', 'into', 'over', 'after', 'trump', 'administration', 'order', 'federal', 'u.s.', 'president', 'will', 'this', 'that'}
@@ -303,6 +300,9 @@ if not filtered_df.empty:
     words = re.findall(r'\w+', all_titles)
     filtered_words = [w for w in words if w not in stop_words and len(w) > 3]
     word_counts = Counter(filtered_words).most_common(50)
+
+    # REPAIRED JAVASCRIPT STRING
+    js_color = "function () { return 'rgb(' + [Math.round(Math.random() * 200 + 55), Math.round(Math.random() * 200 + 55), Math.round(Math.random() * 200 + 55)].join(',') + ')'; }"
 
     wordcloud_options = {
         "tooltip": {"show": True},
@@ -315,4 +315,27 @@ if not filtered_df.empty:
             "textStyle": {
                 "fontFamily": "sans-serif",
                 "fontWeight": "bold",
-                "color": "function () { return 'rgb(' + [Math.round(Math.random() * 200 + 55), Math.round(
+                "color": js_color
+            },
+            "data": [{"name": word, "value": count} for word, count in word_counts]
+        }]
+    }
+    st_echarts(wordcloud_options, height="450px", theme="dark")
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
+
+# 16. VAULT
+st.markdown("<div id='search'></div>", unsafe_allow_html=True)
+st.divider()
+st.subheader("🔍 Search Data Vault")
+st.text_input("Filter the vault directly...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
+
+if not filtered_df.empty:
+    v_df = display_df.sort_values('Date', ascending=False)
+    st.dataframe(
+        v_df[['Date', 'Title', 'URL', 'Themes_List']], 
+        column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")},
+        use_container_width=True, hide_index=True
+    )
+st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
+
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
