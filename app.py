@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# RESTORED: SEO Workaround for Social Media Previews
+# SEO Workaround for Social Media Previews
 st.markdown("""
     <head>
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
@@ -63,22 +63,23 @@ df, cat_cols = load_data()
 query_params = st.query_params
 default_area = query_params.get("area", "All Actions")
 
-# 5. HEADER & VELOCITY METRICS
+# 5. HEADER (RESTRUCTURED)
 st.title("🙊 U.S. Democracy Gone Bananas")
-st.markdown("**Data Source:** [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
+# Subheader moved right under title
+st.markdown("#### A strategic diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
+
+# Source information moved into st.info
+st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
 if not df.empty:
     total_actions = len(df)
     days_active = (df['Date'].max() - df['Date'].min()).days
     pace_per_month = (total_actions / max(days_active, 1)) * 30.44
-    last_update = df['Date'].max().strftime('%b %d, %Y')
     
     m1, m2, m3 = st.columns(3)
-    m1.metric("Total Actions Logged", f"{total_actions}", f"Updated {last_update}", delta_color="off")
+    m1.metric("Total Actions Logged", f"{total_actions}")
     m2.metric("Current Velocity", f"{pace_per_month:.1f} / mo", delta="⚠️ Critical Pace", delta_color="inverse")
-    m3.metric("Strategic Overlap", f"{(len(df[df['Cat_Count'] > 1]) / total_actions * 100):.1f}%", help="Percentage of actions impacting multiple democratic norms simultaneously.")
-
-st.info("**Context:** A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025.")
+    m3.metric("Strategic Overlap", f"{(len(df[df['Cat_Count'] > 1]) / total_actions * 100):.1f}%")
 
 # 6. STICKY GHOST NAVIGATION
 st.markdown("""
@@ -125,8 +126,8 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 9. TIMELINE
-st.markdown("<div id='timeline' style='padding-top: 60px;'></div>", unsafe_allow_html=True)
+# 9. TIMELINE (SPACING ADJUSTED)
+st.markdown("<div id='timeline' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Theme Growth")
     if not df_comp.empty:
@@ -145,12 +146,11 @@ else:
     )
     st.altair_chart((line + points).interactive(), use_container_width=True)
 
-# RESTORED: Progression Chart Tips
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Search section for stable links.")
 st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Data Vault for direct source links.")
 
-# 10. THEMES & GLOSSARY
-st.markdown("<div id='themes' style='padding-top: 60px;'></div>", unsafe_allow_html=True)
+# 10. THEMES (LABEL COLUMN OPTIMIZED)
+st.markdown("<div id='themes' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
 cat_counts = []
@@ -161,16 +161,17 @@ for long, short in CATEGORY_MAP.items():
 
 if cat_counts:
     bar_df = pd.DataFrame(cat_counts).sort_values('Count', ascending=False)
+    # y=alt.Y with more space (fit for desktop, adaptive for mobile)
     st.altair_chart(alt.Chart(bar_df).mark_bar(color='#DE0100').encode(
         x=alt.X('Count:Q', title='Volume'),
-        y=alt.Y('Category:N', sort='-x', title=None)
+        y=alt.Y('Category:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300))
     ).properties(height=len(bar_df) * 40 + 50), use_container_width=True)
 
 with st.expander("📖 Category Glossary"):
     st.table(pd.DataFrame({"Theme": list(SHORT_TO_LONG.keys()), "Definition": list(SHORT_TO_LONG.values())}))
 
 # 11. LATEST
-st.markdown("<div id='latest' style='padding-top: 60px;'></div>", unsafe_allow_html=True)
+st.markdown("<div id='latest' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
 latest_view = display_df.sort_values('Date', ascending=False).head(5)
@@ -180,8 +181,8 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes_List']}")
         st.link_button("🚀 View Source", row['URL'])
 
-# 12. DEEP INSIGHTS (RESTORED FULL ANALYTICAL DEPTH)
-st.markdown("<div id='insights' style='padding-top: 60px;'></div>", unsafe_allow_html=True)
+# 12. DEEP INSIGHTS
+st.markdown("<div id='insights' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
 
@@ -209,7 +210,7 @@ if not df.empty:
         st.markdown("</div>", unsafe_allow_html=True)
 
 # 13. SEARCH DATA VAULT
-st.markdown("<div id='search' style='padding-top: 60px;'></div>", unsafe_allow_html=True)
+st.markdown("<div id='search' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 search = st.text_input("Filter Data...", placeholder="Type keywords...")
@@ -222,4 +223,5 @@ st.dataframe(
     use_container_width=True, hide_index=True
 )
 
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Updated Mar 2026. CC BY 4.0.")
+# 14. FOOTER (UPDATED AS REQUESTED)
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-02-2026. CC BY 4.0.")
