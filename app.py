@@ -22,7 +22,7 @@ st.markdown(f"""
     <style>
         @media (max-width: 768px) {{
             .hero-container, .nav-container, .intro-container {{ flex-direction: column !important; }}
-            .hero-card, .intro-column {{ width: 100% !important; margin-bottom: 10px; }}
+            .hero-card {{ width: 100% !important; margin-bottom: 10px; }}
             .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
             .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         }}
@@ -31,15 +31,6 @@ st.markdown(f"""
         [id^="section-"] {{ scroll-margin-top: 120px !important; }}
         
         /* Layout Elements */
-        .intro-container {{ display: flex; gap: 20px; margin-bottom: 20px; }}
-        .intro-column {{ 
-            flex: 1; 
-            background: rgba(128, 128, 128, 0.05); 
-            padding: 20px; 
-            border-radius: 12px; 
-            border: 1px solid rgba(128, 128, 128, 0.1);
-        }}
-        
         .hero-container {{ 
             display: flex; 
             justify-content: space-between; 
@@ -66,20 +57,34 @@ st.markdown(f"""
         
         /* Typography */
         .russell-quote {{
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             line-height: 1.4;
-            max-width: 850px;
-            margin: 30px 0 10px 0;
-            padding-left: 20px;
+            max-width: 800px;
+            margin: 25px 0 8px 0;
+            padding-left: 18px;
             border-left: 3px solid rgba(128, 128, 128, 0.3);
             font-weight: 500;
+            font-style: italic;
         }}
         .quote-author {{
             text-align: left;
-            padding-left: 20px;
-            font-size: 1rem;
+            padding-left: 21px;
+            font-size: 0.95rem;
+            font-weight: bold;
             opacity: 0.8;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+        }}
+        
+        .intro-header {{
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }}
+        .intro-text {{
+            font-size: 0.9rem;
+            line-height: 1.6;
+            opacity: 0.8;
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -96,7 +101,7 @@ st.markdown(f"""
 # Helper for the back-to-top link
 back_to_top = '<div class="back-to-top"><a href="#top">⌃ back to top</a></div>'
 
-# 2. THEMES & RICH GLOSSARY DATA
+# 2. THEMES & DATA MAPPING
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Systematic removal of protections for marginalized groups like LGBTQ+ communities and minorities."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors."},
@@ -115,7 +120,7 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. DATA ENGINE & SEARCH SYNC
+# 3. DATA ENGINE
 if "q" not in st.session_state: st.session_state.q = ""
 def sync_s(): st.session_state.q = st.session_state.side_q
 def sync_v(): st.session_state.q = st.session_state.vault_q
@@ -133,7 +138,7 @@ def get_data():
 
 df = get_data()
 
-# 4. DATA CONTROL SIDEBAR
+# 4. SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Search Actions", key="side_q", on_change=sync_s, value=st.session_state.q)
 comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
@@ -152,13 +157,16 @@ if df is not None:
         st.session_state.comp_mode = False
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 5. HEADER & HERO SECTION
+# 5. HEADER SECTION
 st.markdown("""
     <div style="text-align: left;">
         <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-        <p style="font-size:0.85rem; opacity:0.7; margin:5px 0 20px 0;">
-            Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by Professor Christina Pagel | 
-            <a href="https://creativecommons.org/" target="_blank" style="color:inherit;">Creative Commons License</a>
+        <p style="font-weight: bold; font-size: 1.1rem; margin: 5px 0 0 0; opacity: 0.95;">
+            An interactive diagnostic for curious, conscious, and caring humans—because facts should always trump opinions.
+        </p>
+        <p style="font-size:0.8rem; opacity:0.7; margin:5px 0 20px 0; line-height: 1.4;">
+            Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <b>Professor Christina Pagel</b> | 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit;">Creative Commons CC BY 4.0</a>
         </p>
         <div class="russell-quote">
             "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt."
@@ -176,23 +184,14 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    # TWIN COLUMN INTRO & HOW-TO
-    st.markdown(f"""
-    <div class="intro-container">
-        <div class="intro-column">
-            <p style="margin:0 0 10px 0; font-size:1.1rem; font-weight:bold; opacity:0.9;">The Diagnostic Intent</p>
-            <p style="margin:0; font-size:0.9rem; opacity:0.85; line-height:1.6;">
-                Authoritarianism thrives on "cocksure" rhetoric that obscures institutional reality. This interactive diagnostic is a sanctuary for the curious: a place to measure the exact volume and velocity of the democratic dismantle. It is time to replace doubt with documentation. In this vault, <b>data trumps opinion.</b>
-            </p>
-        </div>
-        <div class="intro-column">
-            <p style="margin:0 0 10px 0; font-size:1.1rem; font-weight:bold; opacity:0.9;">How to Investigate</p>
-            <p style="margin:0; font-size:0.9rem; opacity:0.85; line-height:1.6;">
-                This is a tool for conscious investigation: all metrics and charts sync to your search and filters. Use the <b>Sidebar</b> to isolate threats and compare the <b>Volume</b>, <b>Velocity</b>, and <b>Complexity</b> of specific efforts to rewrite the American state.
-            </p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # WHY & HOW COLUMNS
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown('<p class="intro-header">Why democracy matters</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">The future of our democracy rests on the stability of its guardrails. We measure the <b>Volume, Velocity, and Complexity</b> of these actions to move past "cocksure" rhetoric and confront the structural dismantle of our state. Documentation is our most vital tool for protecting a collective future.</p>', unsafe_allow_html=True)
+    with col2:
+        st.markdown('<p class="intro-header">How to use this tool</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">This is an interactive dashboard; all metrics and charts sync to your inputs. Use the <b>Sidebar</b> to search specific terms (like "<b>Musk</b>" or "<b>Deportation</b>") and filter by <b>Theme</b> to investigate specific threats in real-time. Toggle <b>Comparison Mode</b> to see targeted pillars.</p>', unsafe_allow_html=True)
 
     st.divider()
     st.subheader("Institutional Health Diagnostic")
@@ -222,7 +221,7 @@ if df is not None:
     </div>
     """, unsafe_allow_html=True)
 
-# 7. TIMELINE & THEMES GRAPHS
+# 7. TIMELINE & THEMES
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Progression")
@@ -233,7 +232,6 @@ if not f_df.empty:
         comp_plot_df = comp_plot_df[comp_plot_df['Active'].str.strip().str.lower() == 'yes']
         comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
         comp_plot_df['Cumulative'] = comp_plot_df.groupby('Theme').cumcount() + 1
-        
         chart = alt.Chart(comp_plot_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x='Date:T', y='Cumulative:Q', color='Theme:N', href='URL:N',
             tooltip=['Date:T', 'Title:N', 'Theme:N', 'Cumulative:Q']
@@ -246,7 +244,7 @@ if not f_df.empty:
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), alt.Tooltip('Title:N', title='Action'), alt.Tooltip('Themes_List:N', title='Themes Hit'), alt.Tooltip('URL:N', title='Source URL')]
         ).properties(width='container', height=400).interactive()
     st.altair_chart(chart, use_container_width=True)
-    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 Hover for diagnostic data. Click points for source URL. Scroll/pinch to zoom.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 Hover for diagnostic data. Click points for source URL.</p>", unsafe_allow_html=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
@@ -265,26 +263,25 @@ if not f_df.empty:
         st.markdown(gloss_html, unsafe_allow_html=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 8. DEEP INSIGHTS 
+# 8. DEEP INSIGHTS
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Deep Insights: Strategic Diagnostic")
 c1, c2 = st.columns(2)
 with c1:
     st.markdown("#### Saturation Strategy & Attrition")
-    st.write("Ensuring the rate of institutional rewrite outpaces judicial processing latency induces 'procedural shock,' allowing the administration to effectively outpace traditional oversight.")
+    st.write("Ensuring the rate of institutional rewrite outpaces judicial processing latency induces 'procedural shock.'")
     st.markdown("#### Resistance Heatmap")
-    st.write("Opposition friction is concentrated in state-level litigation hubs (CA, NY, WA). These remain the primary constraints on administrative velocity.")
+    st.write("Opposition friction is concentrated in state-level litigation hubs (CA, NY, WA).")
 with c2:
     st.markdown("#### Norm-Collapse Loops")
-    st.write("Interlocking thematic strikes hit multiple pillars simultaneously. If one avenue is blocked by a court, a secondary strike in a different domain maintains the strategic objective.")
-    st.warning("**Diagnostic Projection:** Current trends suggest a total institutional dismantle prior to the 2028 electoral cycle.")
+    st.write("Interlocking thematic strikes hit multiple pillars simultaneously.")
+    st.warning("**Diagnostic Projection:** Current trends suggest total institutional dismantle prior to 2028.")
 
-# CENTERED VIDEO
 v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 10. VAULT SEARCH 
+# 10. VAULT SEARCH
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Search Trump Actions Data Vault")
