@@ -11,14 +11,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# RESTORED: Full SEO Workaround including OG Image
 st.markdown("""
     <head>
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
     <meta property="og:description" content="A strategic diagnostic of systemic democratic erosion in the U.S. since Jan 2025." />
+    <meta property="og:image" content="https://raw.githubusercontent.com/your-username/your-repo/main/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image">
     </head>
     """, unsafe_allow_html=True)
 
-# 2. THEMES & GLOSSARY MAPPING (UNIFIED)
+# 2. THEMES & GLOSSARY MAPPING
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption and Enrichment: Actions that directly enrich the president, his family, or his cabinet, or that trade political favors for wealth."},
@@ -85,12 +88,16 @@ if df is not None:
     </div>
     """, unsafe_allow_html=True)
 
-# 5. STICKY NAVIGATION (SPACED)
+# 5. STICKY NAVIGATION & ANCHOR FIX
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {
             position: sticky; top: 2.875rem; z-index: 999; 
             background-color: #0e1117; padding: 20px 0;
+        }
+        /* Fixed scroll anchoring for Section Headlines */
+        [id] {
+            scroll-margin-top: 110px !important;
         }
     </style>
     <div class="nav-container" style="display: flex; justify-content: space-between; gap: 8px;">
@@ -131,8 +138,8 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 8. TIMELINE (40px padding fixed)
-st.markdown("<div id='timeline' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
+# 8. TIMELINE
+st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Theme Growth")
     if not display_df.empty:
@@ -153,8 +160,8 @@ else:
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Search section for stable links.")
 st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Search section for direct source links.")
 
-# 9. THEMES & GLOSSARY (40px padding fixed)
-st.markdown("<div id='themes' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
+# 9. THEMES & GLOSSARY
+st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
 cat_counts = []
@@ -173,8 +180,8 @@ if cat_counts:
 with st.expander("📖 Themes Glossary"):
     st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 
-# 10. LATEST (40px padding fixed)
-st.markdown("<div id='latest' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
+# 10. LATEST
+st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions: {selected_short}")
 latest_view = display_df.sort_values('Date', ascending=False).head(5)
@@ -184,8 +191,8 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes_List']}")
         st.link_button("🚀 View Source", row['URL'])
 
-# 11. DEEP INSIGHTS (RESTORED FULL STRATEGIC ANALYSIS)
-st.markdown("<div id='insights' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
+# 11. DEEP INSIGHTS (RESTORED DEPTH)
+st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
 if df is not None:
@@ -195,20 +202,19 @@ if df is not None:
         st.markdown("#### Strategic Velocity & Attrition")
         st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This is designed to ensure judicial **processing latency** remains higher than the implementation rate. In strategic terms, this volume induces 'procedural shock'—where the sheer number of executive orders and policy shifts exhausts the bandwidth of civil society, journalists, and the legal system.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a move toward a total administrative rewrite—where the cumulative weight of changes effectively creates a new, non-democratic operating system for the federal government.")
-        
         st.markdown("#### Norm-Collapse Loops")
         st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously. For example, an action targeting federal civil service (Hollowing State) often simultaneously limits scientific research (Control of Science) and restricts public access to information (Info Control).")
 
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition is currently concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point against this velocity, explaining the administration's prioritization of Judicial and DOJ hollowing. Data shows that as federal checks weaken, the 'Blue State Shield' becomes the primary mechanism for preserving the Rule of Law, though its efficacy is increasingly challenged by federal pre-emption orders.")
+        st.write("Opposition is concentrated in state-level hubs (CA, WA, NY, IL). Litigation acts as the primary friction point against this velocity, explaining the prioritization of Judicial and DOJ hollowing. Data shows that as federal checks weaken, the 'Blue State Shield' becomes the primary mechanism for preserving the Rule of Law, though its efficacy is increasingly challenged by federal pre-emption orders.")
         st.markdown("<div style='padding-top: 20px;'>", unsafe_allow_html=True)
         st.markdown("**Methodology Context:**")
         st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 12. SEARCH (40px padding fixed)
-st.markdown("<div id='search' style='padding-top: 40px;'></div>", unsafe_allow_html=True)
+# 12. SEARCH
+st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 search = st.text_input("Filter Data...", placeholder="Type keywords...")
