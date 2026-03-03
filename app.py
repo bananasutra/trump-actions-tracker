@@ -124,49 +124,54 @@ if df is not None:
 else:
     filtered_df = pd.DataFrame()
 
-# 6. ELEGANT DREAMY BRANDED HEADER
+# 6. ELEGANT BRANDED HEADER (MINIMALIST & ALIGNED)
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 
 st.markdown("""
     <style>
+        .brand-container {
+            max-width: 1200px;
+            margin-bottom: 30px; 
+        }
         .brand-link { 
             text-decoration: none !important; 
             color: inherit !important; 
             display: flex; 
             align-items: center; 
-            gap: 15px; 
-            margin-bottom: -10px; 
+            gap: 20px;
         }
         .brand-link h1 {
             color: inherit !important;
             text-decoration: none !important;
-            margin: 0;
+            margin: 0 !important;
             font-weight: 700;
+            line-height: 1.1;
+            font-size: calc(1.5rem + 1.5vw);
         }
         .brand-logo { 
-            font-size: 3rem; 
-            background: rgba(255, 255, 255, 0.05); 
-            padding: 5px 15px; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
-            color: inherit !important;
+            font-size: 2.5rem;
+            background: transparent; 
+            padding: 5px 0px;
+            /* THE DREAMY PART: Slow, subtle zoom */
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .brand-link:hover .brand-logo { 
-            background: rgba(222, 1, 0, 0.1); 
-            border-color: #DE0100; 
-            transform: scale(1.05); 
-            box-shadow: 0px 0px 15px rgba(222, 1, 0, 0.2);
+            transform: scale(1.1); 
         }
         .brand-link:hover h1 {
-            opacity: 0.6;
+            opacity: 0.7;
             transition: opacity 0.8s ease;
         }
     </style>
-    <a href="https://trump-actions-tracker.streamlit.app/" target="_self" class="brand-link">
-        <div class="brand-logo">🍌</div>
-        <div><h1>U.S. Democracy Gone Bananas</h1></div>
-    </a>
+    <div class="brand-container">
+        <a href="https://trump-actions-tracker.streamlit.app/" target="_self" class="brand-link">
+            <div class="brand-logo">🍌</div>
+            <div><h1>U.S. Democracy Gone Bananas</h1></div>
+        </a>
+    </div>
 """, unsafe_allow_html=True)
 
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
@@ -285,7 +290,7 @@ if not filtered_df.empty:
             st.link_button("🚀 View Source", row['URL'])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 13. DEEP INSIGHTS (WITH BERTRAND MOMENT)
+# 13. DEEP INSIGHTS (WITH THE BERTRAND MOMENT)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
