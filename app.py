@@ -142,8 +142,7 @@ st.markdown("""
             <h1 class="main-header">U.S. Democracy Gone Bananas</h1>
         </a>
         <p class="sub-header">A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).</p>
-        <p class="source-line">
-            Dashboard by <b>Celine Nadeau</b> | 
+        <p class="source-line"> 
             Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank">Christina Pagel / Trump Action Tracker Info</a> | 
             Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
         </p>
@@ -285,4 +284,4 @@ st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
