@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK (CRITICAL)
+# 1. PAGE CONFIG & SEO HACK (DO NOT REMOVE)
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -14,6 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# THE OG SEO WORKAROUND (Syntax-Safe)
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
@@ -23,7 +24,7 @@ st.markdown(f"""
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     <style>
-        /* PRECISION ANCHORING WORKAROUND */
+        /* PRECISION ANCHORING WORKAROUND - Doubled Braces for f-string safety */
         .anchor {{
             display: block;
             position: relative;
@@ -38,7 +39,7 @@ st.markdown(f"""
             font-weight: bold !important; background-color: transparent !important;
             border: 1px solid currentColor !important; color: inherit !important; 
             box-shadow: none !important; transition: 0.2s !important;
-        }
+        }}
         /* STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
@@ -63,7 +64,7 @@ if "first_visit" not in st.session_state:
     st.session_state.first_visit = True
     show_welcome()
 
-# 3. THEMES & RICH GLOSSARY
+# 3. THEMES & GLOSSARY DATA
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: A systematic removal of protections for marginalized groups like LGBTQ+ communities, immigrants, and minorities."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors."},
@@ -197,7 +198,7 @@ if not filtered_df.empty:
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
 
-# 10. INSIGHTS (RESTORED CONTENT & SPACING)
+# 10. INSIGHTS (CONTENT FULLY RESTORED)
 st.markdown("<a class='anchor' id='insights-anchor'></a>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
