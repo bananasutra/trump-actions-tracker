@@ -21,8 +21,8 @@ st.markdown(f"""
     <meta name="description" content="Strategic diagnostic of authoritarian velocity and institutional rewrite (2025-2026).">
     <style>
         @media (max-width: 768px) {{
-            .hero-container, .nav-container {{ flex-direction: column !important; }}
-            .hero-card {{ width: 100% !important; margin-bottom: 10px; }}
+            .hero-container, .nav-container, .intro-container {{ flex-direction: column !important; }}
+            .hero-card, .intro-column {{ width: 100% !important; margin-bottom: 10px; }}
             .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
             .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         }}
@@ -30,12 +30,22 @@ st.markdown(f"""
         #top {{ scroll-margin-top: 100px; }}
         [id^="section-"] {{ scroll-margin-top: 120px !important; }}
         
+        /* Layout Elements */
+        .intro-container {{ display: flex; gap: 20px; margin-bottom: 20px; }}
+        .intro-column {{ 
+            flex: 1; 
+            background: rgba(128, 128, 128, 0.05); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(128, 128, 128, 0.1);
+        }}
+        
         .hero-container {{ 
             display: flex; 
             justify-content: space-between; 
             gap: 15px; 
             margin-bottom: 25px; 
-            align-items: stretch; /* Ensures equal height across cards */
+            align-items: stretch;
         }}
         .hero-card {{ 
             flex: 1; 
@@ -46,15 +56,32 @@ st.markdown(f"""
             text-align: center;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Aligns header to top and subtext to bottom */
+            justify-content: space-between;
             transition: all 0.2s ease;
         }}
         .hero-card:hover {{
             border-color: rgba(128, 128, 128, 0.4);
             transform: translateY(-2px);
         }}
-        .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
-        .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
+        
+        /* Typography */
+        .russell-quote {{
+            font-size: 1.3rem;
+            line-height: 1.4;
+            max-width: 850px;
+            margin: 30px 0 10px 0;
+            padding-left: 20px;
+            border-left: 3px solid rgba(128, 128, 128, 0.3);
+            font-weight: 500;
+        }}
+        .quote-author {{
+            text-align: left;
+            padding-left: 20px;
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }}
+        
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
@@ -125,11 +152,20 @@ if df is not None:
         st.session_state.comp_mode = False
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 5. HEADER & HERO BOXES
-st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-<p style="font-style: italic; opacity:0.7; margin:15px 0 5px 0; line-height:1.4;">"The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt." — Bertrand Russell</p>
-<p style="opacity:0.8; margin:5px 0 15px 0; line-height:1.6;">Authoritarianism thrives on "cocksure" rhetoric that obscures institutional reality. This interactive diagnostic is a sanctuary for the curious: a place to measure the exact volume and velocity of the democratic dismantle. It is time to replace doubt with documentation. In this vault, data trumps opinion.</p>
-<p style="font-size:0.8rem; opacity:0.6; margin:0;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" style="color:inherit;" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
+# 5. HEADER & HERO SECTION
+st.markdown("""
+    <div style="text-align: left;">
+        <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
+        <p style="font-size:0.85rem; opacity:0.7; margin:5px 0 20px 0;">
+            Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by Professor Christina Pagel | 
+            <a href="https://creativecommons.org/" target="_blank" style="color:inherit;">Creative Commons License</a>
+        </p>
+        <div class="russell-quote">
+            "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt."
+        </div>
+        <div class="quote-author">— Bertrand Russell</div>
+    </div>
+""", unsafe_allow_html=True)
 
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
@@ -140,14 +176,21 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    # GLOBAL ORIENTATION BOX
+    # TWIN COLUMN INTRO & HOW-TO
     st.markdown(f"""
-    <div style="background: rgba(128, 128, 128, 0.05); padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px solid rgba(128, 128, 128, 0.1);">
-        <p style="margin:0 0 8px 0; font-size:1rem; font-weight:bold; opacity:0.9;">How to use this dashboard</p>
-        <p style="margin:0; font-size:0.85rem; opacity:0.85; line-height:1.4;">
-            This is an investigative diagnostic tool for curious people: all metrics and charts on this dashboard sync to your search and/or filters. 
-            Use the sidebar to compare the <b>Volume</b>, <b>Velocity</b>, and <b>Complexity</b> of specific authoritarian efforts, and isolate specific threats to democracy.
-        </p>
+    <div class="intro-container">
+        <div class="intro-column">
+            <p style="margin:0 0 10px 0; font-size:1.1rem; font-weight:bold; opacity:0.9;">The Diagnostic Intent</p>
+            <p style="margin:0; font-size:0.9rem; opacity:0.85; line-height:1.6;">
+                Authoritarianism thrives on "cocksure" rhetoric that obscures institutional reality. This interactive diagnostic is a sanctuary for the curious: a place to measure the exact volume and velocity of the democratic dismantle. It is time to replace doubt with documentation. In this vault, <b>data trumps opinion.</b>
+            </p>
+        </div>
+        <div class="intro-column">
+            <p style="margin:0 0 10px 0; font-size:1.1rem; font-weight:bold; opacity:0.9;">How to Investigate</p>
+            <p style="margin:0; font-size:0.9rem; opacity:0.85; line-height:1.6;">
+                This is a tool for conscious investigation: all metrics and charts sync to your search and filters. Use the <b>Sidebar</b> to isolate threats and compare the <b>Volume</b>, <b>Velocity</b>, and <b>Complexity</b> of specific efforts to rewrite the American state.
+            </p>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
