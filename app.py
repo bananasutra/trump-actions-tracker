@@ -60,7 +60,7 @@ def load_data():
 
 df = load_data()
 
-# 4. STRATEGIC DIALOG (UPDATED CONTENT)
+# 4. STRATEGIC DIALOG (FACTS OVER OPINIONS)
 @st.dialog("Strategic Note on Facts")
 def show_welcome():
     st.markdown("""
@@ -124,24 +124,55 @@ if df is not None:
 else:
     filtered_df = pd.DataFrame()
 
-# 6. BRANDED HEADER & HERO
+# 6. ELEGANT DREAMY BRANDED HEADER
 st.markdown("<div id='top'></div>", unsafe_allow_html=True)
 
 st.markdown("""
     <style>
-        .brand-link { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 15px; margin-bottom: -10px; }
-        .brand-logo { font-size: 3rem; background: rgba(255, 255, 255, 0.05); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
-        .brand-logo:hover { background: rgba(222, 1, 0, 0.1); border-color: #DE0100; transform: scale(1.02); }
+        .brand-link { 
+            text-decoration: none !important; 
+            color: inherit !important; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: -10px; 
+        }
+        .brand-link h1 {
+            color: inherit !important;
+            text-decoration: none !important;
+            margin: 0;
+            font-weight: 700;
+        }
+        .brand-logo { 
+            font-size: 3rem; 
+            background: rgba(255, 255, 255, 0.05); 
+            padding: 5px 15px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+            color: inherit !important;
+        }
+        .brand-link:hover .brand-logo { 
+            background: rgba(222, 1, 0, 0.1); 
+            border-color: #DE0100; 
+            transform: scale(1.05); 
+            box-shadow: 0px 0px 15px rgba(222, 1, 0, 0.2);
+        }
+        .brand-link:hover h1 {
+            opacity: 0.6;
+            transition: opacity 0.8s ease;
+        }
     </style>
     <a href="https://trump-actions-tracker.streamlit.app/" target="_self" class="brand-link">
         <div class="brand-logo">🍌</div>
-        <div><h1 style="margin: 0;">U.S. Democracy Gone Bananas</h1></div>
+        <div><h1>U.S. Democracy Gone Bananas</h1></div>
     </a>
 """, unsafe_allow_html=True)
 
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
+# 7. HERO STATS (RESPONSIVE)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -165,7 +196,7 @@ if not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 7. STICKY NAV & ANCHOR STYLES
+# 8. STICKY NAV & ANCHOR STYLES
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {
@@ -185,7 +216,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 8. DATA PROCESSING ... (Logic remains identical)
+# 9. DATA PROCESSING
 if not filtered_df.empty:
     if comparison_mode:
         long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
@@ -200,7 +231,7 @@ if not filtered_df.empty:
         filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
         chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 9. TIMELINE
+# 10. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if not filtered_df.empty:
     if comparison_mode:
@@ -220,7 +251,7 @@ if not filtered_df.empty:
         st.altair_chart((line + points).interactive(), use_container_width=True)
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 10. THEMES & GLOSSARY
+# 11. THEMES & GLOSSARY
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -241,7 +272,7 @@ with st.expander("📖 Themes Glossary"):
     st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 11. LATEST
+# 12. LATEST
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions in Window: {selected_short}")
@@ -254,7 +285,7 @@ if not filtered_df.empty:
             st.link_button("🚀 View Source", row['URL'])
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 12. DEEP INSIGHTS (WITH BERTRAND MOMENT)
+# 13. DEEP INSIGHTS (WITH BERTRAND MOMENT)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -266,7 +297,7 @@ if not filtered_df.empty:
         st.markdown("#### Strategic Velocity & Attrition")
         st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This volume induces 'procedural shock' designed to exhaust bandwidth.")
         st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes strike several democratic pillars at once.")
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition centers in CA, WA, NY, IL. Litigation remains the primary friction point against this velocity.")
@@ -292,7 +323,7 @@ if not filtered_df.empty:
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown("<a href='#top' class='back-to-top'>^^ Back to Top</a>", unsafe_allow_html=True)
 
-# 13. SEARCH (DATA VAULT)
+# 14. SEARCH (DATA VAULT)
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
