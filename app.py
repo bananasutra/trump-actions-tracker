@@ -18,11 +18,14 @@ st.set_page_config(
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
-    <meta name="description" content="Strategic diagnostic of administrative velocity and institutional rewrite (2025-2026).">
+    <meta name="description" content="Strategic diagnostic of authoritarian velocity and institutional rewrite (2025-2026).">
     <style>
         @media (max-width: 768px) {{
             .hero-container, .nav-container {{ flex-direction: column !important; }}
             .hero-card {{ width: 100% !important; margin-bottom: 10px; }}
+ .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
+        .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
+	.
         }}
         [id^="section-"] {{ scroll-margin-top: 75px !important; padding-top: 10px !important; }}
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; }}
@@ -74,7 +77,7 @@ def get_data():
 
 df = get_data()
 
-# 4. SIDEBAR (RESTORED FILTERS & RESET)
+# 4. DATA CONTROL SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.text_input("🔍 Search Actions", key="side_q", on_change=sync_s, value=st.session_state.q)
 comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
@@ -93,8 +96,10 @@ if df is not None:
         st.session_state.comp_mode = False
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 5. HEADER & HERO BOXES (RESTORED INFO)
-st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1><p style="opacity:0.7; margin:0;">Strategic diagnostic of institutional dismantle (2025–2026).</p><p style="font-size:0.8rem; opacity:0.5;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a></p></div>""", unsafe_allow_html=True)
+# 5. HEADER & HERO BOXES
+st.markdown("""<div style="text-align: left;"><h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
+<p style="opacity:0.8; margin:10;">Documenting the actions, statements, and plans of President Trump and his administration that echo those of authoritarian regimes and may pose a threat to American democracy, since January 2025.</p>
+<p style="font-size:0.8rem; opacity:0.5;">Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <a href="https://www.trumpactiontracker.info/about" target="_blank" style="color:inherit;">Professor Christina Pagel</a> | <a href="https://creativecommons.org/" target="_blank" rel="noopener noreferrer">Creative Commons License</a></p></div>""", unsafe_allow_html=True)
 
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
@@ -112,10 +117,10 @@ if df is not None:
     </div>
     """, unsafe_allow_html=True)
 
-# 6. STICKY NAV (RESTORED "WORDS")
-st.markdown("""<div class="nav-container"><a href="#section-timeline"><button>Timeline</button></a><a href="#section-themes"><button>Themes</button></a><a href="#section-insights"><button>Insights</button></a><a href="#section-words"><button>Words</button></a><a href="#section-search"><button>Search</button></a></div>""", unsafe_allow_html=True)
+# HIDDEN 6. STICKY NAV (RESTORED "WORDS")
+# st.markdown("""<div class="nav-container"><a href="#section-timeline"><button>Timeline</button></a><a href="#section-themes"><button>Themes</button></a><a href="#section-insights"><button>Insights</button></a><a href="#section-words"><button>Words</button></a><a href="#section-search"><button>Search</button></a></div>""", unsafe_allow_html=True)
 
-# 7. TIMELINE & THEMES (RESTORED SECTIONS)
+# 7. TIMELINE & THEMES GRAPHS
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.subheader("Action Progression")
 if not f_df.empty:
@@ -142,7 +147,7 @@ if not f_df.empty:
 
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Action Volume by Pillar")
+st.subheader(“Trump Actions: Volume by Pillar")
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
@@ -155,7 +160,7 @@ if not f_df.empty:
         gloss_html += '</table></div>'
         st.markdown(gloss_html, unsafe_allow_html=True)
 
-# 8. INSIGHTS (HARD-LOCKED CONTENT)
+# 8. DEEP INSIGHTS 
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
@@ -173,23 +178,27 @@ with c2:
 # CENTERED VIDEO
 v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
-# 9. WORDS (RESTORED NEON WORD CLOUD)
-st.markdown("<div id='section-words'></div>", unsafe_allow_html=True)
-st.divider()
-st.subheader("☁️ Thematic Word Cloud")
-if not f_df.empty:
-    all_titles = " ".join(f_df['Title'].values).lower()
-    words = re.findall(r'\w+', all_titles)
-    filtered_words = [w for w in words if len(w) > 4 and w not in {'trump', 'administration', 'order', 'federal'}]
-    word_counts = Counter(filtered_words).most_common(50)
-    js_color = "function () { return 'hsl(' + (Math.random() * 360) + ', 100%, ' + (Math.round(Math.random() * 15) + 75) + '%)'; }"
-    wc_options = {"series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [15, 65], "rotationRange": [0,0], "textStyle": {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
-    st_echarts(wc_options, height="450px")
+# HIDE 9. WORDS (RESTORED NEON WORD CLOUD)
+# st.markdown("<div id='section-words'></div>", unsafe_allow_html=True)
+# st.divider()
+# st.subheader("☁️ Thematic Word Cloud")
+# if not f_df.empty:
+#   all_titles = " ".join(f_df['Title'].values).lower()
+#    words = re.findall(r'\w+', all_titles)
+#    filtered_words = [w for w in words if len(w) > 4 and w not in {'trump', 'administration', 'order', 'federal'}]
+#    word_counts = Counter(filtered_words).most_common(50)
+#    js_color = "function () { return 'hsl(' + (Math.random() * 360) + ', 100%, ' + (Math.round(Math.random() * 15) + 75) + '%)'; }"
+#    wc_options = {"series": [{"type": "wordCloud", "gridSize": 15, "sizeRange": [15, 65], "rotationRange": [0,0], "textStyle": 
+# {"fontWeight": "bold", "color": js_color}, "data": [{"name": word, "value": count} for word, count in word_counts]}]}
+#    st_echarts(wc_options, height="450px")
 
-# 10. SEARCH & CAPTION
+# 10. VAULT SEARCH 
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("🔍 Search Data Vault")
+st.subheader("🔍 Search Trump Actions Data Vault")
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
+
+# 11. FOOTER
+st.divider()
 st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
