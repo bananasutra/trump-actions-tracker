@@ -11,7 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# SEO Workaround for Social Media Previews
 st.markdown("""
     <head>
     <meta property="og:title" content="U.S. Democracy Gone Bananas: Trump Actions Tracker" />
@@ -21,7 +20,7 @@ st.markdown("""
     </head>
     """, unsafe_allow_html=True)
 
-# 2. THEMES & GLOSSARY MAPPING (UNIFIED & ALPHABETIZED)
+# 2. THEMES & GLOSSARY MAPPING
 THEME_GLOSSARY = [
     {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Removing civil rights from marginalized groups like LGBTQ+ communities and immigrants, attacking diversity and inclusion (DEI) initiatives, and contravening due process rights."},
     {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption and Enrichment: Actions that directly enrich the president, his family, or his cabinet, or that trade political favors for wealth."},
@@ -60,7 +59,7 @@ def load_data():
 
 df = load_data()
 
-# 4. SIDEBAR (FILTERS & NEW DATE SLIDER)
+# 4. SIDEBAR (FILTERS & DATE SLIDER)
 st.sidebar.title("Filters")
 comparison_mode = st.sidebar.toggle("📊 Comparison Mode", value=False)
 query_params = st.query_params
@@ -75,31 +74,22 @@ else:
     selected_short = st.sidebar.selectbox("Filter Area", options, index=start_index)
     st.query_params["area"] = selected_short
 
-# NEW: Date Range Slider
 if df is not None:
     st.sidebar.divider()
     st.sidebar.subheader("📅 Timeline Scrub")
     min_date = df['Date'].min().to_pydatetime()
     max_date = df['Date'].max().to_pydatetime()
-    
-    selected_range = st.sidebar.slider(
-        "Select Window",
-        min_value=min_date, max_value=max_date,
-        value=(min_date, max_date),
-        format="MMM DD"
-    )
-    # Applying the Date Mask
+    selected_range = st.sidebar.slider("Select Window", min_value=min_date, max_value=max_date, value=(min_date, max_date), format="MMM DD")
     mask = (df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])
     filtered_df = df.loc[mask]
 else:
     filtered_df = df
 
-# 5. HEADER (RESTRUCTURED)
+# 5. HEADER & HERO
 st.title("🙊 U.S. Democracy Gone Bananas")
 st.markdown("##### Diagnostic of systemic democratic erosion and institutional dismantling since Jan 2025.")
 st.info("**Context:** Data Source: [Christina Pagel / Trump Action Tracker Info](https://www.trumpactiontracker.info/) | CC BY 4.0")
 
-# 6. CENTERED HERO STATS (RESPONSIVE TO SLIDER)
 if filtered_df is not None and not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -124,7 +114,7 @@ if filtered_df is not None and not filtered_df.empty:
     </div>
     """, unsafe_allow_html=True)
 
-# 7. STICKY NAVIGATION & ANCHOR FIX
+# 6. STICKY NAVIGATION & ANCHOR FIX
 st.markdown("""
     <style>
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {
@@ -142,7 +132,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 8. DATA PROCESSING (BRANCHING)
+# 7. DATA PROCESSING
 if comparison_mode:
     long_cats = [SHORT_TO_LONG[s] for s in selected_compare]
     display_df = filtered_df.melt(id_vars=['Date', 'Index', 'Title', 'Themes_List', 'URL', 'Cat_Count'], value_vars=long_cats, var_name='Category_Long', value_name='Is_Active')
@@ -156,7 +146,7 @@ else:
     filtered_daily['Cumulative'] = filtered_daily['Index'].cumsum()
     chart_df = chart_df.merge(filtered_daily[['Date', 'Cumulative']], on='Date')
 
-# 9. TIMELINE
+# 8. TIMELINE
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 if comparison_mode:
     st.subheader("Velocity Analysis: Comparative Theme Growth")
@@ -177,9 +167,8 @@ else:
         st.altair_chart((line + points).interactive(), use_container_width=True)
 
 st.caption("💡 **Desktop:** Hover for details, Click point for source. **Mobile:** Use Search section for stable links.")
-st.caption("⚠️ **Note on Links:** Many sites block direct opening. Search the Search section for direct source links.")
 
-# 10. THEMES & GLOSSARY
+# 9. THEMES & GLOSSARY
 st.markdown("<div id='themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
@@ -199,7 +188,7 @@ if cat_counts:
 with st.expander("📖 Themes Glossary"):
     st.table(GLOSSARY_DF[['Theme', 'Mapping', 'Definition']])
 
-# 11. LATEST
+# 10. LATEST
 st.markdown("<div id='latest'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader(f"📍 Latest 5 Actions in Window: {selected_short}")
@@ -210,29 +199,37 @@ for i, row in latest_view.iterrows():
         st.write(f"**Themes:** {row['Themes_List']}")
         st.link_button("🚀 View Source", row['URL'])
 
-# 12. DEEP INSIGHTS (RESTORED FULL ANALYSIS)
+# 11. DEEP INSIGHTS (REFINED LAYOUT)
 st.markdown("<div id='insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
+
 if filtered_df is not None and not filtered_df.empty:
     total_raw = len(filtered_df)
     multi_ratio = (len(filtered_df[filtered_df['Cat_Count'] > 1]) / total_raw * 100)
+    
+    # ROW 1: EQUALIZED COLUMNS
     col_ins1, col_ins2 = st.columns(2)
     with col_ins1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write(f"In this window, we see a velocity of **{pace_per_month:.1f} actions per month**. This volume creates 'procedural shock'—exhausting the bandwidth of legal systems and civil oversight.")
-        st.warning(f"**Projection:** Extrapolating current pace projects **8,220 actions** by Jan 2029—a total institutional rewrite.")
+        st.write(f"The administration is maintaining a velocity of **{pace_per_month:.1f} actions per month**. This volume induces 'procedural shock'—where the sheer number of executive orders exhausts the bandwidth of civil society and the legal system.")
+        
         st.markdown("#### Norm-Collapse Loops")
-        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' showing how single actions strike multiple norms simultaneously.")
+        st.write(f"**Interconnectivity:** {multi_ratio:.1f}% of events are 'multi-tagged,' indicating interlocking strikes engineered to bypass multiple institutional checks simultaneously.")
+
     with col_ins2:
         st.markdown("#### The Resistance Heatmap")
-        st.write("Opposition centers in CA, WA, NY, IL. Litigation remains the primary friction point.")
-        st.markdown("<div style='padding-top: 20px;'>", unsafe_allow_html=True)
-        st.markdown("**Methodology Context:**")
-        st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.write("Opposition centers in CA, WA, NY, IL. Litigation acts as the primary friction point against this velocity, explaining the prioritization of Judicial and DOJ hollowing.")
+        
+        # MOVED DIAGNOSTIC HIGHLIGHT HERE
+        st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**. This signals a total administrative rewrite—where the cumulative weight of changes effectively creates a new operating system for the federal government.")
 
-# 13. SEARCH (VAULT)
+    # ROW 2: FULL WIDTH VIDEO
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("#### Methodology Context & Expert Analysis")
+    st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+
+# 12. SEARCH
 st.markdown("<div id='search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
