@@ -6,7 +6,7 @@ from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
 
-# 1. PAGE CONFIG & SEO HACK (DO NOT REMOVE)
+# 1. PAGE CONFIG & SEO HACK
 st.set_page_config(
     page_title="U.S. Democracy Gone Bananas", 
     page_icon="🍌", 
@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# THE OG SEO WORKAROUND (Syntax-Safe)
+# THE OG SEO WORKAROUND (With Doubled Braces for Syntax Safety)
 st.markdown(f"""
     <head>
     <title>U.S. Democracy Gone Bananas</title>
@@ -24,15 +24,19 @@ st.markdown(f"""
     <meta property="og:image" content="https://raw.githubusercontent.com/celinenadeau/repo/main/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
     <style>
-        /* PRECISION ANCHORING WORKAROUND - Doubled Braces for f-string safety */
-        .anchor {{
-            display: block;
-            position: relative;
-            top: -120px;
-            visibility: hidden;
+        /* SURGICAL SCROLL OFFSET - No extra tags needed */
+        [id^="section-"] {{
+            scroll-margin-top: 85px !important;
         }}
+        
         /* BLUE-FREE NAV LOCK */
-        .nav-container {{ display: flex !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; }}
+        .nav-container {{ 
+            display: flex !important; 
+            justify-content: space-between !important; 
+            gap: 10px !important; 
+            width: 100% !important; 
+            margin-bottom: -10px !important; /* Pulls content up */
+        }}
         .nav-container a {{ flex: 1 !important; text-decoration: none !important; color: inherit !important; }}
         .nav-container button, .nav-container button:hover, .nav-container button:active, .nav-container button:focus {{
             width: 100% !important; padding: 6px 12px !important; border-radius: 5px !important;
@@ -40,6 +44,7 @@ st.markdown(f"""
             border: 1px solid currentColor !important; color: inherit !important; 
             box-shadow: none !important; transition: 0.2s !important;
         }}
+        
         /* STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
@@ -101,7 +106,6 @@ def load_data():
 df = load_data()
 
 # 5. HEADER (LEFT-ALIGNED)
-st.markdown("<div id='top-anchor'></div>", unsafe_allow_html=True)
 st.markdown("""
     <div style="text-align: left;">
         <a href="/?" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:15px;">
@@ -109,7 +113,7 @@ st.markdown("""
             <h1 style="font-size: 2.8rem; font-weight: 800; margin-bottom: 0px;">U.S. Democracy Gone Bananas</h1>
         </a>
         <p style="opacity:0.7; font-size:1.1rem; margin-top:-5px; margin-bottom:5px;">A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).</p>
-        <p style="font-size:0.8rem; opacity:0.5; margin-bottom:20px;">
+        <p style="font-size:0.8rem; opacity:0.5; margin-bottom:15px;">
             Dashboard by <b>Celine Nadeau</b> | 
             Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration:underline;">Christina Pagel / Trump Action Tracker</a> | 
             <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration:underline;">CC BY 4.0</a>
@@ -134,26 +138,19 @@ if df is not None:
         mask = mask & (df['Title'].str.contains(st.session_state.search_term, case=False, na=False))
     filtered_df = df.loc[mask]
 
-    def reset_all():
-        st.session_state.search_term = ""
-        st.session_state.sidebar_search = ""
-        st.session_state.vault_search = ""
-        st.session_state.comparison_toggle = False
-    st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
-
 # 7. STICKY NAV
 st.markdown("""
     <div class="nav-container">
-        <a href="#timeline-anchor"><button>Timeline</button></a>
-        <a href="#themes-anchor"><button>Themes</button></a>
-        <a href="#insights-anchor"><button>Insights</button></a>
-        <a href="#words-anchor"><button>Words</button></a>
-        <a href="#search-anchor"><button>Search</button></a>
+        <a href="#section-timeline"><button>Timeline</button></a>
+        <a href="#section-themes"><button>Themes</button></a>
+        <a href="#section-insights"><button>Insights</button></a>
+        <a href="#section-words"><button>Words</button></a>
+        <a href="#section-search"><button>Search</button></a>
     </div>
 """, unsafe_allow_html=True)
 
-# 8. TIMELINE (4-ROW TOOLTIP & CLICK RESTORED)
-st.markdown("<a class='anchor' id='timeline-anchor'></a>", unsafe_allow_html=True)
+# 8. TIMELINE
+st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.subheader("Action Progression")
 if not filtered_df.empty:
     if st.session_state.comparison_toggle:
@@ -187,10 +184,10 @@ if not filtered_df.empty:
         ).properties(width='container', height=400).interactive()
     
     st.altair_chart(chart, use_container_width=True)
-    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 <b>Nav:</b> Hover for 4-row diagnostic data. Click points for source URL. Scroll/pinch to zoom timeline.</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-25px;'>💡 <b>Nav:</b> Hover for diagnostic data. Click points for source. Scroll/pinch to zoom.</p>", unsafe_allow_html=True)
 
 # 9. THEMES
-st.markdown("<a class='anchor' id='themes-anchor'></a>", unsafe_allow_html=True)
+st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Action Volume by Theme")
 if not filtered_df.empty:
@@ -198,20 +195,20 @@ if not filtered_df.empty:
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
 
-# 10. INSIGHTS (CONTENT FULLY RESTORED)
-st.markdown("<a class='anchor' id='insights-anchor'></a>", unsafe_allow_html=True)
+# 10. INSIGHTS
+st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🚨 Deep Insights: Strategic Diagnostic")
 if not filtered_df.empty:
     ins_col1, ins_col2 = st.columns(2)
     with ins_col1:
         st.markdown("#### Strategic Velocity & Attrition")
-        st.write("Moving at high administrative velocity induces 'procedural shock.' By ensuring the rate of institutional rewrite exceeds judicial processing latency, the administration effectively outruns traditional oversight.")
+        st.write("Moving at high administrative velocity induces 'procedural shock.' By ensuring the rate of institutional rewrite outpaces judicial processing latency, the administration effectively outruns traditional oversight.")
         st.markdown("#### Resistance Heatmap")
         st.write("Opposition friction is concentrated in state-level litigation hubs (CA, NY, WA). These are currently the primary remaining constraints on administrative speed.")
     with ins_col2:
         st.markdown("#### Norm-Collapse Loops")
-        st.write("Interlocking thematic strikes strike multiple pillars simultaneously. This ensures that if one avenue is blocked by a court, a secondary strike in a different domain maintains the strategic objective.")
+        st.write("Interlocking thematic strikes hit multiple pillars simultaneously. This ensures that if one avenue is blocked by a court, a secondary strike in a different domain maintains the strategic objective.")
         st.warning("**Diagnostic Projection:** Current trends suggest a total institutional dismantle prior to the 2028 electoral cycle.")
     
     st.markdown("<br>", unsafe_allow_html=True)
@@ -220,7 +217,7 @@ if not filtered_df.empty:
     st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 
 # 11. WORD CLOUD
-st.markdown("<a class='anchor' id='words-anchor'></a>", unsafe_allow_html=True)
+st.markdown("<div id='section-words'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("☁️ Thematic Word Cloud")
 if not filtered_df.empty:
@@ -233,7 +230,7 @@ if not filtered_df.empty:
     st_echarts(wc_options, height="450px")
 
 # 12. VAULT
-st.markdown("<a class='anchor' id='search-anchor'></a>", unsafe_allow_html=True)
+st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
