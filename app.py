@@ -58,19 +58,16 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 4. CSS (RESPONSIVE STACKING + MONOCHROME NAV)
+# 4. CSS (THE ABSOLUTE HARD-LOCK)
 st.markdown("""
     <style>
         /* 1. NUCLEAR NAV RESET (NO BLUE + FIXED PADDING) */
         .nav-container { display: flex !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; }
         .nav-container a { flex: 1 !important; text-decoration: none !important; color: inherit !important; }
         
-        .nav-container button, 
-        .nav-container button:hover, 
-        .nav-container button:active, 
-        .nav-container button:focus {
+        .nav-container button, .nav-container button:hover, .nav-container button:active, .nav-container button:focus {
             width: 100% !important; 
-            padding: 8px 16px !important; /* Fixed Vertical Padding */
+            padding: 8px 16px !important; 
             border-radius: 5px !important;
             font-weight: bold !important; 
             cursor: pointer !important; 
@@ -81,19 +78,23 @@ st.markdown("""
             transition: 0.3s !important;
         }
 
-        /* 2. HEADER STYLING (LEFT ALIGNED + AUTHORITY FONT) */
+        /* 2. FIXED ANCHORING (NO MORE SCALPING) */
+        [id] { 
+            scroll-margin-top: 180px !important; 
+        }
+
+        /* 3. HEADER STYLING (LEFT ALIGNED) */
         .main-header { font-size: 3rem !important; font-weight: 800; margin-bottom: 0px; text-align: left; }
         .sub-header { opacity: 0.7; font-size: 1.1rem; margin-top: -5px; margin-bottom: 10px; text-align: left; }
         .source-line { font-size: 0.85rem; opacity: 0.5; margin-bottom: 35px; text-align: left; }
         .source-line a { color: inherit !important; text-decoration: underline !important; font-weight: 600; }
 
-        /* 3. STICKY NAV RE-ANCHOR */
+        /* 4. STICKY NAV RE-ANCHOR */
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) { 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(20px) !important; padding: 5px 0 !important; 
         }
 
-        /* 4. UI COMPONENTS (RESPONSIVE FLEX) */
         .hero-card {
             flex: 1; background: rgba(128, 128, 128, 0.1); 
             border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 25px; 
@@ -106,13 +107,10 @@ st.markdown("""
             .nav-container a, .hero-card { width: 100% !important; }
         }
 
-        /* TIGHTEN TIPS UNDER GRAPH */
         .tight-tips { margin-top: -30px !important; }
-        
         .glossary-footnote { font-size: 11px !important; color: #888 !important; }
         .glossary-footnote table { border-collapse: collapse; width: 100%; margin-top: 10px; }
         .glossary-footnote th, .glossary-footnote td { text-align: left; padding: 8px; border-bottom: 1px solid rgba(128,128,128,0.2); }
-        [id] { scroll-margin-top: 150px !important; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -142,7 +140,8 @@ st.markdown("""
             <h1 class="main-header">U.S. Democracy Gone Bananas</h1>
         </a>
         <p class="sub-header">A real-time diagnostic of systemic institutional dismantle and administrative rewrite (2025–2026).</p>
-        <p class="source-line"> 
+        <p class="source-line">
+            Dashboard by <b>Celine Nadeau</b> | 
             Data Source: <a href="https://www.trumpactiontracker.info/" target="_blank">Christina Pagel / Trump Action Tracker Info</a> | 
             Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>
         </p>
@@ -173,7 +172,7 @@ if df is not None:
         st.session_state.comparison_mode = False
     st.sidebar.button("🧹 Clear All Filters", on_click=reset_all, use_container_width=True)
 
-# 8. HERO CARDS (DIAGNOSTIC CONTEXT LOCKED HERE)
+# 8. HERO CARDS (DIAGNOSTIC CONTEXT)
 if not filtered_df.empty:
     total_actions = len(filtered_df)
     days_active = max((selected_range[1] - selected_range[0]).days, 1)
@@ -211,7 +210,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# 10. TIMELINE (INTERACTIVE TIPS ANCHORED HERE)
+# 10. TIMELINE (TIGHT TIPS)
 st.markdown("<div id='timeline'></div>", unsafe_allow_html=True)
 st.divider()
 if not filtered_df.empty:
@@ -220,7 +219,6 @@ if not filtered_df.empty:
     line = alt.Chart(chart_df).mark_line(interpolate='step-after', color='#DE0100', strokeWidth=3).encode(x='Date:T', y='Cumulative:Q', tooltip=['Date', 'Title']).properties(width='container', height=400).interactive()
     st.altair_chart(line, use_container_width=True)
     
-    # TIGHTENED INTERACTIVE TIPS
     st.markdown("""
     <div class="tight-tips" style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
         <p style='font-size: 0.8rem; opacity: 0.6; font-style: italic;'>💡 <b>Navigation:</b> Hover over the lines to see action titles. Scroll or pinch the chart to zoom into specific dates.</p>
@@ -259,7 +257,6 @@ if not filtered_df.empty:
         st.markdown("#### The Resistance Heatmap")
         st.write("Opposition is concentrated in state-level litigation hubs (CA, WA, NY, IL). These hubs are the primary friction points against administrative velocity.")
         st.warning(f"**Diagnostic Projection:** By Jan 2029, the tracker projects **8,220 actions**, signaling a total administrative rewrite.")
-    
     st.markdown(f"""<div class="quote-container" style="background: rgba(128, 128, 128, 0.05); border-left: 5px solid #DE0100; padding: 25px; border-radius: 5px; margin-bottom: 40px;"><p style="font-style: italic; margin-bottom: 5px;">"fools and fanatics are always so certain of themselves, and wiser people so full of doubts."</p><p style="text-align: right; font-weight: bold; margin: 0;">— Bertrand Russell</p></div>""", unsafe_allow_html=True)
     v_left, v_mid, v_right = st.columns([1, 8, 1])
     with v_mid: st.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
@@ -284,4 +281,4 @@ st.subheader("🔍 Search Data Vault")
 st.text_input("Filter results...", key="vault_search", on_change=sync_vault, value=st.session_state.search_term)
 if not filtered_df.empty:
     st.dataframe(filtered_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source"), "Date": st.column_config.DateColumn("Date", format="YYYY-MM-DD")}, use_container_width=True, hide_index=True)
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau. Last updated 03-03-2026. CC BY 4.0.")
