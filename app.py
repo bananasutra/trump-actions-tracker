@@ -85,16 +85,16 @@ st.markdown(f"""
         }}
         
         .intro-header {{
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             opacity: 0.9;
         }}
         .intro-text {{
             font-size: 0.95rem !important;
             line-height: 1.6 !important;
             opacity: 0.85;
-            margin-bottom: 25px; /* Spacing with chart */
+            margin-bottom: 25px; 
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -250,8 +250,10 @@ if not f_df.empty:
         comp_plot_df = comp_plot_df[comp_plot_df['Active'].str.strip().str.lower() == 'yes']
         comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
         comp_plot_df['Cumulative'] = comp_plot_df.groupby('Theme').cumcount() + 1
+        
+        # MOBILE-OPTIMIZED LEGEND (Bottom, Horizontal)
         chart = alt.Chart(comp_plot_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
-            x='Date:T', y='Cumulative:Q', color='Theme:N', href='URL:N',
+            x='Date:T', y='Cumulative:Q', color=alt.Color('Theme:N', legend=alt.Legend(orient='bottom', direction='horizontal', title=None)), href='URL:N',
             tooltip=['Date:T', 'Title:N', 'Theme:N', 'Cumulative:Q']
         ).properties(width='container', height=400).interactive()
     else:
@@ -273,7 +275,14 @@ st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown re
 
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
-    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
+    
+    # FIXED AXIS PADDING & LABEL LIMITS
+    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
+        x=alt.X('Count:Q', title="Actions"), 
+        y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300, labelPadding=10)), 
+        tooltip=['Theme', 'Count']
+    ).properties(height=400).configure_view(stroke=None).interactive()
+    
     st.altair_chart(theme_bar, use_container_width=True)
     st.caption("💡 Use search and/or filter to investigate overlaps and hover over the bars to see exact counts.")
 
