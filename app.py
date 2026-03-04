@@ -55,10 +55,39 @@ st.markdown(f"""
         .analysis-card {{ margin-bottom: 25px; }}
         
         /* Typography */
+        .source-line {{
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin: 25px 0 25px 0;
+            padding-top: 15px;
+            border-top: 1px solid rgba(128, 128, 128, 0.2);
+            line-height: 1.5;
+        }}
+        
+        .russell-quote {{
+            font-size: 1.3rem;
+            line-height: 1.5;
+            max-width: 850px;
+            margin: 35px 0 12px 0;
+            padding-left: 20px;
+            border-left: 4px solid rgba(128, 128, 128, 0.3);
+            font-weight: 500;
+            font-style: italic;
+        }}
+        .quote-author {{
+            text-align: left;
+            padding-left: 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            opacity: 0.8;
+            margin-bottom: 35px;
+        }}
+        
+        .intro-header {{ font-size: 1.15rem; font-weight: bold; margin-bottom: 6px; opacity: 0.9; }}
         .intro-text {{ font-size: 0.95rem !important; line-height: 1.6 !important; opacity: 0.85; margin-bottom: 25px; }}
-        .analysis-h4 {{ font-size: 1.15rem; font-weight: bold; margin-bottom: 15px; opacity: 0.9; border-bottom: 1px solid rgba(128, 128, 128, 0.2); padding-bottom: 8px; }}
+        .analysis-h4 {{ font-size: 1.2rem; font-weight: bold; margin-bottom: 18px; opacity: 0.9; border-bottom: 1px solid rgba(128, 128, 128, 0.2); padding-bottom: 10px; }}
         .analysis-bullet {{ font-size: 0.88rem; line-height: 1.5; margin-bottom: 10px; opacity: 0.9; }}
-        .projection-block {{ background: rgba(222, 1, 0, 0.05); padding: 20px; border-left: 4px solid #DE0100; border-radius: 4px; margin-top: 20px; }}
+        .projection-block {{ background: rgba(222, 1, 0, 0.05); padding: 25px; border-left: 5px solid #DE0100; border-radius: 4px; margin-top: 25px; }}
 
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
@@ -295,12 +324,11 @@ with col_b:
         </div>
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">3. Choose Courage Over Comfort</p>
-            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery over comfort. Radical empathy and kindness are not signs of weakness; they are the ultimate defiance against a system built on cruelty.</p>
+            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery over comfort. Banasutra philosophy holds that radical empathy and kindness are the ultimate defiance against a system built on cruelty.</p>
             <p class="analysis-bullet"><b>The Action:</b> Practice emotional courage. Question authority relentlessly, protect the marginalized in your community, and recognize kindness as a tactical democratic guardrail.</p>
         </div>
     """, unsafe_allow_html=True)
 
-# FULL WIDTH DIAGNOSTIC PROJECTION
 st.markdown("""
     <div class="projection-block">
         <p style="font-weight:bold; color:#DE0100; margin-bottom:8px; font-size:1.1rem;">Diagnostic Projection</p>
