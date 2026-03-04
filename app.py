@@ -30,13 +30,24 @@ st.markdown(f"""
         #top {{ scroll-margin-top: 100px; }}
         [id^="section-"] {{ scroll-margin-top: 120px !important; }}
         
-        /* Sidebar UX Fixes */
-        [data-testid="stSidebarNav"] {{ display: none; }} /* Clean sidebar */
+        /* Sidebar UX Fixes - Force visibility of the caret */
+        [data-testid="stSidebarNav"] {{ display: none; }}
         [data-testid="collapsedControl"] {{
-            color: #DE0100 !important;
-            transform: scale(1.4);
-            left: 10px;
+            background-color: #DE0100 !important;
+            color: white !important;
+            border-radius: 0 5px 5px 0 !important;
+            width: 40px !important;
+            height: 40px !important;
+            left: 0 !important;
+            top: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2) !important;
         }}
+        
+        /* Tighten Date Slider Spacing */
+        div[data-testid="stSlider"] {{ margin-bottom: -15px !important; }}
         
         /* Layout Elements */
         .hero-container {{ 
@@ -93,16 +104,15 @@ st.markdown(f"""
         }}
         
         .intro-header {{
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: bold;
             margin-bottom: 2px;
             opacity: 0.9;
         }}
         .intro-text {{
-            font-size: 0.95rem !important;
-            line-height: 1.6 !important;
-            opacity: 0.85;
-            margin-bottom: 25px; 
+            font-size: 0.82rem !important;
+            line-height: 1.5 !important;
+            opacity: 0.75;
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -158,23 +168,28 @@ df = get_data()
 
 # 4. HARMONIZED SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
+st.sidebar.divider()
+
+# 4.1 Global Dashboard Mode
+comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
+st.sidebar.divider()
 
 if df is not None:
-    # 4.1 Filter by Date
+    # 4.2 Filter by Date
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
     selected_range = st.sidebar.slider("Filter by Date", min_value=min_date, max_value=max_date, value=(min_date, max_date))
-    
-    # 4.2 Filter by Theme
     st.sidebar.divider()
-    comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
+    
+    # 4.3 Filter by Theme
     if comp_mode:
         selected_themes = st.sidebar.multiselect("Filter by Theme", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
     else:
         selected_pillar = st.sidebar.selectbox("Filter by Theme", ["All Actions"] + SORTED_SHORT_NAMES)
-
-    # 4.3 Filter by Keyword
     st.sidebar.divider()
+
+    # 4.4 Filter by Keyword
     st.sidebar.text_input("Filter by Keyword", key="side_q", on_change=sync_s, value=st.session_state.q)
+    st.sidebar.divider()
     
     # Reset
     def reset_all():
@@ -199,10 +214,7 @@ st.markdown("""
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
     f_df = f_df[f_df['Title'].str.contains(st.session_state.q, case=False, na=False)]
-    if comp_mode:
-        # Comparison mode logic (already handled in chart logic)
-        pass
-    elif selected_pillar != "All Actions":
+    if not comp_mode and selected_pillar != "All Actions":
         f_df = f_df[f_df[SHORT_TO_LONG[selected_pillar]].str.strip().str.lower() == 'yes']
 
     pace = (len(f_df) / 400) * 30.44
@@ -220,15 +232,13 @@ if df is not None:
     # SOURCE LINE
     st.markdown("""
         <div class="source-line">
-            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
+            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target=\"_blank\" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target=\"_blank\" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
         </div>
     """, unsafe_allow_html=True)
 
     st.divider()
     st.subheader("Institutional Health Diagnostic")
-    st.markdown('<p class="intro-text"><b>Real-time indicators:</b> These metrics provide a high-level assessment of institutional health. By monitoring <b>Strategic Volume</b>, <b>Systemic Velocity</b>, and <b>Tactical Complexity</b>, we quantify administrative efforts to bypass traditional democratic guardrails.</p>', unsafe_allow_html=True)
-
     st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card">
@@ -259,8 +269,6 @@ if df is not None:
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Timeline of Actions")
-st.markdown('<p class="intro-text"><b>Visualizing momentum:</b> This graph tracks the cumulative progression of actions over time. Use search and filters to identify "spikes" in activity—periods where the velocity of the institutional rewrite intensified. Use the Comparison Mode in the sidebar to contrast specific thematic velocities.</p>', unsafe_allow_html=True)
-
 if not f_df.empty:
     if comp_mode:
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
@@ -268,21 +276,10 @@ if not f_df.empty:
         comp_plot_df = comp_plot_df[comp_plot_df['Active'].str.strip().str.lower() == 'yes']
         comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
         comp_plot_df['Cumulative'] = comp_plot_df.groupby('Theme').cumcount() + 1
-        
         chart = alt.Chart(comp_plot_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
-            x='Date:T', 
-            y='Cumulative:Q', 
-            color=alt.Color('Theme:N', legend=alt.Legend(
-                orient='right', 
-                columns=1, 
-                labelFontSize=10, 
-                symbolSize=100,
-                title=None
-            )), 
-            href='URL:N',
+            x='Date:T', y='Cumulative:Q', color='Theme:N', href='URL:N',
             tooltip=['Date:T', 'Title:N', 'Theme:N', 'Cumulative:Q']
         ).properties(width='container', height=400).interactive()
-        
     else:
         chart_df = f_df.copy().sort_values('Date')
         chart_df['Cumulative'] = range(1, len(chart_df) + 1)
@@ -290,31 +287,17 @@ if not f_df.empty:
             x='Date:T', y='Cumulative:Q', href='URL:N',
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), alt.Tooltip('Title:N', title='Action'), alt.Tooltip('Themes_List:N', title='Themes Hit'), alt.Tooltip('URL:N', title='Source URL')]
         ).properties(width='container', height=400).interactive()
-    
     st.altair_chart(chart, use_container_width=True)
-    st.caption("💡 On desktop, hover any data point to view the specific action and its source.")
+    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 Hover for diagnostic data. Click points for source URL.</p>", unsafe_allow_html=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 8. VOLUME BY THEME
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Volume by Theme")
-st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown reveals which democratic pillars are under the heaviest stress. It helps isolate the administration\'s primary strategic focus.</p>', unsafe_allow_html=True)
-
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
-    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
-        x=alt.X('Count:Q', title="Actions"), 
-        y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(
-            labelLimit=300, 
-            labelPadding=10,
-            labelFontSize=11
-        )), 
-        tooltip=['Theme', 'Count']
-    ).properties(height=400).configure_view(stroke=None).interactive()
-    
+    theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
-    st.caption("💡 Use search and/or filter to investigate overlaps and hover over the bars to see exact counts.")
 
     with st.expander("📖 Strategic Themes Glossary"):
         gloss_html = '<div style="font-size:0.85rem; opacity:0.9;"><table>'
@@ -324,12 +307,10 @@ if not f_df.empty:
         st.markdown(gloss_html, unsafe_allow_html=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 9. STRATEGIC ANALYSIS
+# 8. STRATEGIC ANALYSIS
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Strategic Analysis")
-st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> Beyond the raw numbers, these insights explain the methodology of the dismantle. This section identifies patterns like <b>Saturation</b> and <b>Interlocking Strikes</b>.</p>', unsafe_allow_html=True)
-
 c1, c2 = st.columns(2)
 with c1:
     st.markdown("#### Saturation Strategy & Attrition")
@@ -348,8 +329,6 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Search")
-st.markdown('<p class="intro-text"><b>Granular evidence:</b> The complete repository of verifiable data. Use the search bar below to find specific keywords, people, or policies.</p>', unsafe_allow_html=True)
-
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
