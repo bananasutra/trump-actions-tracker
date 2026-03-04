@@ -198,7 +198,7 @@ if df is not None:
         st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
         st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
-    # SOURCE LINE MOVED UNDER COLUMNS
+    # SOURCE LINE
     st.markdown("""
         <div class="source-line">
             <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
@@ -237,7 +237,7 @@ if df is not None:
 # 7. TIMELINE & THEMES
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Action Progression")
+st.subheader("Timeline of Actions")
 if not f_df.empty:
     if comp_mode:
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
@@ -262,7 +262,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Volume by Strategic Pillar")
+st.subheader("Volume by Theme")
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
@@ -276,10 +276,10 @@ if not f_df.empty:
         st.markdown(gloss_html, unsafe_allow_html=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 8. DEEP INSIGHTS
+# 8. STRATEGIC ANALYSIS
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Deep Insights: Strategic Diagnostic")
+st.subheader("Strategic Analysis")
 c1, c2 = st.columns(2)
 with c1:
     st.markdown("#### Saturation Strategy & Attrition")
@@ -294,10 +294,10 @@ with c2:
 v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 10. VAULT SEARCH
+# 10. DATA SEARCH
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Search Trump Actions Data Vault")
+st.subheader("Data Search")
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
