@@ -30,6 +30,25 @@ st.markdown(f"""
         #top {{ scroll-margin-top: 100px; }}
         [id^="section-"] {{ scroll-margin-top: 120px !important; }}
         
+        /* Sidebar UX Fixes */
+        [data-testid="stSidebarNav"] {{ display: none; }}
+        [data-testid="collapsedControl"] {{
+            background-color: #DE0100 !important;
+            color: white !important;
+            border-radius: 0 5px 5px 0 !important;
+            width: 40px !important;
+            height: 40px !important;
+            left: 0 !important;
+            top: 10px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2) !important;
+        }}
+        
+        /* Slider & Layout Spacing */
+        div[data-testid="stSlider"] {{ margin-bottom: -15px !important; }}
+        
         /* Layout Elements */
         .hero-container {{ 
             display: flex; 
@@ -96,6 +115,23 @@ st.markdown(f"""
             opacity: 0.85;
             margin-bottom: 25px; 
         }}
+
+        /* Strategic Analysis Styles */
+        .analysis-card {{
+            margin-bottom: 20px;
+        }}
+        .analysis-h4 {{
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #DE0100;
+        }}
+        .analysis-bullet {{
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
@@ -108,7 +144,6 @@ st.markdown(f"""
     <div id="top"></div>
     """, unsafe_allow_html=True)
 
-# Helper for the back-to-top link
 back_to_top = '<div class="back-to-top"><a href="#top">⌃ back to top</a></div>'
 
 # 2. THEMES & DATA MAPPING
@@ -196,7 +231,6 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    # WHY & HOW COLUMNS
     col1, col2 = st.columns(2)
     with col1:
         st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
@@ -205,7 +239,6 @@ if df is not None:
         st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
         st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
-    # SOURCE LINE
     st.markdown("""
         <div class="source-line">
             <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
@@ -300,18 +333,50 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Strategic Analysis")
-st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> Beyond the raw numbers, these insights explain the methodology of the dismantle. This section identifies patterns like <b>Saturation</b> and <b>Interlocking Strikes</b>.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> We have entered a phase of institutional rehearsal for total state rewrite. By quantifying these actions, we move beyond the noise of daily outrage to confront the structural dismantling of American democracy.</p>', unsafe_allow_html=True)
 
-c1, c2 = st.columns(2)
-with c1:
-    st.markdown("#### Saturation Strategy & Attrition")
-    st.write("Ensuring the rate of institutional rewrite outpaces judicial processing latency induces 'procedural shock.'")
-    st.markdown("#### Resistance Heatmap")
-    st.write("Opposition friction is concentrated in state-level litigation hubs (CA, NY, WA).")
-with c2:
-    st.markdown("#### Norm-Collapse Loops")
-    st.write("Interlocking thematic strikes hit multiple pillars simultaneously.")
-    st.warning("**Diagnostic Projection:** Current trends suggest total institutional dismantle prior to 2028.")
+col_a, col_b = st.columns(2)
+
+with col_a:
+    st.markdown('<p class="analysis-h4">I. The Critical Risks</p>', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="analysis-card">
+            <p style="font-weight:bold; margin-bottom:5px;">1. Volume & Velocity: Saturation Strategy</p>
+            <p class="analysis-bullet"><b>The Risk:</b> High-velocity actions induce "procedural shock." By overwhelming oversight capacity, the state ensures institution rewrite outpaces legal response. Damage becomes permanent before review begins.</p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through overwhelming mass.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Simultaneous Inspector General purges alongside the removal of job protections for thousands of civil servants.</i></p>
+        </div>
+        <div class="analysis-card">
+            <p style="font-weight:bold; margin-bottom:5px;">2. Complexity: Norm-Collapse Loops</p>
+            <p class="analysis-bullet"><b>The Risk:</b> Complexity is weaponized via "interlocking strikes." By hitting multiple domains simultaneously, the state ensures the objective is met even if a court blocks one specific channel.</p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Umberto Eco</i> identified that autocracy relies on "Newspeak"—a restricted vocabulary that prevents critical thought and creates a new reality where dissent is chilled.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Coordinated assaults on universities using funding freezes, visa revocations, and civil rights probes.</i></p>
+        </div>
+        <div style="background: rgba(222, 1, 0, 0.05); padding: 15px; border-left: 3px solid #DE0100; margin-top: 10px;">
+            <p style="font-weight:bold; color:#DE0100; margin-bottom:5px;">3. Diagnostic Projection</p>
+            <p class="analysis-bullet">Current trends suggest a total institutional dismantle prior to 2028. The manipulation of emergency powers and defunding of independent media are removing the guardrails required for free and fair elections. As <i>Timothy Snyder</i> warns: <b>Institutions do not protect themselves.</b></p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_b:
+    st.markdown('<p class="analysis-h4">II. Actionable Paths</p>', unsafe_allow_html=True)
+    st.markdown("""
+        <div class="analysis-card">
+            <p style="font-weight:bold; margin-bottom:5px;">1. Break the Silence of Enablers</p>
+            <p class="analysis-bullet"><b>The Strategy:</b> Autocracy requires the collaboration of elites and business leaders. <i>Robert Paxton</i> emphasizes that fascism thrives on the willing cooperation of those who share power to suppress opposition.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Apply relentless pressure on the corporations, law firms, and tech executives actively profiting from the surveillance and deportation apparatus.</p>
+        </div>
+        <div class="analysis-card">
+            <p style="font-weight:bold; margin-bottom:5px;">2. Document Reality Daily</p>
+            <p class="analysis-bullet"><b>The Strategy:</b> In a "post-truth" era, documentation is the most vital form of resistance. Refuse to adopt the dehumanizing "Newspeak" of the state. <i>Do not obey in advance.</i></p>
+            <p class="analysis-bullet"><b>The Action:</b> Aggressively share authoritative data like this tracker. Confront disinformation with irrefutable evidence. Do not let rhetoric replace reality.</p>
+        </div>
+        <div class="analysis-card">
+            <p style="font-weight:bold; margin-bottom:5px;">3. Choose Courage Over Comfort</p>
+            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery over comfort. Banasutra philosophy holds that radical empathy and kindness are the ultimate defiance against a system built on cruelty.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Practice intellectual and emotional courage. Question authority relentlessly, protect the marginalized, and recognize kindness as a tactical democratic guardrail.</p>
+        </div>
+    """, unsafe_allow_html=True)
 
 v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
 st.markdown(back_to_top, unsafe_allow_html=True)
