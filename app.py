@@ -91,16 +91,10 @@ st.markdown(f"""
             opacity: 0.9;
         }}
         .intro-text {{
-            font-size: 0.82rem !important;
+            font-size: 0.9rem !important;
             line-height: 1.5 !important;
-            opacity: 0.75;
-        }}
-        
-        .section-subhead {{
-            font-size: 0.85rem;
-            opacity: 0.7;
-            margin-bottom: 15px;
-            font-style: italic;
+            opacity: 0.8;
+            margin-bottom: 12px; /* Spacing with chart */
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -245,8 +239,7 @@ if df is not None:
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Timeline of Actions")
-st.markdown('<p class="section-subhead">Visualizing momentum.</p>', unsafe_allow_html=True)
-st.markdown('<p class="intro-text">This graph tracks the cumulative progression of actions over time. Use search and filters to identify "spikes" in activity—periods where the velocity of the institutional rewrite intensified. Use the Comparison Mode in the sidebar to contrast specific thematic velocities.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text"><b>Visualizing momentum:</b> This graph tracks the cumulative progression of actions over time. Use search and filters to identify "spikes" in activity—periods where the velocity of the institutional rewrite intensified. Use the Comparison Mode in the sidebar to contrast specific thematic velocities.</p>', unsafe_allow_html=True)
 
 if not f_df.empty:
     if comp_mode:
@@ -274,8 +267,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Volume by Theme")
-st.markdown('<p class="section-subhead">Mapping the targets.</p>', unsafe_allow_html=True)
-st.markdown('<p class="intro-text">This breakdown reveals which democratic pillars are under the heaviest stress. It helps isolate the administration\'s primary strategic focus.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown reveals which democratic pillars are under the heaviest stress. It helps isolate the administration\'s primary strategic focus.</p>', unsafe_allow_html=True)
 
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
@@ -295,8 +287,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Strategic Analysis")
-st.markdown('<p class="section-subhead">Diagnostic findings.</p>', unsafe_allow_html=True)
-st.markdown('<p class="intro-text">Beyond the raw numbers, these insights explain the methodology of the dismantle. This section identifies patterns like <b>Saturation</b> and <b>Interlocking Strikes</b>.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> Beyond the raw numbers, these insights explain the methodology of the dismantle. This section identifies patterns like <b>Saturation</b> and <b>Interlocking Strikes</b>.</p>', unsafe_allow_html=True)
 
 c1, c2 = st.columns(2)
 with c1:
@@ -316,8 +307,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Search")
-st.markdown('<p class="section-subhead">Granular evidence.</p>', unsafe_allow_html=True)
-st.markdown('<p class="intro-text">The complete repository of verifiable data. Use the search bar below to find specific keywords, people, or policies.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text"><b>Granular evidence:</b> The complete repository of verifiable data. Use the search bar below to find specific keywords, people, or policies.</p>', unsafe_allow_html=True)
 
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
