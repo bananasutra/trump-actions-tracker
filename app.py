@@ -49,19 +49,20 @@ st.markdown(f"""
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; align-items: stretch; }}
         .hero-card {{ flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }}
         
-        /* Analysis Layout */
+        /* Analysis Layout & Semantic Hierarchy */
         .analysis-grid {{ display: flex; gap: 40px; margin-bottom: 30px; }}
         .analysis-column {{ flex: 1; }}
         .analysis-card {{ margin-bottom: 25px; }}
+        
+        h3 {{ font-size: 1.5rem !important; font-weight: bold !important; margin-bottom: 20px !important; opacity: 0.95; border-bottom: 1px solid rgba(128,128,128,0.3); padding-bottom: 10px; }}
+        h4 {{ font-size: 1.1rem !important; font-weight: bold !important; margin-bottom: 8px !important; color: inherit !important; }}
         
         /* Typography */
         .source-line {{ font-size: 0.85rem; opacity: 0.85; margin: 25px 0 25px 0; padding-top: 15px; border-top: 1px solid rgba(128, 128, 128, 0.2); line-height: 1.5; }}
         .russell-quote {{ font-size: 1.3rem; line-height: 1.5; max-width: 850px; margin: 35px 0 12px 0; padding-left: 20px; border-left: 4px solid rgba(128, 128, 128, 0.3); font-weight: 500; font-style: italic; }}
         .quote-author {{ text-align: left; padding-left: 24px; font-size: 1rem; font-weight: bold; opacity: 0.8; margin-bottom: 35px; }}
-        .intro-header {{ font-size: 1.15rem; font-weight: bold; margin-bottom: 6px; opacity: 0.9; }}
         .intro-text {{ font-size: 0.95rem !important; line-height: 1.6 !important; opacity: 0.85; margin-bottom: 25px; }}
         
-        .analysis-h3 {{ font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; opacity: 0.95; border-bottom: 1px solid rgba(128, 128, 128, 0.3); padding-bottom: 12px; }}
         .analysis-bullet {{ font-size: 0.88rem; line-height: 1.5; margin-bottom: 10px; opacity: 0.9; }}
         .projection-block {{ background: rgba(222, 1, 0, 0.05); padding: 25px; border-left: 5px solid #DE0100; border-radius: 4px; margin-top: 25px; }}
 
@@ -114,7 +115,7 @@ def get_data():
 
 df = get_data()
 
-# 4. SIDEBAR
+# 4. HARMONIZED SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.divider()
 comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
@@ -269,48 +270,52 @@ st.markdown('<p class="intro-text">Institutional rehearsal for a total state rew
 col_a, col_b = st.columns(2)
 
 with col_a:
-    st.markdown('<p class="analysis-h3">The Critical Risks</p>', unsafe_allow_html=True)
     st.markdown("""
+        <h3>The Critical Risks</h3>
         <div class="analysis-card">
-            <p style="font-weight:bold; margin-bottom:5px;">1. Volume & Velocity: Saturation Strategy</p>
+            <h4>1. Volume & Velocity: Saturation Strategy</h4>
             <p class="analysis-bullet"><b>The Risk:</b> High-velocity actions induce "procedural shock" by overwhelming oversight capacity. The state ensures institution rewrite outpaces legal response, making damage permanent before review begins.</p>
-            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through sheer overwhelming mass.</p>
-            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Evidence: Simultaneous Inspector General purges alongside the removal of job protections for thousands of career civil servants.</i></p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through overwhelming mass.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Simultaneous Inspector General purges alongside the removal of job protections for thousands of career civil servants.</i></p>
         </div>
         <div class="analysis-card">
-            <p style="font-weight:bold; margin-bottom:5px;">2. Complexity: Norm-Collapse Loops</p>
+            <h4>2. Complexity: Norm-Collapse Loops</h4>
             <p class="analysis-bullet"><b>The Risk:</b> Complexity is weaponized via "interlocking strikes." By hitting multiple domains simultaneously, the state ensures the objective is met even if a court blocks one specific channel.</p>
             <p class="analysis-bullet"><b>The Framework:</b> <i>Umberto Eco</i> identified that autocracy relies on "Newspeak"—a restricted vocabulary that prevents critical thought and creates a new reality where dissent is chilled.</p>
-            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Evidence: Coordinated assaults on universities using funding freezes, visa revocations, and civil rights probes.</i></p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Coordinated assaults on universities using funding freezes, visa revocations, and civil rights probes.</i></p>
         </div>
         <div class="analysis-card">
-            <p style="font-weight:bold; margin-bottom:5px;">3. Apathy: The Erosion of Accountability</p>
-            <p class="analysis-bullet"><b>The Risk:</b> Normalization is the ultimate phase of dismantle. When outrage fatigue leads to public apathy, the state is freed from the burden of justification, turning unchecked power into the new institutional baseline.</p>
-            <p class="analysis-bullet"><b>The Framework:</b> <i>Hannah Arendt</i> warned that the greatest danger to democracy is not active malice, but the "banality" of those who stop questioning the systematic erosion of truth.</p>
-            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Observation: The transition from questioning state motives to accepting them as "just the way things are."</i></p>
+            <h4>3. Apathy: The Erosion of Accountability</h4>
+            <p class="analysis-bullet"><b>The Risk:</b> Normalization is the final stage of dismantle. When outrage fatigue leads to apathy, the state is freed from the burden of justification, turning unchecked power into the new institutional baseline.</p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Hannah Arendt</i> warned that the danger to democracy is not just active malice, but the "banality" of those who stop questioning the systematic erosion of truth.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: The public transition from questioning state motives to accepting them as "just the way things are."</i></p>
         </div>
     """, unsafe_allow_html=True)
 
 with col_b:
-    st.markdown('<p class="analysis-h3">Actionable Paths</p>', unsafe_allow_html=True)
     st.markdown("""
+        <h3>Actionable Paths</h3>
         <div class="analysis-card">
-            <p style="font-weight:bold; margin-bottom:5px;">1. Break the Silence of Enablers</p>
-            <p class="analysis-bullet"><b>The Strategy:</b> Autocracy requires the collaboration of elites and business leaders. <i>Robert Paxton</i> emphasizes that fascism thrives on the willing cooperation of those who share power to suppress opposition.</p>
-            <p class="analysis-bullet"><b>The Action:</b> Apply relentless social and financial pressure on the corporations, law firms, and tech executives actively profiting from the surveillance and deportation apparatus.</p>
+            <h4>1. Break the Silence of Enablers</h4>
+            <p class="analysis-bullet"><b>The Strategy:</b> Autocracy requires the collaboration of elites. <i>Robert Paxton</i> emphasizes that fascism thrives on the willing cooperation of those who share power to suppress opposition.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Apply relentless social and financial pressure on the corporations, law firms, and tech firms actively profiting from the surveillance and deportation apparatus.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Publicly targeting stakeholders and municipal contracts of private entities enmeshed in the rewrite.</i></p>
         </div>
         <div class="analysis-card">
-            <p style="font-weight:bold; margin-bottom:5px;">2. Document Reality Daily</p>
-            <p class="analysis-bullet"><b>The Strategy:</b> In a "post-truth" era, documentation is the most vital form of resistance. Refuse to adopt the dehumanizing "Newspeak" of the state. <i>Do not obey in advance.</i></p>
+            <h4>2. Document Reality Daily</h4>
+            <p class="analysis-bullet"><b>The Strategy:</b> In a "post-truth" era, documentation is a vital act of resistance. Refuse to adopt dehumanizing "Newspeak." <i>Do not obey in advance.</i></p>
             <p class="analysis-bullet"><b>The Action:</b> Aggressively share authoritative data projects. Confront disinformation with irrefutable evidence. Do not let rhetoric replace institutional reality.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Actively distributing verified trackers to local networks and archiving state deletions of public data.</i></p>
         </div>
         <div class="analysis-card">
-            <p style="font-weight:bold; margin-bottom:5px;">3. Choose Courage Over Comfort</p>
-            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery over comfort. Banasutra philosophy holds that radical empathy and kindness are the ultimate defiance against a system built on cruelty.</p>
-            <p class="analysis-bullet"><b>The Action:</b> Practice emotional courage. Question authority relentlessly, protect the marginalized in your community, and recognize kindness as a tactical democratic guardrail.</p>
+            <h4>3. Choose Courage Over Comfort</h4>
+            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery. Banasutra philosophy holds that radical empathy and kindness are the ultimate defiance against a system built on cruelty.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Practice emotional courage. Question authority relentlessly, protect the marginalized in your community, and recognize kindness as a tactical guardrail.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Establishing community-led mutual aid and protective networks for those targeted by systemic purges.</i></p>
         </div>
     """, unsafe_allow_html=True)
 
+# FULL WIDTH DIAGNOSTIC PROJECTION
 st.markdown("""
     <div class="projection-block">
         <p style="font-weight:bold; color:#DE0100; margin-bottom:8px; font-size:1.1rem;">Diagnostic Projection</p>
