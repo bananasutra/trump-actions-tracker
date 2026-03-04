@@ -85,16 +85,16 @@ st.markdown(f"""
         }}
         
         .intro-header {{
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             opacity: 0.9;
         }}
         .intro-text {{
             font-size: 0.95rem !important;
             line-height: 1.6 !important;
             opacity: 0.85;
-            margin-bottom: 25px; /* Increased vertical spacing from chart */
+            margin-bottom: 25px; /* Spacing with chart */
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -209,6 +209,8 @@ if df is not None:
 
     st.divider()
     st.subheader("Institutional Health Diagnostic")
+    st.markdown('<p class="intro-text"><b>Real-time indicators:</b> These metrics provide a high-level assessment of institutional health. By monitoring <b>Strategic Volume</b>, <b>Systemic Velocity</b>, and <b>Tactical Complexity</b>, we quantify administrative efforts to bypass traditional democratic guardrails.</p>', unsafe_allow_html=True)
+
     st.markdown(f"""
     <div class="hero-container">
         <div class="hero-card">
