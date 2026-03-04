@@ -54,6 +54,7 @@ st.markdown(f"""
         .analysis-column {{ flex: 1; }}
         .analysis-card {{ margin-bottom: 25px; }}
         
+        h2 {{ font-size: 1.75rem !important; font-weight: bold !important; margin-top: 10px !important; }}
         h3 {{ font-size: 1.5rem !important; font-weight: bold !important; margin-bottom: 20px !important; opacity: 0.95; border-bottom: 1px solid rgba(128,128,128,0.3); padding-bottom: 10px; }}
         h4 {{ font-size: 1.1rem !important; font-weight: bold !important; margin-bottom: 8px !important; color: inherit !important; }}
         
@@ -179,7 +180,7 @@ if df is not None:
     """, unsafe_allow_html=True)
 
     st.divider()
-    st.subheader("Institutional Health Diagnostic")
+    st.markdown("<h2>Institutional Health Diagnostic</h2>", unsafe_allow_html=True)
     st.markdown('<p class="intro-text"><b>Real-time indicators:</b> These metrics provide a high-level assessment of institutional health. By monitoring <b>Strategic Volume</b>, <b>Systemic Velocity</b>, and <b>Tactical Complexity</b>, we quantify administrative efforts to bypass traditional democratic guardrails.</p>', unsafe_allow_html=True)
 
     st.markdown(f"""
@@ -211,7 +212,7 @@ if df is not None:
 # 7. TIMELINE OF ACTIONS
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Timeline of Actions")
+st.markdown("<h2>Timeline of Actions</h2>", unsafe_allow_html=True)
 st.markdown('<p class="intro-text"><b>Visualizing momentum:</b> This graph tracks the cumulative progression of actions over time. Use search and filters to identify "spikes" in activity—periods where the velocity of the institutional rewrite intensified. Use the Comparison Mode in the sidebar to contrast specific thematic velocities.</p>', unsafe_allow_html=True)
 
 if not f_df.empty:
@@ -239,7 +240,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 # 8. VOLUME BY THEME
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Volume by Theme")
+st.markdown("<h2>Volume by Theme</h2>", unsafe_allow_html=True)
 st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown reveals which democratic pillars are under the heaviest stress. It helps isolate the administration\'s primary strategic focus.</p>', unsafe_allow_html=True)
 
 if not f_df.empty:
@@ -264,7 +265,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 # 9. STRATEGIC ANALYSIS
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Strategic Analysis")
+st.markdown("<h2>Strategic Analysis</h2>", unsafe_allow_html=True)
 st.markdown('<p class="intro-text">Institutional rehearsal for a total state rewrite is no longer a risk—it is a documented fact. Headlines that speak of "sliding" or "risks" are beyond euphemisms; they are forms of dangerous denial. Quantifiable data is the only tool that moves past the noise of daily outrage to confront the structural dismantling of democracy.</p>', unsafe_allow_html=True)
 
 col_a, col_b = st.columns(2)
@@ -275,7 +276,7 @@ with col_a:
         <div class="analysis-card">
             <h4>1. Volume & Velocity: Saturation Strategy</h4>
             <p class="analysis-bullet"><b>The Risk:</b> High-velocity actions induce "procedural shock" by overwhelming oversight capacity. The state ensures institution rewrite outpaces legal response, making damage permanent before review begins.</p>
-            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through overwhelming mass.</p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through sheer overwhelming mass.</p>
             <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Simultaneous Inspector General purges alongside the removal of job protections for thousands of career civil servants.</i></p>
         </div>
         <div class="analysis-card">
@@ -328,7 +329,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 # 10. DATA SEARCH
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
-st.subheader("Data Search")
+st.markdown("<h2>Data Search</h2>", unsafe_allow_html=True)
 st.markdown('<p class="intro-text"><b>Granular evidence:</b> The complete repository of verifiable data. Use the search bar below to find specific keywords, people, or policies.</p>', unsafe_allow_html=True)
 
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
