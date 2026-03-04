@@ -60,7 +60,7 @@ st.markdown(f"""
             font-size: 1.25rem;
             line-height: 1.4;
             max-width: 800px;
-            margin: 25px 0 8px 0;
+            margin: 20px 0 8px 0;
             padding-left: 18px;
             border-left: 3px solid rgba(128, 128, 128, 0.3);
             font-weight: 500;
@@ -72,19 +72,19 @@ st.markdown(f"""
             font-size: 0.95rem;
             font-weight: bold;
             opacity: 0.8;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }}
         
         .intro-header {{
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             opacity: 0.9;
         }}
         .intro-text {{
-            font-size: 0.9rem;
-            line-height: 1.6;
-            opacity: 0.8;
+            font-size: 0.82rem;
+            line-height: 1.5;
+            opacity: 0.75;
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
@@ -161,12 +161,12 @@ if df is not None:
 st.markdown("""
     <div style="text-align: left;">
         <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-        <p style="font-weight: bold; font-size: 1.1rem; margin: 5px 0 0 0; opacity: 0.95;">
+        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 4px 0; opacity: 0.95;">
             An interactive diagnostic for curious, conscious, and caring humans—because facts should always trump opinions.
         </p>
-        <p style="font-size:0.8rem; opacity:0.7; margin:5px 0 20px 0; line-height: 1.4;">
-            Source: <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit;">Trump Action Tracker</a> by <b>Professor Christina Pagel</b> | 
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit;">Creative Commons CC BY 4.0</a>
+        <p style="font-size:0.85rem; opacity:0.8; margin:0 0 20px 0; line-height: 1.4;">
+            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
         </p>
         <div class="russell-quote">
             "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt."
@@ -184,13 +184,13 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    # WHY & HOW COLUMNS
+    # WHY & HOW COLUMNS (Refined Formatting)
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown('<p class="intro-header">Why democracy matters</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">In a world of loud opinions, documentation is the only antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic nature of the democratic dismantle. Use this data to replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">Because democracy matters, and in a world of loud opinions, documentation is the only antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic nature of the democratic dismantle. Use this data to replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
     with col2:
-        st.markdown('<p class="intro-header">How to use this tool</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
         st.markdown('<p class="intro-text">This dashboard is fully interactive; all metrics and charts sync to your inputs. Use the <b>Sidebar</b> to search specific terms (like "<b>Musk</b>" or "<b>Deportation</b>") or filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
     st.divider()
