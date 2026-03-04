@@ -55,37 +55,13 @@ st.markdown(f"""
         .analysis-card {{ margin-bottom: 25px; }}
         
         /* Typography */
-        .source-line {{
-            font-size: 0.85rem;
-            opacity: 0.85;
-            margin: 25px 0 25px 0;
-            padding-top: 15px;
-            border-top: 1px solid rgba(128, 128, 128, 0.2);
-            line-height: 1.5;
-        }}
-        
-        .russell-quote {{
-            font-size: 1.3rem;
-            line-height: 1.5;
-            max-width: 850px;
-            margin: 35px 0 12px 0;
-            padding-left: 20px;
-            border-left: 4px solid rgba(128, 128, 128, 0.3);
-            font-weight: 500;
-            font-style: italic;
-        }}
-        .quote-author {{
-            text-align: left;
-            padding-left: 24px;
-            font-size: 1rem;
-            font-weight: bold;
-            opacity: 0.8;
-            margin-bottom: 35px;
-        }}
-        
+        .source-line {{ font-size: 0.85rem; opacity: 0.85; margin: 25px 0 25px 0; padding-top: 15px; border-top: 1px solid rgba(128, 128, 128, 0.2); line-height: 1.5; }}
+        .russell-quote {{ font-size: 1.3rem; line-height: 1.5; max-width: 850px; margin: 35px 0 12px 0; padding-left: 20px; border-left: 4px solid rgba(128, 128, 128, 0.3); font-weight: 500; font-style: italic; }}
+        .quote-author {{ text-align: left; padding-left: 24px; font-size: 1rem; font-weight: bold; opacity: 0.8; margin-bottom: 35px; }}
         .intro-header {{ font-size: 1.15rem; font-weight: bold; margin-bottom: 6px; opacity: 0.9; }}
         .intro-text {{ font-size: 0.95rem !important; line-height: 1.6 !important; opacity: 0.85; margin-bottom: 25px; }}
-        .analysis-h4 {{ font-size: 1.2rem; font-weight: bold; margin-bottom: 18px; opacity: 0.9; border-bottom: 1px solid rgba(128, 128, 128, 0.2); padding-bottom: 10px; }}
+        
+        .analysis-h3 {{ font-size: 1.4rem; font-weight: bold; margin-bottom: 20px; opacity: 0.95; border-bottom: 1px solid rgba(128, 128, 128, 0.3); padding-bottom: 12px; }}
         .analysis-bullet {{ font-size: 0.88rem; line-height: 1.5; margin-bottom: 10px; opacity: 0.9; }}
         .projection-block {{ background: rgba(222, 1, 0, 0.05); padding: 25px; border-left: 5px solid #DE0100; border-radius: 4px; margin-top: 25px; }}
 
@@ -138,7 +114,7 @@ def get_data():
 
 df = get_data()
 
-# 4. HARMONIZED SIDEBAR
+# 4. SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.divider()
 comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
@@ -288,12 +264,12 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Strategic Analysis")
-st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> Institutional rehearsal for a total state rewrite is no longer a risk—it is a documented fact. Headlines that speak of "sliding" or "risks" are beyond euphemisms; they are forms of dangerous denial. Quantifiable data is the only tool that moves past the noise of daily outrage to confront the structural dismantling of democracy.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text">Institutional rehearsal for a total state rewrite is no longer a risk—it is a documented fact. Headlines that speak of "sliding" or "risks" are beyond euphemisms; they are forms of dangerous denial. Quantifiable data is the only tool that moves past the noise of daily outrage to confront the structural dismantling of democracy.</p>', unsafe_allow_html=True)
 
 col_a, col_b = st.columns(2)
 
 with col_a:
-    st.markdown('<p class="analysis-h4">I. The Critical Risks</p>', unsafe_allow_html=True)
+    st.markdown('<p class="analysis-h3">The Critical Risks</p>', unsafe_allow_html=True)
     st.markdown("""
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">1. Volume & Velocity: Saturation Strategy</p>
@@ -307,15 +283,21 @@ with col_a:
             <p class="analysis-bullet"><b>The Framework:</b> <i>Umberto Eco</i> identified that autocracy relies on "Newspeak"—a restricted vocabulary that prevents critical thought and creates a new reality where dissent is chilled.</p>
             <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Evidence: Coordinated assaults on universities using funding freezes, visa revocations, and civil rights probes.</i></p>
         </div>
+        <div class="analysis-card">
+            <p style="font-weight:bold; margin-bottom:5px;">3. Apathy: The Erosion of Accountability</p>
+            <p class="analysis-bullet"><b>The Risk:</b> Normalization is the ultimate phase of dismantle. When outrage fatigue leads to public apathy, the state is freed from the burden of justification, turning unchecked power into the new institutional baseline.</p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Hannah Arendt</i> warned that the greatest danger to democracy is not active malice, but the "banality" of those who stop questioning the systematic erosion of truth.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Observation: The transition from questioning state motives to accepting them as "just the way things are."</i></p>
+        </div>
     """, unsafe_allow_html=True)
 
 with col_b:
-    st.markdown('<p class="analysis-h4">II. Actionable Paths</p>', unsafe_allow_html=True)
+    st.markdown('<p class="analysis-h3">Actionable Paths</p>', unsafe_allow_html=True)
     st.markdown("""
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">1. Break the Silence of Enablers</p>
             <p class="analysis-bullet"><b>The Strategy:</b> Autocracy requires the collaboration of elites and business leaders. <i>Robert Paxton</i> emphasizes that fascism thrives on the willing cooperation of those who share power to suppress opposition.</p>
-            <p class="analysis-bullet"><b>The Action:</b> Apply relentless social and financial pressure on the corporations, tech firms, and law firms actively profiting from the surveillance and deportation apparatus.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Apply relentless social and financial pressure on the corporations, law firms, and tech executives actively profiting from the surveillance and deportation apparatus.</p>
         </div>
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">2. Document Reality Daily</p>
