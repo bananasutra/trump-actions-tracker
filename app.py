@@ -85,16 +85,16 @@ st.markdown(f"""
         }}
         
         .intro-header {{
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             opacity: 0.9;
         }}
         .intro-text {{
-            font-size: 0.9rem !important;
-            line-height: 1.5 !important;
-            opacity: 0.8;
-            margin-bottom: 12px; /* Spacing with chart */
+            font-size: 0.95rem !important;
+            line-height: 1.6 !important;
+            opacity: 0.85;
+            margin-bottom: 25px; /* Increased vertical spacing from chart */
         }}
         
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
