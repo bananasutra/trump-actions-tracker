@@ -96,6 +96,13 @@ st.markdown(f"""
             opacity: 0.75;
         }}
         
+        .section-subhead {{
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-bottom: 15px;
+            font-style: italic;
+        }}
+        
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
@@ -234,10 +241,13 @@ if df is not None:
     </div>
     """, unsafe_allow_html=True)
 
-# 7. TIMELINE & THEMES
+# 7. TIMELINE OF ACTIONS
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Timeline of Actions")
+st.markdown('<p class="section-subhead">Visualizing momentum.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text">This graph tracks the cumulative progression of actions over time. Use search and filters to identify "spikes" in activity—periods where the velocity of the institutional rewrite intensified. Use the Comparison Mode in the sidebar to contrast specific thematic velocities.</p>', unsafe_allow_html=True)
+
 if not f_df.empty:
     if comp_mode:
         long_names = [SHORT_TO_LONG[s] for s in selected_themes]
@@ -257,16 +267,21 @@ if not f_df.empty:
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), alt.Tooltip('Title:N', title='Action'), alt.Tooltip('Themes_List:N', title='Themes Hit'), alt.Tooltip('URL:N', title='Source URL')]
         ).properties(width='container', height=400).interactive()
     st.altair_chart(chart, use_container_width=True)
-    st.markdown("<p style='font-size:0.75rem; opacity:0.6; font-style:italic; margin-top:-20px;'>💡 Hover for diagnostic data. Click points for source URL.</p>", unsafe_allow_html=True)
+    st.caption("💡 On desktop, hover any data point to view the specific action and its source.")
 st.markdown(back_to_top, unsafe_allow_html=True)
 
+# 8. VOLUME BY THEME
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Volume by Theme")
+st.markdown('<p class="section-subhead">Mapping the targets.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text">This breakdown reveals which democratic pillars are under the heaviest stress. It helps isolate the administration\'s primary strategic focus.</p>', unsafe_allow_html=True)
+
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(x=alt.X('Count:Q', title="Actions"), y=alt.Y('Theme:N', sort='-x', title=None), tooltip=['Theme', 'Count']).properties(height=400).interactive()
     st.altair_chart(theme_bar, use_container_width=True)
+    st.caption("💡 Use search and/or filter to investigate overlaps and hover over the bars to see exact counts.")
 
     with st.expander("📖 Strategic Themes Glossary"):
         gloss_html = '<div style="font-size:0.85rem; opacity:0.9;"><table>'
@@ -276,10 +291,13 @@ if not f_df.empty:
         st.markdown(gloss_html, unsafe_allow_html=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
-# 8. STRATEGIC ANALYSIS
+# 9. STRATEGIC ANALYSIS
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Strategic Analysis")
+st.markdown('<p class="section-subhead">Diagnostic findings.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text">Beyond the raw numbers, these insights explain the methodology of the dismantle. This section identifies patterns like <b>Saturation</b> and <b>Interlocking Strikes</b>.</p>', unsafe_allow_html=True)
+
 c1, c2 = st.columns(2)
 with c1:
     st.markdown("#### Saturation Strategy & Attrition")
@@ -298,6 +316,9 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Data Search")
+st.markdown('<p class="section-subhead">Granular evidence.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text">The complete repository of verifiable data. Use the search bar below to find specific keywords, people, or policies.</p>', unsafe_allow_html=True)
+
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
 st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
 st.markdown(back_to_top, unsafe_allow_html=True)
