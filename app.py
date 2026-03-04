@@ -56,11 +56,20 @@ st.markdown(f"""
         }}
         
         /* Typography */
+        .source-line {{
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin: 15px 0 20px 0;
+            padding-top: 10px;
+            border-top: 1px solid rgba(128, 128, 128, 0.1);
+            line-height: 1.4;
+        }}
+        
         .russell-quote {{
             font-size: 1.25rem;
             line-height: 1.4;
             max-width: 800px;
-            margin: 20px 0 8px 0;
+            margin: 15px 0 8px 0;
             padding-left: 18px;
             border-left: 3px solid rgba(128, 128, 128, 0.3);
             font-weight: 500;
@@ -72,18 +81,18 @@ st.markdown(f"""
             font-size: 0.95rem;
             font-weight: bold;
             opacity: 0.8;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }}
         
         .intro-header {{
             font-size: 1.05rem;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             opacity: 0.9;
         }}
         .intro-text {{
-            font-size: 0.82rem;
-            line-height: 1.5;
+            font-size: 0.82rem !important;
+            line-height: 1.4 !important;
             opacity: 0.75;
         }}
         
@@ -161,13 +170,13 @@ if df is not None:
 st.markdown("""
     <div style="text-align: left;">
         <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 4px 0; opacity: 0.95;">
+        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 0 0; opacity: 0.95;">
             An interactive diagnostic for curious, conscious, and caring humans—because facts should always trump opinions.
         </p>
-        <p style="font-size:0.85rem; opacity:0.8; margin:0 0 20px 0; line-height: 1.4;">
+        <div class="source-line">
             <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
             <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
-        </p>
+        </div>
         <div class="russell-quote">
             "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt."
         </div>
@@ -184,7 +193,7 @@ if df is not None:
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
     
-    # WHY & HOW COLUMNS (Refined Formatting)
+    # WHY & HOW COLUMNS
     col1, col2 = st.columns(2)
     with col1:
         st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
