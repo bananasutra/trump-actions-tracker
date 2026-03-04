@@ -272,7 +272,7 @@ col_a, col_b = st.columns(2)
 
 with col_a:
     st.markdown("""
-        <h3>The Critical Risks</h3>
+        <h3>Critical Risks</h3>
         <div class="analysis-card">
             <h4>1. Volume & Velocity: Saturation Strategy</h4>
             <p class="analysis-bullet"><b>The Risk:</b> High-velocity actions induce "procedural shock" by overwhelming oversight capacity. The state ensures institution rewrite outpaces legal response, making damage permanent before review begins.</p>
