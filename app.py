@@ -30,6 +30,14 @@ st.markdown(f"""
         #top {{ scroll-margin-top: 100px; }}
         [id^="section-"] {{ scroll-margin-top: 120px !important; }}
         
+        /* Sidebar UX Fixes */
+        [data-testid="stSidebarNav"] {{ display: none; }} /* Clean sidebar */
+        [data-testid="collapsedControl"] {{
+            color: #DE0100 !important;
+            transform: scale(1.4);
+            left: 10px;
+        }}
+        
         /* Layout Elements */
         .hero-container {{ 
             display: flex; 
@@ -87,7 +95,7 @@ st.markdown(f"""
         .intro-header {{
             font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             opacity: 0.9;
         }}
         .intro-text {{
@@ -130,7 +138,7 @@ CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
 SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
-# 3. DATA ENGINE
+# 3. DATA ENGINE & SEARCH SYNC
 if "q" not in st.session_state: st.session_state.q = ""
 def sync_s(): st.session_state.q = st.session_state.side_q
 def sync_v(): st.session_state.q = st.session_state.vault_q
@@ -148,20 +156,27 @@ def get_data():
 
 df = get_data()
 
-# 4. SIDEBAR
+# 4. HARMONIZED SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
-st.sidebar.text_input("🔍 Search Actions", key="side_q", on_change=sync_s, value=st.session_state.q)
-comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
-
-if comp_mode:
-    selected_themes = st.sidebar.multiselect("Select Pillars", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
-else:
-    selected_pillar = st.sidebar.selectbox("Filter Pillar", ["All Actions"] + SORTED_SHORT_NAMES)
 
 if df is not None:
+    # 4.1 Filter by Date
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
-    selected_range = st.sidebar.slider("Timeline Scrub", min_value=min_date, max_value=max_date, value=(min_date, max_date))
+    selected_range = st.sidebar.slider("Filter by Date", min_value=min_date, max_value=max_date, value=(min_date, max_date))
     
+    # 4.2 Filter by Theme
+    st.sidebar.divider()
+    comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
+    if comp_mode:
+        selected_themes = st.sidebar.multiselect("Filter by Theme", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
+    else:
+        selected_pillar = st.sidebar.selectbox("Filter by Theme", ["All Actions"] + SORTED_SHORT_NAMES)
+
+    # 4.3 Filter by Keyword
+    st.sidebar.divider()
+    st.sidebar.text_input("Filter by Keyword", key="side_q", on_change=sync_s, value=st.session_state.q)
+    
+    # Reset
     def reset_all():
         st.session_state.q = ""
         st.session_state.comp_mode = False
@@ -184,7 +199,10 @@ st.markdown("""
 if df is not None:
     f_df = df[(df['Date'] >= selected_range[0]) & (df['Date'] <= selected_range[1])]
     f_df = f_df[f_df['Title'].str.contains(st.session_state.q, case=False, na=False)]
-    if not comp_mode and selected_pillar != "All Actions":
+    if comp_mode:
+        # Comparison mode logic (already handled in chart logic)
+        pass
+    elif selected_pillar != "All Actions":
         f_df = f_df[f_df[SHORT_TO_LONG[selected_pillar]].str.strip().str.lower() == 'yes']
 
     pace = (len(f_df) / 400) * 30.44
@@ -251,8 +269,6 @@ if not f_df.empty:
         comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
         comp_plot_df['Cumulative'] = comp_plot_df.groupby('Theme').cumcount() + 1
         
-        # RESPONSIVE WRAPPING LEGEND
-        # On wide screens: Right side. On narrow screens: Below & Columns.
         chart = alt.Chart(comp_plot_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
             x='Date:T', 
             y='Cumulative:Q', 
@@ -267,12 +283,6 @@ if not f_df.empty:
             tooltip=['Date:T', 'Title:N', 'Theme:N', 'Cumulative:Q']
         ).properties(width='container', height=400).interactive()
         
-        # Configure wrapping logic for small screens
-        chart = chart.configure_legend(
-            orient='bottom', 
-            columns=2  # On narrow viewports, 2 columns fit better
-        ) if st.session_state.get('viewport_width', 1000) < 800 else chart
-
     else:
         chart_df = f_df.copy().sort_values('Date')
         chart_df['Cumulative'] = range(1, len(chart_df) + 1)
@@ -293,8 +303,6 @@ st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown re
 
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
-    
-    # FIXED AXIS PADDING & LABEL LIMITS FOR "Suppressing Dissent"
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
         x=alt.X('Count:Q', title="Actions"), 
         y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(
