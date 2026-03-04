@@ -22,7 +22,7 @@ st.markdown(f"""
     <style>
         @media (max-width: 768px) {{
             .hero-container, .nav-container, .intro-container {{ flex-direction: column !important; }}
-            .hero-card {{ width: 100% !important; margin-bottom: 10px; }}
+            .hero-card, .intro-column {{ width: 100% !important; margin-bottom: 10px; }}
             .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
             .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         }}
@@ -188,10 +188,10 @@ if df is not None:
     col1, col2 = st.columns(2)
     with col1:
         st.markdown('<p class="intro-header">Why democracy matters</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">The future of our democracy rests on the stability of its guardrails. We measure the <b>Volume, Velocity, and Complexity</b> of these actions to move past "cocksure" rhetoric and confront the structural dismantle of our state. Documentation is our most vital tool for protecting a collective future.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">In a world of loud opinions, documentation is the only antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic nature of the democratic dismantle. Use this data to replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
     with col2:
         st.markdown('<p class="intro-header">How to use this tool</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">This is an interactive dashboard; all metrics and charts sync to your inputs. Use the <b>Sidebar</b> to search specific terms (like "<b>Musk</b>" or "<b>Deportation</b>") and filter by <b>Theme</b> to investigate specific threats in real-time. Toggle <b>Comparison Mode</b> to see targeted pillars.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">This dashboard is fully interactive; all metrics and charts sync to your inputs. Use the <b>Sidebar</b> to search specific terms (like "<b>Musk</b>" or "<b>Deportation</b>") or filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
     st.divider()
     st.subheader("Institutional Health Diagnostic")
