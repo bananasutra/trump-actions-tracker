@@ -251,11 +251,28 @@ if not f_df.empty:
         comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
         comp_plot_df['Cumulative'] = comp_plot_df.groupby('Theme').cumcount() + 1
         
-        # MOBILE-OPTIMIZED LEGEND (Bottom, Horizontal)
+        # RESPONSIVE WRAPPING LEGEND
+        # On wide screens: Right side. On narrow screens: Below & Columns.
         chart = alt.Chart(comp_plot_df).mark_line(interpolate='step-after', strokeWidth=3).encode(
-            x='Date:T', y='Cumulative:Q', color=alt.Color('Theme:N', legend=alt.Legend(orient='bottom', direction='horizontal', title=None)), href='URL:N',
+            x='Date:T', 
+            y='Cumulative:Q', 
+            color=alt.Color('Theme:N', legend=alt.Legend(
+                orient='right', 
+                columns=1, 
+                labelFontSize=10, 
+                symbolSize=100,
+                title=None
+            )), 
+            href='URL:N',
             tooltip=['Date:T', 'Title:N', 'Theme:N', 'Cumulative:Q']
         ).properties(width='container', height=400).interactive()
+        
+        # Configure wrapping logic for small screens
+        chart = chart.configure_legend(
+            orient='bottom', 
+            columns=2  # On narrow viewports, 2 columns fit better
+        ) if st.session_state.get('viewport_width', 1000) < 800 else chart
+
     else:
         chart_df = f_df.copy().sort_values('Date')
         chart_df['Cumulative'] = range(1, len(chart_df) + 1)
@@ -263,6 +280,7 @@ if not f_df.empty:
             x='Date:T', y='Cumulative:Q', href='URL:N',
             tooltip=[alt.Tooltip('Date:T', format='%Y-%m-%d'), alt.Tooltip('Title:N', title='Action'), alt.Tooltip('Themes_List:N', title='Themes Hit'), alt.Tooltip('URL:N', title='Source URL')]
         ).properties(width='container', height=400).interactive()
+    
     st.altair_chart(chart, use_container_width=True)
     st.caption("💡 On desktop, hover any data point to view the specific action and its source.")
 st.markdown(back_to_top, unsafe_allow_html=True)
@@ -276,10 +294,14 @@ st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown re
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
     
-    # FIXED AXIS PADDING & LABEL LIMITS
+    # FIXED AXIS PADDING & LABEL LIMITS FOR "Suppressing Dissent"
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
         x=alt.X('Count:Q', title="Actions"), 
-        y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300, labelPadding=10)), 
+        y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(
+            labelLimit=300, 
+            labelPadding=10,
+            labelFontSize=11
+        )), 
         tooltip=['Theme', 'Count']
     ).properties(height=400).configure_view(stroke=None).interactive()
     
