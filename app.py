@@ -57,11 +57,11 @@ st.markdown(f"""
         
         /* Typography */
         .source-line {{
-            font-size: 0.85rem;
-            opacity: 0.85;
-            margin: 15px 0 20px 0;
-            padding-top: 10px;
-            border-top: 1px solid rgba(128, 128, 128, 0.1);
+            font-size: 0.82rem;
+            opacity: 0.8;
+            margin: 20px 0 25px 0;
+            padding-top: 12px;
+            border-top: 1px solid rgba(128, 128, 128, 0.15);
             line-height: 1.4;
         }}
         
@@ -69,7 +69,7 @@ st.markdown(f"""
             font-size: 1.25rem;
             line-height: 1.4;
             max-width: 800px;
-            margin: 15px 0 8px 0;
+            margin: 22px 0 8px 0;
             padding-left: 18px;
             border-left: 3px solid rgba(128, 128, 128, 0.3);
             font-weight: 500;
@@ -81,7 +81,7 @@ st.markdown(f"""
             font-size: 0.95rem;
             font-weight: bold;
             opacity: 0.8;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }}
         
         .intro-header {{
@@ -92,7 +92,7 @@ st.markdown(f"""
         }}
         .intro-text {{
             font-size: 0.82rem !important;
-            line-height: 1.4 !important;
+            line-height: 1.5 !important;
             opacity: 0.75;
         }}
         
@@ -171,12 +171,8 @@ st.markdown("""
     <div style="text-align: left;">
         <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
         <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 0 0; opacity: 0.95;">
-            An interactive diagnostic for curious, conscious, and caring humans—because facts should always trump opinions.
+            An interactive diagnostic tool for curious, conscious, and caring humans—because facts sure trump opinions.
         </p>
-        <div class="source-line">
-            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
-        </div>
         <div class="russell-quote">
             "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt."
         </div>
@@ -197,10 +193,18 @@ if df is not None:
     col1, col2 = st.columns(2)
     with col1:
         st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">Because democracy matters, and in a world of loud opinions, documentation is the only antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic nature of the democratic dismantle. Use this data to replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">Because democracy matters, and in a world of loud opinions, documentation is the antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic dismantle of our state. Replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
     with col2:
         st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">This dashboard is fully interactive; all metrics and charts sync to your inputs. Use the <b>Sidebar</b> to search specific terms (like "<b>Musk</b>" or "<b>Deportation</b>") or filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
+        st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
+
+    # SOURCE LINE MOVED UNDER COLUMNS
+    st.markdown("""
+        <div class="source-line">
+            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
+        </div>
+    """, unsafe_allow_html=True)
 
     st.divider()
     st.subheader("Institutional Health Diagnostic")
