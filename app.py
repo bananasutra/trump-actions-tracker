@@ -21,8 +21,8 @@ st.markdown(f"""
     <meta name="description" content="Strategic diagnostic of authoritarian velocity and institutional rewrite (2025-2026).">
     <style>
         @media (max-width: 768px) {{
-            .hero-container, .nav-container, .intro-container {{ flex-direction: column !important; }}
-            .hero-card, .intro-column {{ width: 100% !important; margin-bottom: 10px; }}
+            .hero-container, .nav-container, .intro-container, .analysis-grid {{ flex-direction: column !important; }}
+            .hero-card, .intro-column, .analysis-column {{ width: 100% !important; margin-bottom: 10px; }}
             .nav-container {{ display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px; }}
             .nav-container button {{ width: 100%; padding: 6px 12px; border-radius: 5px; font-weight: bold; background: transparent; border: 1px solid currentColor; }}
         }}
@@ -43,102 +43,28 @@ st.markdown(f"""
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2) !important;
         }}
-        
-        /* Slider & Layout Spacing */
-        div[data-testid="stSlider"] {{ margin-bottom: -15px !important; }}
         
         /* Layout Elements */
-        .hero-container {{ 
-            display: flex; 
-            justify-content: space-between; 
-            gap: 15px; 
-            margin-bottom: 25px; 
-            align-items: stretch;
-        }}
-        .hero-card {{ 
-            flex: 1; 
-            background: rgba(128, 128, 128, 0.1); 
-            border: 1px solid rgba(128, 128, 128, 0.2); 
-            border-radius: 12px; 
-            padding: 20px; 
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: all 0.2s ease;
-        }}
-        .hero-card:hover {{
-            border-color: rgba(128, 128, 128, 0.4);
-            transform: translateY(-2px);
-        }}
+        .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; align-items: stretch; }}
+        .hero-card {{ flex: 1; background: rgba(128, 128, 128, 0.1); border: 1px solid rgba(128, 128, 128, 0.2); border-radius: 12px; padding: 20px; text-align: center; }}
+        
+        /* Analysis Layout */
+        .analysis-grid {{ display: flex; gap: 40px; margin-bottom: 30px; }}
+        .analysis-column {{ flex: 1; }}
+        .analysis-card {{ margin-bottom: 25px; }}
         
         /* Typography */
-        .source-line {{
-            font-size: 0.82rem;
-            opacity: 0.8;
-            margin: 20px 0 25px 0;
-            padding-top: 12px;
-            border-top: 1px solid rgba(128, 128, 128, 0.15);
-            line-height: 1.4;
-        }}
-        
-        .russell-quote {{
-            font-size: 1.25rem;
-            line-height: 1.4;
-            max-width: 800px;
-            margin: 22px 0 8px 0;
-            padding-left: 18px;
-            border-left: 3px solid rgba(128, 128, 128, 0.3);
-            font-weight: 500;
-            font-style: italic;
-        }}
-        .quote-author {{
-            text-align: left;
-            padding-left: 21px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            opacity: 0.8;
-            margin-bottom: 20px;
-        }}
-        
-        .intro-header {{
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 4px;
-            opacity: 0.9;
-        }}
-        .intro-text {{
-            font-size: 0.95rem !important;
-            line-height: 1.6 !important;
-            opacity: 0.85;
-            margin-bottom: 25px; 
-        }}
+        .intro-text {{ font-size: 0.95rem !important; line-height: 1.6 !important; opacity: 0.85; margin-bottom: 25px; }}
+        .analysis-h4 {{ font-size: 1.15rem; font-weight: bold; margin-bottom: 15px; opacity: 0.9; border-bottom: 1px solid rgba(128, 128, 128, 0.2); padding-bottom: 8px; }}
+        .analysis-bullet {{ font-size: 0.88rem; line-height: 1.5; margin-bottom: 10px; opacity: 0.9; }}
+        .projection-block {{ background: rgba(222, 1, 0, 0.05); padding: 20px; border-left: 4px solid #DE0100; border-radius: 4px; margin-top: 20px; }}
 
-        /* Strategic Analysis Styles */
-        .analysis-card {{
-            margin-bottom: 20px;
-        }}
-        .analysis-h4 {{
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #DE0100;
-        }}
-        .analysis-bullet {{
-            font-size: 0.88rem;
-            line-height: 1.5;
-            margin-bottom: 10px;
-            opacity: 0.9;
-        }}
-        
         div[data-testid="stVerticalBlock"] > div:has(div.nav-container) {{ 
             position: sticky !important; top: 2.875rem !important; z-index: 999 !important; 
             background: inherit !important; backdrop-filter: blur(15px) !important; padding: 5px 0 !important; 
         }}
         .back-to-top {{ text-align: right; font-size: 0.75rem; opacity: 0.6; }}
-        .back-to-top a {{ color: inherit; text-decoration: none; }}
     </style>
     </head>
     <div id="top"></div>
@@ -183,7 +109,7 @@ def get_data():
 
 df = get_data()
 
-# 4. SIDEBAR
+# 4. HARMONIZED SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
 st.sidebar.divider()
 comp_mode = st.sidebar.toggle("📊 Comparison Mode", key="comp_mode")
@@ -333,7 +259,7 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-insights'></div>", unsafe_allow_html=True)
 st.divider()
 st.subheader("Strategic Analysis")
-st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> We have entered a phase of institutional rehearsal for total state rewrite. By quantifying these actions, we move beyond the noise of daily outrage to confront the structural dismantling of American democracy.</p>', unsafe_allow_html=True)
+st.markdown('<p class="intro-text"><b>Diagnostic findings:</b> Institutional rehearsal for a total state rewrite is no longer a risk—it is a documented fact. Headlines that speak of "sliding" or "risks" are beyond euphemisms; they are forms of dangerous denial. Quantifiable data is the only tool that moves past the noise of daily outrage to confront the structural dismantling of democracy.</p>', unsafe_allow_html=True)
 
 col_a, col_b = st.columns(2)
 
@@ -342,19 +268,15 @@ with col_a:
     st.markdown("""
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">1. Volume & Velocity: Saturation Strategy</p>
-            <p class="analysis-bullet"><b>The Risk:</b> High-velocity actions induce "procedural shock." By overwhelming oversight capacity, the state ensures institution rewrite outpaces legal response. Damage becomes permanent before review begins.</p>
-            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through overwhelming mass.</p>
-            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Simultaneous Inspector General purges alongside the removal of job protections for thousands of civil servants.</i></p>
+            <p class="analysis-bullet"><b>The Risk:</b> High-velocity actions induce "procedural shock" by overwhelming oversight capacity. The state ensures institution rewrite outpaces legal response, making damage permanent before review begins.</p>
+            <p class="analysis-bullet"><b>The Framework:</b> <i>Bertrand Russell</i> warned that democracy requires the courage to demand evidence; saturation exhausts that courage through sheer overwhelming mass.</p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Evidence: Simultaneous Inspector General purges alongside the removal of job protections for thousands of career civil servants.</i></p>
         </div>
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">2. Complexity: Norm-Collapse Loops</p>
             <p class="analysis-bullet"><b>The Risk:</b> Complexity is weaponized via "interlocking strikes." By hitting multiple domains simultaneously, the state ensures the objective is met even if a court blocks one specific channel.</p>
             <p class="analysis-bullet"><b>The Framework:</b> <i>Umberto Eco</i> identified that autocracy relies on "Newspeak"—a restricted vocabulary that prevents critical thought and creates a new reality where dissent is chilled.</p>
-            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Example: Coordinated assaults on universities using funding freezes, visa revocations, and civil rights probes.</i></p>
-        </div>
-        <div style="background: rgba(222, 1, 0, 0.05); padding: 15px; border-left: 3px solid #DE0100; margin-top: 10px;">
-            <p style="font-weight:bold; color:#DE0100; margin-bottom:5px;">3. Diagnostic Projection</p>
-            <p class="analysis-bullet">Current trends suggest a total institutional dismantle prior to 2028. The manipulation of emergency powers and defunding of independent media are removing the guardrails required for free and fair elections. As <i>Timothy Snyder</i> warns: <b>Institutions do not protect themselves.</b></p>
+            <p class="analysis-bullet" style="font-size:0.8rem; opacity:0.7;"><i>Evidence: Coordinated assaults on universities using funding freezes, visa revocations, and civil rights probes.</i></p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -364,21 +286,28 @@ with col_b:
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">1. Break the Silence of Enablers</p>
             <p class="analysis-bullet"><b>The Strategy:</b> Autocracy requires the collaboration of elites and business leaders. <i>Robert Paxton</i> emphasizes that fascism thrives on the willing cooperation of those who share power to suppress opposition.</p>
-            <p class="analysis-bullet"><b>The Action:</b> Apply relentless pressure on the corporations, law firms, and tech executives actively profiting from the surveillance and deportation apparatus.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Apply relentless social and financial pressure on the corporations, tech firms, and law firms actively profiting from the surveillance and deportation apparatus.</p>
         </div>
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">2. Document Reality Daily</p>
             <p class="analysis-bullet"><b>The Strategy:</b> In a "post-truth" era, documentation is the most vital form of resistance. Refuse to adopt the dehumanizing "Newspeak" of the state. <i>Do not obey in advance.</i></p>
-            <p class="analysis-bullet"><b>The Action:</b> Aggressively share authoritative data like this tracker. Confront disinformation with irrefutable evidence. Do not let rhetoric replace reality.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Aggressively share authoritative data projects. Confront disinformation with irrefutable evidence. Do not let rhetoric replace institutional reality.</p>
         </div>
         <div class="analysis-card">
             <p style="font-weight:bold; margin-bottom:5px;">3. Choose Courage Over Comfort</p>
-            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery over comfort. Banasutra philosophy holds that radical empathy and kindness are the ultimate defiance against a system built on cruelty.</p>
-            <p class="analysis-bullet"><b>The Action:</b> Practice intellectual and emotional courage. Question authority relentlessly, protect the marginalized, and recognize kindness as a tactical democratic guardrail.</p>
+            <p class="analysis-bullet"><b>The Strategy:</b> True knowledge requires bravery over comfort. Radical empathy and kindness are not signs of weakness; they are the ultimate defiance against a system built on cruelty.</p>
+            <p class="analysis-bullet"><b>The Action:</b> Practice emotional courage. Question authority relentlessly, protect the marginalized in your community, and recognize kindness as a tactical democratic guardrail.</p>
         </div>
     """, unsafe_allow_html=True)
 
-v_l, v_c, v_r = st.columns([1, 8, 1]); v_c.video("https://www.youtube.com/watch?v=lbTQ-lkudd4")
+# FULL WIDTH DIAGNOSTIC PROJECTION
+st.markdown("""
+    <div class="projection-block">
+        <p style="font-weight:bold; color:#DE0100; margin-bottom:8px; font-size:1.1rem;">Diagnostic Projection</p>
+        <p class="analysis-bullet" style="font-size:0.95rem;">Current trends suggest a total institutional dismantle prior to the 2028 electoral cycle. The manipulation of emergency powers and defunding of independent media are systemically removing the guardrails required for free and fair elections. As <i>Timothy Snyder</i> warns: <b>Institutions do not protect themselves.</b></p>
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 10. DATA SEARCH
