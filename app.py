@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import re
+import os
 from collections import Counter
 from datetime import datetime
 from streamlit_echarts import st_echarts
@@ -103,18 +104,26 @@ if "q" not in st.session_state: st.session_state.q = ""
 def sync_s(): st.session_state.q = st.session_state.side_q
 def sync_v(): st.session_state.q = st.session_state.vault_q
 
-@st.cache_data
+@st.cache_data(persist="disk")
 def get_data():
-    import os
+    # USES 'os' TO FIND YOUR CSV AUTOMATICALLY
     files = [f for f in os.listdir('.') if f.endswith('.csv')]
-    if not files: return None
-    df = pd.read_csv(files[0], skiprows=2)
+    if not files: 
+        return None
+    
+    # LOADS THE DATA
+    df = pd.read_csv(files[0], skiprows=2).copy()
+    
+    # PROCESSES EVERYTHING ONCE (CACHED)
     df['Date'] = pd.to_datetime(df['Date'])
-    df['Themes_List'] = df.apply(lambda r: ", ".join([CATEGORY_MAP[c] for c in CATEGORY_MAP if str(r[c]).strip().lower() == 'yes']), axis=1)
+    
+    # Pre-calculates the Themes_List for your search bar
+    df['Themes_List'] = df.apply(lambda r: ", ".join([CATEGORY_MAP[c] for c in CATEGORY_MAP if str(r.get(c, '')).strip().lower() == 'yes']), axis=1)
+    
+    # Pre-calculates category counts for your complexity metrics
     df['Cat_Count'] = df[list(CATEGORY_MAP.keys())].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
+    
     return df.sort_values('Date')
-
-df = get_data()
 
 # 4. HARMONIZED SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
