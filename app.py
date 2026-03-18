@@ -273,6 +273,14 @@ if df is not None:
 st.markdown("<div id='section-timeline'></div>", unsafe_allow_html=True)
 st.divider()
 st.markdown("<h2>Timeline of Actions</h2>", unsafe_allow_html=True)
+# Dynamic line above chart: reflects keyword and theme filters
+kw = (st.session_state.q or "").strip()
+theme_note = "" if (comp_mode or selected_pillar == "All Actions") else f" in <b>{selected_pillar}</b>"
+if kw:
+    timeline_intro = f'<p class="intro-text"><b>In this view:</b> Showing <b>{len(f_df)}</b> actions matching "<b>{kw}</b>"{theme_note}.</p>'
+else:
+    timeline_intro = f'<p class="intro-text"><b>In this view:</b> Showing <b>{len(f_df)}</b> actions{theme_note}.</p>'
+st.markdown(timeline_intro, unsafe_allow_html=True)
 st.markdown('<p class="intro-text"><b>Visualizing momentum:</b> This graph tracks the cumulative progression of actions over time. Use search and filters to identify "spikes" in activity—periods where the velocity of the institutional rewrite intensified. Use the Comparison Mode in the sidebar to contrast specific thematic velocities.</p>', unsafe_allow_html=True)
 
 if not f_df.empty:
