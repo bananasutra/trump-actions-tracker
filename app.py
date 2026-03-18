@@ -406,10 +406,28 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-search'></div>", unsafe_allow_html=True)
 st.divider()
 st.markdown("<h2>Data Search</h2>", unsafe_allow_html=True)
-st.markdown('<p class="intro-text"><b>Granular evidence:</b> The complete repository of verifiable data. Use the search bar below to find specific keywords, people, or policies.</p>', unsafe_allow_html=True)
+kw_search = (st.session_state.q or "").strip()
+if kw_search:
+    st.markdown(
+        f'<p class="intro-text"><b>Granular evidence:</b> Showing '
+        f'<b>{len(f_df)}</b> records matching "<b>{kw_search}</b>". '
+        'Use the search bar below to find specific keywords, people, or policies.</p>',
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        '<p class="intro-text"><b>Granular evidence:</b> The complete repository of verifiable data. '
+        'Use the search bar below to find specific keywords, people, or policies.</p>',
+        unsafe_allow_html=True,
+    )
 
 st.text_input("Synchronized Filter", key="vault_q", on_change=sync_v, value=st.session_state.q)
-st.dataframe(f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False), column_config={"URL": st.column_config.LinkColumn("Source")}, use_container_width=True, hide_index=True)
+st.dataframe(
+    f_df[['Date', 'Title', 'URL', 'Themes_List']].sort_values('Date', ascending=False),
+    column_config={"URL": st.column_config.LinkColumn("Source")},
+    use_container_width=True,
+    hide_index=True,
+)
 st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 11. FOOTER
