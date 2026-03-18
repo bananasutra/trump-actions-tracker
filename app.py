@@ -223,7 +223,7 @@ if df is not None:
     """, unsafe_allow_html=True)
 
     # Compact always-visible copy; move HOW/WHY depth into an expander with breathing room
-    with st.expander("How and why to use this tool", expanded=False):
+    with st.expander("Why and how to use this tool", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
