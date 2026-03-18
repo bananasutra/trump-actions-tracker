@@ -317,7 +317,19 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 st.markdown("<div id='section-themes'></div>", unsafe_allow_html=True)
 st.divider()
 st.markdown("<h2>Volume by Theme</h2>", unsafe_allow_html=True)
-st.markdown('<p class="intro-text"><b>Mapping the targets:</b> This breakdown reveals which democratic pillars are under the heaviest stress. It helps isolate the administration\'s primary strategic focus.</p>', unsafe_allow_html=True)
+theme_filter_note = "" if (comp_mode or selected_pillar == "All Actions") else f" within <b>{selected_pillar}</b>"
+if kw:
+    volume_intro_dynamic = (
+        f'<p class="intro-text"><b>Mapping the targets:</b> In this filtered view, '
+        f'<b>{len(f_df)}</b> actions matching "<b>{kw}</b>"{theme_filter_note} '
+        'concentrate pressure across the themes below.</p>'
+    )
+else:
+    volume_intro_dynamic = (
+        f'<p class="intro-text"><b>Mapping the targets:</b> This breakdown reveals which democratic pillars are '
+        f'under the heaviest stress{theme_filter_note}. It helps isolate the administration\'s primary strategic focus.</p>'
+    )
+st.markdown(volume_intro_dynamic, unsafe_allow_html=True)
 
 if not f_df.empty:
     cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
