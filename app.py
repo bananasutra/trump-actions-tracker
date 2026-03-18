@@ -180,6 +180,11 @@ if df is not None:
 
     pace = (len(f_df) / 400) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
+
+    # Full dataset range for clarity (Tier 1)
+    data_start = df['Date'].min().strftime('%b %d, %Y')
+    data_end = df['Date'].max().strftime('%b %d, %Y')
+    data_range_str = f"{data_start} – {data_end}"
     
     col1, col2 = st.columns(2)
     with col1:
@@ -189,15 +194,30 @@ if df is not None:
         st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
         st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(f"""
         <div class="source-line">
             <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a>
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a> | 
+            <b>Data range:</b> {data_range_str}
         </div>
     """, unsafe_allow_html=True)
 
     st.divider()
     st.markdown("<h2>Institutional Health Diagnostic</h2>", unsafe_allow_html=True)
+    # Dynamic narrative (Tier 2): updates with filters
+    range_start = selected_range[0].strftime('%b %d, %Y')
+    range_end = selected_range[1].strftime('%b %d, %Y')
+    top_themes = sorted(
+        [(short, (f_df[long].str.strip().str.lower() == 'yes').sum()) for long, short in CATEGORY_MAP.items()],
+        key=lambda x: -x[1]
+    )[:2]
+    top_line = ", ".join(f"{name} ({count})" for name, count in top_themes if count > 0) or "—"
+    st.markdown(
+        f'<p class="intro-text"><b>In this view:</b> From {range_start} to {range_end}, you\'re viewing '
+        f'<b>{len(f_df)}</b> actions at <b>{pace:.1f}/mo</b>, with <b>{overlap:.1f}%</b> touching multiple themes. '
+        f'Top themes: {top_line}.</p>',
+        unsafe_allow_html=True
+    )
     st.markdown('<p class="intro-text"><b>Real-time indicators:</b> These metrics provide a high-level assessment of institutional health. By monitoring <b>Strategic Volume</b>, <b>Systemic Velocity</b>, and <b>Tactical Complexity</b>, we quantify administrative efforts to bypass traditional democratic guardrails.</p>', unsafe_allow_html=True)
 
     st.markdown(f"""
@@ -355,4 +375,4 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 11. FOOTER
 st.divider()
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0.")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0. Data: " + data_range_str + ".")
