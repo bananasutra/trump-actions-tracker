@@ -44,6 +44,14 @@ st.markdown(f"""
             align-items: center !important;
             justify-content: center !important;
         }}
+        /* Sidebar spacing & legibility */
+        [data-testid="stSidebar"] > div:first-child {{
+            padding-top: 1.5rem !important;
+        }}
+        [data-testid="stSidebar"] label {{
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+        }}
         
         /* Layout Elements */
         .hero-container {{ display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; align-items: stretch; }}
@@ -185,13 +193,13 @@ if df is not None:
 st.markdown("""
     <div style="text-align: left;">
         <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 0 0; opacity: 0.95;">
+        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 4px 0; opacity: 0.95;">
             An interactive diagnostic tool for curious, conscious, and caring humans—because facts sure trump opinions.
         </p>
-        <div class="russell-quote">
-            "The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt."
-        </div>
-        <div class="quote-author">— Bertrand Russell</div>
+        <p style="font-size: 0.9rem; opacity: 0.8; margin: 4px 0 0 0;">
+            “The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.”
+            <span style="font-weight:bold;">— Bertrand Russell</span>
+        </p>
     </div>
 """, unsafe_allow_html=True)
 
@@ -208,14 +216,16 @@ if df is not None:
     data_start = df['Date'].min().strftime('%b %d, %Y')
     data_end = df['Date'].max().strftime('%b %d, %Y')
     data_range_str = f"{data_start} – {data_end}"
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">Because democracy matters, and in a world of loud opinions, documentation is the antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic dismantle of our state. Replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
-    with col2:
-        st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
-        st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
+
+    # Compact always-visible copy; move HOW/WHY depth into an expander
+    with st.expander("How and why to use this tool", expanded=False):
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown('<p class="intro-header">Why use this tool?</p>', unsafe_allow_html=True)
+            st.markdown('<p class="intro-text">Because democracy matters, and in a world of loud opinions, documentation is the antidote. Tracking the <b>Volume, Velocity, and Complexity</b> of current actions reveals the systematic dismantle of our state. Replace doubt with evidence and rhetoric with reality.</p>', unsafe_allow_html=True)
+        with col2:
+            st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
+            st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
     st.markdown(f"""
         <div class="source-line">
