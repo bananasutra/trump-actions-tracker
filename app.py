@@ -46,7 +46,7 @@ st.markdown(f"""
         }}
         /* Sidebar spacing & legibility */
         [data-testid="stSidebar"] > div:first-child {{
-            padding-top: 1.5rem !important;
+            padding-top: 2.25rem !important;
         }}
         [data-testid="stSidebar"] label {{
             font-size: 0.85rem !important;
@@ -67,9 +67,9 @@ st.markdown(f"""
         h4 {{ font-size: 1.1rem !important; font-weight: bold !important; margin-bottom: 8px !important; color: inherit !important; }}
         
         /* Typography */
-        .source-line {{ font-size: 0.85rem; opacity: 0.85; margin: 25px 0 25px 0; padding-top: 15px; border-top: 1px solid rgba(128, 128, 128, 0.2); line-height: 1.5; }}
-        .russell-quote {{ font-size: 1.3rem; line-height: 1.5; max-width: 850px; margin: 35px 0 12px 0; padding-left: 20px; border-left: 4px solid rgba(128, 128, 128, 0.3); font-weight: 500; font-style: italic; }}
-        .quote-author {{ text-align: left; padding-left: 24px; font-size: 1rem; font-weight: bold; opacity: 0.8; margin-bottom: 35px; }}
+        .source-line {{ font-size: 0.85rem; opacity: 0.85; margin: 12px 0 20px 0; padding-top: 10px; border-top: 1px solid rgba(128, 128, 128, 0.2); line-height: 1.4; }}
+        .russell-quote {{ font-size: 1.0rem; line-height: 1.4; max-width: 850px; margin: 10px 0 0 0; opacity: 0.85; }}
+        .quote-author {{ display: inline; font-size: 0.9rem; font-weight: bold; opacity: 0.85; margin-left: 4px; }}
         .intro-text {{ font-size: 0.95rem !important; line-height: 1.6 !important; opacity: 0.85; margin-bottom: 25px; }}
         
         .analysis-bullet {{ font-size: 0.88rem; line-height: 1.5; margin-bottom: 10px; opacity: 0.9; }}
@@ -191,15 +191,14 @@ if df is not None:
 
 # 5. HEADER SECTION
 st.markdown("""
-    <div style="text-align: left;">
+    <div style="text-align: left; margin-bottom: 8px;">
         <h1 style="margin:0;">🍌 U.S. Democracy Gone Bananas</h1>
-        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 4px 0; opacity: 0.95;">
+        <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 0 0; opacity: 0.95;">
             An interactive diagnostic tool for curious, conscious, and caring humans—because facts sure trump opinions.
         </p>
-        <p style="font-size: 0.9rem; opacity: 0.8; margin: 4px 0 0 0;">
-            “The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.”
-            <span style="font-weight:bold;">— Bertrand Russell</span>
-        </p>
+        <div class="russell-quote">
+            “The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.”<span class="quote-author">— Bertrand Russell</span>
+        </div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -217,7 +216,7 @@ if df is not None:
     data_end = df['Date'].max().strftime('%b %d, %Y')
     data_range_str = f"{data_start} – {data_end}"
 
-    # Compact always-visible copy; move HOW/WHY depth into an expander
+    # Compact always-visible copy; move HOW/WHY depth into an expander with breathing room
     with st.expander("How and why to use this tool", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
