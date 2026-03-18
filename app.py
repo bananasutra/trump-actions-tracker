@@ -141,13 +141,28 @@ st.sidebar.divider()
 
 if df is not None:
     min_date, max_date = df['Date'].min().to_pydatetime(), df['Date'].max().to_pydatetime()
-    selected_range = st.sidebar.slider("Filter by Date", min_value=min_date, max_value=max_date, value=(min_date, max_date))
+    selected_range = st.sidebar.slider(
+        "Filter by Date",
+        min_value=min_date,
+        max_value=max_date,
+        value=(min_date, max_date),
+        key="date_range",
+    )
     st.sidebar.divider()
     
     if comp_mode:
-        selected_themes = st.sidebar.multiselect("Filter by Theme", options=SORTED_SHORT_NAMES, default=SORTED_SHORT_NAMES)
+        selected_themes = st.sidebar.multiselect(
+            "Filter by Theme",
+            options=SORTED_SHORT_NAMES,
+            default=SORTED_SHORT_NAMES,
+            key="theme_multi",
+        )
     else:
-        selected_pillar = st.sidebar.selectbox("Filter by Theme", ["All Actions"] + SORTED_SHORT_NAMES)
+        selected_pillar = st.sidebar.selectbox(
+            "Filter by Theme",
+            ["All Actions"] + SORTED_SHORT_NAMES,
+            key="theme_select",
+        )
     st.sidebar.divider()
 
     st.sidebar.text_input("Filter by Keyword", key="side_q", on_change=sync_s, value=st.session_state.q)
@@ -156,6 +171,14 @@ if df is not None:
     def reset_all():
         st.session_state.q = ""
         st.session_state.comp_mode = False
+        st.session_state.side_q = ""
+        st.session_state.vault_q = ""
+        if "date_range" in st.session_state:
+            st.session_state.date_range = (min_date, max_date)
+        if "theme_select" in st.session_state:
+            st.session_state.theme_select = "All Actions"
+        if "theme_multi" in st.session_state:
+            st.session_state.theme_multi = SORTED_SHORT_NAMES
     st.sidebar.button("Sweep All Filters", on_click=reset_all, use_container_width=True)
 
 # 5. HEADER SECTION
