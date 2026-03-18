@@ -196,9 +196,6 @@ st.markdown("""
         <p style="font-weight: bold; font-size: 1.15rem; margin: 8px 0 0 0; opacity: 0.95;">
             An interactive diagnostic tool for curious, conscious, and caring humans—because facts sure trump opinions.
         </p>
-        <div class="russell-quote">
-            “The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.”<span class="quote-author">— Bertrand Russell</span>
-        </div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -216,6 +213,15 @@ if df is not None:
     data_end = df['Date'].max().strftime('%b %d, %Y')
     data_range_str = f"{data_start} – {data_end}"
 
+    # Source placed high, under subheader
+    st.markdown(f"""
+        <div class="source-line">
+            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a> | 
+            <b>Data range:</b> {data_range_str}
+        </div>
+    """, unsafe_allow_html=True)
+
     # Compact always-visible copy; move HOW/WHY depth into an expander with breathing room
     with st.expander("How and why to use this tool", expanded=False):
         col1, col2 = st.columns(2)
@@ -226,11 +232,10 @@ if df is not None:
             st.markdown('<p class="intro-header">How to use this tool?</p>', unsafe_allow_html=True)
             st.markdown('<p class="intro-text">This dashboard is interactive; all metrics sync to your inputs. Use the <b>Sidebar</b> to search terms like "<b>Musk</b>" or "<b>Deportation</b>" and filter by <b>Pillar</b> to investigate specific threats and quantify the institutional footprint in real-time.</p>', unsafe_allow_html=True)
 
-    st.markdown(f"""
-        <div class="source-line">
-            <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a> | 
-            <b>Data range:</b> {data_range_str}
+    # Quote as a visual delimiter between intro and data
+    st.markdown("""
+        <div class="russell-quote">
+            “The fundamental cause of the trouble is that in the modern world the stupid are cocksure while the intelligent are full of doubt.”<span class="quote-author">— Bertrand Russell</span>
         </div>
     """, unsafe_allow_html=True)
 
