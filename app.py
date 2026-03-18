@@ -107,14 +107,31 @@ def sync_v(): st.session_state.q = st.session_state.vault_q
 def get_data():
     import os
     files = [f for f in os.listdir('.') if f.endswith('.csv')]
-    if not files: return None
+    if not files:
+        return None
     df = pd.read_csv(files[0], skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
-    df['Themes_List'] = df.apply(lambda r: ", ".join([CATEGORY_MAP[c] for c in CATEGORY_MAP if str(r[c]).strip().lower() == 'yes']), axis=1)
-    df['Cat_Count'] = df[list(CATEGORY_MAP.keys())].apply(lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1)
+    df['Themes_List'] = df.apply(
+        lambda r: ", ".join(
+            [CATEGORY_MAP[c] for c in CATEGORY_MAP if str(r[c]).strip().lower() == 'yes']
+        ),
+        axis=1,
+    )
+    df['Cat_Count'] = df[list(CATEGORY_MAP.keys())].apply(
+        lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1
+    )
     return df.sort_values('Date')
 
-df = get_data()
+with st.spinner("Retrieving data..."):
+    df = get_data()
+
+if df is None:
+    st.error("⚠️ CRITICAL: Data engine failed to locate the CSV file.")
+    st.info(
+        "Ensure your data file (e.g., 'trump-actions-3-1-26.csv') "
+        "is in the main folder of your GitHub repository."
+    )
+    st.stop()
 
 # 4. HARMONIZED SIDEBAR
 st.sidebar.title("🎛️ Data Controls")
