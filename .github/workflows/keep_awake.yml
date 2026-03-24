@@ -1,11 +1,30 @@
+# Plain curl/HTTP GET returns 200 from Streamlit's static HTML shell only; it does not run
+# the app or open the WebSocket, so the container can stay asleep. Use a real browser visit.
+# See: https://dev.to/yasumorishima/http-200-but-your-streamlit-app-is-still-sleeping-why-get-requests-dont-work-and-how-playwright-3g67
 name: Keep App Awake
 on:
   schedule:
-    - cron: '0 0 * * *'
+    # Every 6 hours UTC — Community Cloud can sleep after ~1–2 days without real sessions
+    - cron: "0 */6 * * *"
   workflow_dispatch:
+
 jobs:
-  ping:
+  wake:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - name: Ping
-        run: curl -s https://trump-actions-tracker.streamlit.app/ > /dev/null
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install chromium --with-deps
+
+      - name: Wake Streamlit app
+        env:
+          STREAMLIT_APP_URL: https://trump-actions-tracker.streamlit.app
+        run: python scripts/keep_streamlit_awake.py
