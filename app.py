@@ -89,21 +89,21 @@ back_to_top = '<div class="back-to-top"><a href="#top">⌃ back to top</a></div>
 
 # 2. THEMES & DATA MAPPING
 THEME_GLOSSARY = [
-    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "Definition": "Dismantling Social Protections & Rights: Systematic removal of protections for marginalized groups like LGBTQ+ communities and minorities."},
-    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors."},
-    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "Definition": "Violating Democratic Norms: Fracturing checks and balances and dismissal of constitutional constraints."},
-    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "Definition": "Attacking Autonomy: Restricting curricula and targeting cultural institutions."},
-    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "Definition": "Hollowing the State: Dismantling federal expertise and politicizing the civil service."},
-    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "Definition": "Global Destabilisation: An aggressive pivot threatening traditional alliances."},
-    {"Theme": "Immigration", "Mapping": "Anti-immigrant or Militarised Nationalism", "Definition": "Militarised Nationalism: Demonization of immigrants combined with expanded domestic surveillance."},
-    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "Definition": "Information Control: Manufacturing state narratives and restricting scientific data access."},
-    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "Definition": "Ideological Control of Science: Suppression of climate research and defunding of public health."},
-    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "Definition": "Weaponising the State: Using executive power to target political rivals and critics."}
+    {"Theme": "Civil Rights", "Mapping": "Weakening Civil Rights", "CSVColumn": "Dismantling social protections and civil rights", "Definition": "Dismantling Social Protections & Rights: Systematic removal of protections for marginalized groups like LGBTQ+ communities and minorities."},
+    {"Theme": "Corruption", "Mapping": "Corruption & Enrichment", "CSVColumn": "Corruption and enrichment", "Definition": "Corruption & Enrichment: Actions that appear to directly enrich the president, his circle, or trade political favors."},
+    {"Theme": "Democratic Norms", "Mapping": "Violating Democratic Norms, Undermining Rule of Law", "CSVColumn": "Violating democrating norms or undermining rule of law", "Definition": "Violating Democratic Norms: Fracturing checks and balances and dismissal of constitutional constraints."},
+    {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "CSVColumn": "Attacking universities, schools, museums and culture", "Definition": "Attacking Autonomy: Restricting curricula and targeting cultural institutions."},
+    {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "CSVColumn": "Hollowing state or weakening federal institutions", "Definition": "Hollowing the State: Dismantling federal expertise and politicizing the civil service."},
+    {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "CSVColumn": "Aggressive foreign policy and global destabilisation", "Definition": "Global Destabilisation: An aggressive pivot threatening traditional alliances."},
+    {"Theme": "Immigration", "Mapping": "Anti-immigrant or Militarised Nationalism", "CSVColumn": "Anti-immigration or miliatised nationalism", "Definition": "Militarised Nationalism: Demonization of immigrants combined with expanded domestic surveillance."},
+    {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "CSVColumn": "Controlling information, including spreading misinformation and propoganda", "Definition": "Information Control: Manufacturing state narratives and restricting scientific data access."},
+    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "CSVColumn": "Control of science and health to align with state ideology", "Definition": "Ideological Control of Science: Suppression of climate research and defunding of public health."},
+    {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "CSVColumn": "Suppressing dissent or weaponising state against 'enemies'", "Definition": "Weaponising the State: Using executive power to target political rivals and critics."}
 ]
 
 GLOSSARY_DF = pd.DataFrame(THEME_GLOSSARY).sort_values("Theme")
-CATEGORY_MAP = dict(zip(GLOSSARY_DF['Mapping'], GLOSSARY_DF['Theme']))
-SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
+CATEGORY_MAP = dict(zip(GLOSSARY_DF['CSVColumn'], GLOSSARY_DF['Theme']))
+SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['CSVColumn']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
 # 3. DATA ENGINE
@@ -120,14 +120,17 @@ def get_data():
         return None
     df = pd.read_csv(DATA_CSV, skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
+    theme_cols = [c for c in CATEGORY_MAP if c in df.columns]
     df['Themes_List'] = df.apply(
         lambda r: ", ".join(
-            [CATEGORY_MAP[c] for c in CATEGORY_MAP if str(r[c]).strip().lower() == 'yes']
+            [CATEGORY_MAP[c] for c in theme_cols if str(r[c]).strip().lower() == 'yes']
         ),
         axis=1,
     )
-    df['Cat_Count'] = df[list(CATEGORY_MAP.keys())].apply(
-        lambda x: (x.str.strip().str.lower() == 'yes').sum(), axis=1
+    df['Cat_Count'] = (
+        df[theme_cols].apply(lambda x: (x.astype(str).str.strip().str.lower() == 'yes').sum(), axis=1)
+        if theme_cols
+        else 0
     )
     return df.sort_values('Date')
 
