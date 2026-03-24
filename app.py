@@ -107,6 +107,8 @@ SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['Mapping']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
 # 3. DATA ENGINE
+DATA_CSV = "trump-actions-3-24-26.csv"
+
 if "q" not in st.session_state: st.session_state.q = ""
 def sync_s(): st.session_state.q = st.session_state.side_q
 def sync_v(): st.session_state.q = st.session_state.vault_q
@@ -114,10 +116,9 @@ def sync_v(): st.session_state.q = st.session_state.vault_q
 @st.cache_data
 def get_data():
     import os
-    files = [f for f in os.listdir('.') if f.endswith('.csv')]
-    if not files:
+    if not os.path.isfile(DATA_CSV):
         return None
-    df = pd.read_csv(files[0], skiprows=2)
+    df = pd.read_csv(DATA_CSV, skiprows=2)
     df['Date'] = pd.to_datetime(df['Date'])
     df['Themes_List'] = df.apply(
         lambda r: ", ".join(
@@ -136,7 +137,7 @@ with st.spinner("Retrieving data..."):
 if df is None:
     st.error("⚠️ CRITICAL: Data engine failed to locate the CSV file.")
     st.info(
-        "Ensure your data file (e.g., 'trump-actions-3-1-26.csv') "
+        f"Ensure your data file '{DATA_CSV}' "
         "is in the main folder of your GitHub repository."
     )
     st.stop()
