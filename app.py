@@ -95,9 +95,9 @@ THEME_GLOSSARY = [
     {"Theme": "Education & Culture", "Mapping": "Attacking Universities, Schools, Museums, Culture", "CSVColumn": "Attacking universities, schools, museums and culture", "Definition": "Attacking Autonomy: Restricting curricula and targeting cultural institutions."},
     {"Theme": "Federal Institutions", "Mapping": "Hollowing State / Weakening Federal Institutions", "CSVColumn": "Hollowing state or weakening federal institutions", "Definition": "Hollowing the State: Dismantling federal expertise and politicizing the civil service."},
     {"Theme": "Foreign Policy", "Mapping": "Aggressive Foreign Policy & Global Destabilisation", "CSVColumn": "Aggressive foreign policy and global destabilisation", "Definition": "Global Destabilisation: An aggressive pivot threatening traditional alliances."},
-    {"Theme": "Immigration", "Mapping": "Anti-immigrant or Militarised Nationalism", "CSVColumn": "Anti-immigration or miliatised nationalism", "Definition": "Militarised Nationalism: Demonization of immigrants combined with expanded domestic surveillance."},
+    {"Theme": "Immigration", "Mapping": "Anti-immigrant or Militarised Nationalism", "CSVColumn": "Anti-immigration or militarised nationalism", "Definition": "Militarised Nationalism: Demonization of immigrants combined with expanded domestic surveillance."},
     {"Theme": "Info Control", "Mapping": "Controlling Information Including Spreading Misinformation and Propaganda", "CSVColumn": "Controlling information, including spreading misinformation and propoganda", "Definition": "Information Control: Manufacturing state narratives and restricting scientific data access."},
-    {"Theme": "Science & Health", "Mapping": "Control of Science & Health to Align with State Ideology", "CSVColumn": "Control of science and health to align with state ideology", "Definition": "Ideological Control of Science: Suppression of climate research and defunding of public health."},
+    {"Theme": "Science & Health", "Mapping": "Politicisation of Science & Health", "CSVColumn": "Politicisation of science and health", "Definition": "Ideological Control of Science: Suppression of climate research and defunding of public health."},
     {"Theme": "Suppressing Dissent", "Mapping": "Suppressing Dissent / Weaponising State Against 'Enemies'", "CSVColumn": "Suppressing dissent or weaponising state against 'enemies'", "Definition": "Weaponising the State: Using executive power to target political rivals and critics."}
 ]
 
@@ -107,7 +107,7 @@ SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['CSVColumn']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
 # 3. DATA ENGINE
-DATA_CSV = "trump-actions-3-24-26.csv"
+DATA_CSV = "trump-actions-5-16-26.csv"
 
 if "q" not in st.session_state: st.session_state.q = ""
 def sync_s(): st.session_state.q = st.session_state.side_q
@@ -462,4 +462,4 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 11. FOOTER
 st.divider()
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 03-03-2026. CC BY 4.0. Data: " + data_range_str + ".")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 05-16-2026. CC BY 4.0. Data: " + data_range_str + ".")
