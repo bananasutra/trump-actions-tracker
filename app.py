@@ -108,17 +108,30 @@ SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
 # 3. DATA ENGINE
 DATA_CSV = "trump-actions-5-16-26.csv"
+DATA_REVISION = "2026-05-16"  # bump when CSV path or theme headers change (cache bust)
+# Pagel renamed two headers in the May 2026 export; keep aliases for older snapshots.
+CSV_COLUMN_ALIASES = {
+    "Control of science and health to align with state ideology": "Politicisation of science and health",
+    "Anti-immigration or miliatised nationalism": "Anti-immigration or militarised nationalism",
+}
 
 if "q" not in st.session_state: st.session_state.q = ""
 def sync_s(): st.session_state.q = st.session_state.side_q
 def sync_v(): st.session_state.q = st.session_state.vault_q
 
+def theme_yes_counts(frame, theme_columns):
+    return [
+        (CATEGORY_MAP[col], (frame[col].astype(str).str.strip().str.lower() == "yes").sum())
+        for col in theme_columns
+    ]
+
 @st.cache_data
-def get_data():
+def get_data(data_revision):
     import os
     if not os.path.isfile(DATA_CSV):
         return None
     df = pd.read_csv(DATA_CSV, skiprows=2)
+    df = df.rename(columns=CSV_COLUMN_ALIASES)
     df['Date'] = pd.to_datetime(df['Date'])
     theme_cols = [c for c in CATEGORY_MAP if c in df.columns]
     df['Themes_List'] = df.apply(
@@ -135,7 +148,9 @@ def get_data():
     return df.sort_values('Date')
 
 with st.spinner("Retrieving data..."):
-    df = get_data()
+    df = get_data(DATA_REVISION)
+
+THEME_COLUMNS = [c for c in GLOSSARY_DF["CSVColumn"] if c in df.columns] if df is not None else []
 
 if df is None:
     st.error("⚠️ CRITICAL: Data engine failed to locate the CSV file.")
@@ -143,6 +158,10 @@ if df is None:
         f"Ensure your data file '{DATA_CSV}' "
         "is in the main folder of your GitHub repository."
     )
+    st.stop()
+
+if not THEME_COLUMNS:
+    st.error("⚠️ CRITICAL: No theme columns matched the CSV headers. Check THEME_GLOSSARY vs export.")
     st.stop()
 
 # 4. HARMONIZED SIDEBAR
@@ -248,10 +267,7 @@ if df is not None:
     # Dynamic narrative (Tier 2): updates with filters
     range_start = selected_range[0].strftime('%b %d, %Y')
     range_end = selected_range[1].strftime('%b %d, %Y')
-    top_themes = sorted(
-        [(short, (f_df[long].str.strip().str.lower() == 'yes').sum()) for long, short in CATEGORY_MAP.items()],
-        key=lambda x: -x[1]
-    )[:2]
+    top_themes = sorted(theme_yes_counts(f_df, THEME_COLUMNS), key=lambda x: -x[1])[:2]
     top_line = ", ".join(f"{name} ({count})" for name, count in top_themes if count > 0) or "—"
     st.markdown(
         f'<p class="intro-text"><b>In this view:</b> From {range_start} to {range_end}, you\'re viewing '
@@ -311,7 +327,7 @@ st.markdown('<p class="intro-text"><b>Visualizing momentum:</b> This graph track
 
 if not f_df.empty:
     if comp_mode:
-        long_names = [SHORT_TO_LONG[s] for s in selected_themes]
+        long_names = [SHORT_TO_LONG[s] for s in selected_themes if SHORT_TO_LONG[s] in f_df.columns]
         comp_plot_df = f_df.melt(id_vars=['Date', 'Title', 'URL', 'Themes_List'], value_vars=long_names, var_name='Mapping', value_name='Active')
         comp_plot_df = comp_plot_df[comp_plot_df['Active'].str.strip().str.lower() == 'yes']
         comp_plot_df['Theme'] = comp_plot_df['Mapping'].map(CATEGORY_MAP)
@@ -350,7 +366,7 @@ else:
 st.markdown(volume_intro_dynamic, unsafe_allow_html=True)
 
 if not f_df.empty:
-    cat_counts = [{'Theme': short, 'Count': (f_df[long].str.strip().str.lower() == 'yes').sum()} for long, short in CATEGORY_MAP.items()]
+    cat_counts = [{'Theme': short, 'Count': count} for short, count in theme_yes_counts(f_df, THEME_COLUMNS)]
     theme_bar = alt.Chart(pd.DataFrame(cat_counts)).mark_bar(color='#DE0100').encode(
         x=alt.X('Count:Q', title="Actions"), 
         y=alt.Y('Theme:N', sort='-x', title=None, axis=alt.Axis(labelLimit=300, labelPadding=10)), 
