@@ -107,8 +107,8 @@ SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['CSVColumn']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
 # 3. DATA ENGINE
-DATA_CSV = "trump-actions-5-16-26.csv"
-DATA_REVISION = "2026-05-16"  # bump when CSV path or theme headers change (cache bust)
+DATA_CSV = "trump-actions-6-26-26.csv"
+DATA_REVISION = "2026-06-26"  # bump when CSV path or theme headers change (cache bust)
 # Pagel renamed two headers in the May 2026 export; keep aliases for older snapshots.
 CSV_COLUMN_ALIASES = {
     "Control of science and health to align with state ideology": "Politicisation of science and health",
@@ -478,4 +478,4 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 11. FOOTER
 st.divider()
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 05-16-2026. CC BY 4.0. Data: " + data_range_str + ".")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 06-26-2026. CC BY 4.0. Data: " + data_range_str + ".")
