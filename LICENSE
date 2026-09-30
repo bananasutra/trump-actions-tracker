@@ -1,3 +1,30 @@
+SCOPE OF THIS LICENSE
+=====================
+
+The CC0 1.0 Universal dedication below applies ONLY to the dashboard
+software and documentation in this repository, authored by Celine Nadeau
+(bananasutra):
+
+    app.py
+    scripts/
+    requirements.txt
+    .github/
+    .devcontainer/
+    README.md
+
+It does NOT apply to the Trump Action Tracker dataset files in this
+repository (trump-actions*.csv). Those are data collected, described and
+classified by Professor Christina Pagel, published at
+trumpactiontracker.info, and licensed by her under Creative Commons
+BY-SA 4.0 (earlier exports: CC BY 4.0). They are included here as a
+dated archive under her stated permission for journalism, research,
+education and other public-interest analysis, with credit.
+
+No rights in Professor Pagel's dataset are waived, granted or
+relicensed by this file. See DATA-LICENSE.md for her terms verbatim.
+
+------------------------------------------------------------------------
+
 Creative Commons Legal Code
 
 CC0 1.0 Universal
