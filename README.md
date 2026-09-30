@@ -11,7 +11,7 @@ The **Trump Action Tracker** is a friendly data dashboard designed to monitor th
 * **Norm-Collapse Loops:** Identifying "multi-tagged" actions that simultaneously weaken multiple institutional checks and balances.
 
 ### 🛠️ Methodology & Data
-This dashboard utilizes verified data from the **Christina Pagel / Trump Action Tracker** Source: trumpactiontracker.info (CC BY 4.0). It provides a high-fidelity visualization of the **Rule of Law**, **Civil Rights**, and **Federal Oversight** hollowing through 2026.
+This dashboard utilizes verified data from the **Christina Pagel / Trump Action Tracker** Source: trumpactiontracker.info (CC BY-SA 4.0). It provides a high-fidelity visualization of the **Rule of Law**, **Civil Rights**, and **Federal Oversight** hollowing through 2026.
 
 ---
 

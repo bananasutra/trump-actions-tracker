@@ -1,10 +1,6 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import re
-from collections import Counter
-from datetime import datetime
-from streamlit_echarts import st_echarts
 
 # 1. PAGE CONFIG & SEO HARD-LOCK
 st.set_page_config(
@@ -107,8 +103,8 @@ SHORT_TO_LONG = dict(zip(GLOSSARY_DF['Theme'], GLOSSARY_DF['CSVColumn']))
 SORTED_SHORT_NAMES = GLOSSARY_DF['Theme'].tolist()
 
 # 3. DATA ENGINE
-DATA_CSV = "trump-actions-6-26-26.csv"
-DATA_REVISION = "2026-06-26"  # bump when CSV path or theme headers change (cache bust)
+DATA_CSV = "trump-actions-9-24-26.csv"
+DATA_REVISION = "2026-09-24"  # bump when CSV path or theme headers change (cache bust)
 # Pagel renamed two headers in the May 2026 export; keep aliases for older snapshots.
 CSV_COLUMN_ALIASES = {
     "Control of science and health to align with state ideology": "Politicisation of science and health",
@@ -228,7 +224,8 @@ if df is not None:
     if not comp_mode and selected_pillar != "All Actions":
         f_df = f_df[f_df[SHORT_TO_LONG[selected_pillar]].str.strip().str.lower() == 'yes']
 
-    pace = (len(f_df) / 400) * 30.44
+    span_days = max((selected_range[1] - selected_range[0]).days, 1)
+    pace = (len(f_df) / span_days) * 30.44
     overlap = (len(f_df[f_df['Cat_Count'] > 1]) / len(f_df) * 100) if len(f_df) > 0 else 0
 
     # Full dataset range for clarity (Tier 1)
@@ -240,7 +237,7 @@ if df is not None:
     st.markdown(f"""
         <div class="source-line">
             <b>Source:</b> <a href="https://www.trumpactiontracker.info/" target="_blank" style="color:inherit; text-decoration: underline;">Trump Action Tracker</a> by Professor Christina Pagel | 
-            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY 4.0</a> | 
+            <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" style="color:inherit; text-decoration: underline;">Creative Commons CC BY-SA 4.0</a> | 
             <b>Data range:</b> {data_range_str}
         </div>
     """, unsafe_allow_html=True)
@@ -478,4 +475,4 @@ st.markdown(back_to_top, unsafe_allow_html=True)
 
 # 11. FOOTER
 st.divider()
-st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 06-26-2026. CC BY 4.0. Data: " + data_range_str + ".")
+st.caption("Dashboard by Celine Nadeau aka bananasutra. Last updated 09-24-2026. CC BY-SA 4.0. Data: " + data_range_str + ".")
