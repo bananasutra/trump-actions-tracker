@@ -6,7 +6,12 @@ on:
   schedule:
     # Every 6 hours UTC — Community Cloud can sleep after ~1–2 days without real sessions
     - cron: "0 */6 * * *"
+    # Monthly, offset off the hour. Only this run makes the keepalive commit below.
+    - cron: "23 5 1 * *"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   wake:
@@ -28,3 +33,17 @@ jobs:
         env:
           STREAMLIT_APP_URL: https://trump-actions-tracker.streamlit.app
         run: python scripts/keep_streamlit_awake.py
+
+      # GitHub disables scheduled workflows after 60 days with no repository
+      # activity, and a push does NOT re-enable one that is already disabled.
+      # Workflow runs do not count as activity, so this commits once a month to
+      # keep the clock from ever reaching 60.
+      - name: Keepalive commit (monthly only)
+        if: github.event.schedule == '23 5 1 * *'
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > .github/last-keepalive
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/last-keepalive
+          git diff --staged --quiet || git commit -m "chore: keepalive to prevent workflow auto-disable [skip ci]"
+          git push
